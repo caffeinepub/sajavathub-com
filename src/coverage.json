@@ -1,77 +1,41 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T09:37:00.499Z",
+  "generatedAt": "2026-02-13T10:42:47.040Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 3,
+    "total": 3,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Implement backend support for a Havenly-like product category catalog, including data types and query/mutation APIs to manage categories and their products.",
+        "id": "REQ-21",
+        "summary": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-12",
-        "summary": "Add React Query hooks to load the product categories and category products from the backend actor, following existing patterns in frontend/src/hooks/useQueries.ts.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-13",
-        "summary": "Create a public product category browsing experience similar in concept to Havenly: a categories landing page with category cards and a category detail page showing products for that category.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/products/ProductCategoriesPage.tsx",
-          "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/public/assets/generated/category-living-room.dim_800x800.png",
-          "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
-          "frontend/public/assets/generated/category-dining.dim_800x800.png",
-          "frontend/public/assets/generated/category-office.dim_800x800.png",
-          "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
-          "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/products/ProductCategoriesPage.tsx",
-          "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/public/assets/generated/category-living-room.dim_800x800.png",
-          "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
-          "frontend/public/assets/generated/category-dining.dim_800x800.png",
-          "frontend/public/assets/generated/category-office.dim_800x800.png",
-          "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
-          "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png"
-        ]
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Add navigation entry points to the new product category pages in the site header (desktop + mobile) so users can discover the product categories from anywhere on the marketing site.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/navigation/SiteHeader.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/navigation/SiteHeader.tsx"
-        ]
-      },
-      {
-        "id": "REQ-15",
-        "summary": "Add initial seed data for product categories and products so the new UI is populated in development without requiring manual admin actions.",
+        "id": "REQ-22",
+        "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
+      },
+      {
+        "id": "REQ-23",
+        "summary": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/products/SafeExternalImage.tsx",
+          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/products/SafeExternalImage.tsx",
+          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        ]
       }
     ]
   },
@@ -79,25 +43,11 @@
     "backend/main.mo",
     "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
-    "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
-    "frontend/public/assets/generated/category-dining.dim_800x800.png",
-    "frontend/public/assets/generated/category-living-room.dim_800x800.png",
-    "frontend/public/assets/generated/category-office.dim_800x800.png",
-    "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/navigation/SiteHeader.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/components/products/SafeExternalImage.tsx",
     "frontend/src/pages/products/ProductCategoriesPage.tsx",
-    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

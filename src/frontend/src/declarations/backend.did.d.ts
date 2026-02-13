@@ -47,6 +47,7 @@ export interface PortfolioItem {
 export interface Product {
   'id' : string,
   'stylePreference' : StylePreference,
+  'inventory' : bigint,
   'name' : string,
   'description' : string,
   'imageUrl' : string,
@@ -107,7 +108,6 @@ export interface _SERVICE {
   'addDesigner' : ActorMethod<[Designer], undefined>,
   'addNote' : ActorMethod<[ProjectNote], undefined>,
   'addPackage' : ActorMethod<[Package], undefined>,
-  'addProductCategory' : ActorMethod<[ProductCategory], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createProjectBrief' : ActorMethod<[ProjectBrief], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -124,7 +124,6 @@ export interface _SERVICE {
   'getProjectBrief' : ActorMethod<[string], [] | [ProjectBrief]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserProjectBriefs' : ActorMethod<[Principal], Array<ProjectBrief>>,
-  'initializeProductCategories' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'requestConsultation' : ActorMethod<[ConsultationRequest], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,

@@ -1,11 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 11,
   "summary": "Plan and build an Indian website named sajavathub.com, similar in concept and functionality to https://havenly.com/.",
-  "architectural_notes": [],
-  "known_issues": [],
+  "architectural_notes": [
+    "Plan to populate categories/products primarily via expanded backend seed data, including external image URLs from free sources (e.g., Unsplash/Freepik), so the UI is populated without admin actions.",
+    "Ensure product categories are visible end-to-end: backend must expose categories/products via APIs + seed data, and frontend must include routing/navigation and queries to render categories."
+  ],
+  "known_issues": [
+    "Using external image URLs from the internet may introduce licensing/attribution and hotlink reliability risks; consider hosting/caching later.",
+    "Product categories are not visible in the UI; likely a frontend routing/navigation/query integration issue and/or backend API/seed data not being loaded correctly."
+  ],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Square category thumbnail illustration/photo: Indian living room furnishings (category-living-room.dim_800x800.png)\n- Square category thumbnail illustration/photo: Indian bedroom furnishings (category-bedroom.dim_800x800.png)\n- Square category thumbnail illustration/photo: Indian dining room furnishings (category-dining.dim_800x800.png)\n- Square category thumbnail illustration/photo: Indian home office furnishings (category-office.dim_800x800.png)\n- Square category thumbnail illustration/photo: Indian decor & lighting styling elements (category-decor-lighting.dim_800x800.png)\n- Square category thumbnail illustration/photo: Indian rugs & textiles styling elements (category-rugs-textiles.dim_800x800.png)",
   "existing_features": [
     {
       "id": "feature-create-the-core-site-structure-and-routing-for-an-indian-interior-design-service-website-named-sajavathub-com-with-a-public-marketing-area-and-an-authenticated-client-area",
@@ -102,6 +107,30 @@
         "REQ-14"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-populate-all-newly-added-expanded-seeded-products-with-free-to-use-sample-image-urls-from-the-public-internet-and-ensure-the-frontend-continues-to-render-reliably-if-any-external-image-fails-to-load",
+      "title": "Populate all newly added/expanded seeded products with free-to-use sample image URLs from the public internet and ensure the frontend continues to render reliably if any external image fails to load.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-frontend-product-categories-browsing-experience-so-categories-are-visible-on-the-products-page-and-category-detail-pages-load-products-reliably-for-both-anonymous-and-authenticated-users",
+      "title": "Fix the frontend product categories browsing experience so categories are visible on the \"/products\" page and category detail pages load products reliably for both anonymous and authenticated users.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-newly-added-seeded-products-across-all-categories-use-free-sample-image-urls-from-the-public-internet-and-keep-the-ui-resilient-to-image-hotlink-failures-i-e-the-product-grids-should-still-render-even-if-some-external-images-fail",
+      "title": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -138,6 +167,52 @@
       "summary": "Add initial seed data for product categories and products so the new UI is populated in development without requiring manual admin actions.",
       "reqIds": [
         "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Expand product catalog: add comprehensive room-wise furniture products and add new Furnishing and Decor categories; use free sample image URLs for products (e.g., Unsplash/Freepik) via expanded backend seed data.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Expand the backend product category seed data so the product catalog includes comprehensive room-wise furniture categories and product lists for at least: Living Room, Bedroom, Dining Room, Home Office, and Kids Room.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" with comprehensive product lists (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases).",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Ensure the product category catalog is automatically available from the backend without requiring any manual/admin initialization, so the public \"/products\" page can always display categories.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
+      "reqIds": [
+        "REQ-22"
       ],
       "status": "pending"
     }

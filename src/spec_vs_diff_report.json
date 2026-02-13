@@ -1,98 +1,51 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T09:37:00.496Z",
-  "summary": "The diff adds new frontend routes/pages for product category browsing and a new \"Shop\" header link, plus introduces new backend Product/ProductCategory types and a productCategories store. However, key backend catalog API requirements (types/fields, query/mutation endpoints, admin gating, and seed data) are not evidenced, and some implemented structures diverge from the requested catalog model. The addition of backend/migration.mo also appears to violate the single-actor/single-file backend constraint.",
+  "generatedAt": "2026-02-13T10:42:47.037Z",
+  "summary": "Diff adds a backend migration module and integrates it into backend/main.mo, adds/updates SafeExternalImage to handle external image failures, and updates the product categories page UI logic (including category image selection). However, the diff evidence is insufficient to confirm that all required seeded categories/products (including Furnishing and Decor) are actually created and available on a fresh deploy, because the seeding/migration content is truncated and only shows partial Living Room product data.",
   "missing_requirements": [
     {
-      "id": "REQ-11",
-      "requirement": "Backend ProductCategory and Product types must match required fields (ProductCategory: id, name, description, imageUrl, sortOrder; Product: id, categoryId, name, brand, imageUrl, productUrl, optional priceINR, optional tags).",
-      "reason": "backend/main.mo defines Product and ProductCategory, but ProductCategory lacks imageUrl and sortOrder and instead contains an embedded products array; Product lacks categoryId, brand, productUrl, optional priceINR/tags (and includes different fields like roomType/stylePreference/description/priceINR as required).",
+      "id": "REQ-21",
+      "requirement": "Seed comprehensive room-wise furniture categories (Living Room, Bedroom, Dining Room, Home Office, Kids Room) with multiple products each, automatically available on fresh deploy; seeded products must have non-empty id/name/description/imageUrl and valid roomType/stylePreference; getProductsByCategory must return non-empty for each seeded category.",
+      "reason": "The migration/seeding shown is truncated and only provides explicit evidence of some Living Room products. There is no visible evidence in the provided diff summary that Bedroom, Dining Room, Home Office, and Kids Room categories are seeded with multiple products each, nor that fresh-deploy initialization guarantees non-empty getProductCategories without manual actions.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "requirement": "Backend exposes query endpoints to list all product categories and list products by category (optionally fetch product by id).",
-      "reason": "Diff shows new types and a productCategories Map, but does not show any new public query functions like getProductCategories or getProductsByCategory.",
-      "evidence": [
+        "backend/migration.mo (truncated)",
         "backend/main.mo (truncated)"
       ]
     },
     {
-      "id": "REQ-11",
-      "requirement": "Backend exposes admin-gated mutation endpoints to create/update categories and products following existing admin authorization pattern.",
-      "reason": "Diff shows admin gating for addPackage, but no new admin-gated mutations for categories/products are shown.",
+      "id": "REQ-22",
+      "requirement": "Add backend categories named exactly \"Furnishing\" and \"Decor\" and seed each with multiple products using external (http/https) free sample image URLs; data shape must match existing frontend Product/ProductCategory types with no frontend changes required.",
+      "reason": "No explicit evidence in the provided truncated migration code shows categories with name exactly \"Furnishing\" and \"Decor\" or their seeded product lists. The diff summary does not show getProductCategories output or category creation for these names.",
       "evidence": [
-        "backend/main.mo (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "requirement": "Add React Query hooks useGetProductCategories and useGetProductsByCategory with stable queryKeys ['productCategories'] and ['productsByCategory', categoryId], disabled until actor is ready.",
-      "reason": "The diff snippet of frontend/src/hooks/useQueries.ts shows imports of ProductCategory/Product but does not show the actual hooks or queryKey/enabled configuration for product categories/products (file is truncated).",
-      "evidence": [
-        "frontend/src/hooks/useQueries.ts (truncated)",
-        "frontend/src/pages/products/ProductCategoriesPage.tsx",
-        "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "requirement": "Categories landing page lists categories sorted by sortOrder and displays category image, name, short description.",
-      "reason": "ProductCategoriesPage sorts categories by a computed value from category.id (split('-').length) rather than a sortOrder field, and selects images via string-matching on category.description instead of using category.imageUrl.",
-      "evidence": [
-        "frontend/src/pages/products/ProductCategoriesPage.tsx"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "requirement": "Category detail page product cards show image, name, brand (if present), and priceINR formatted as INR or hidden when absent; includes an external link CTA opening in new tab with safe rel attributes.",
-      "reason": "ProductCategoryDetailPage is truncated at the product card rendering (\"src={product.i...\") so the presence of brand display, conditional price handling, and external link target/rel cannot be verified from the provided diff summary.",
-      "evidence": [
-        "frontend/src/pages/products/ProductCategoryDetailPage.tsx (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "requirement": "Backend includes initial seed data: at least 6 categories and at least 3 products per category returned by query APIs; uses static imageUrl paths to frontend public assets and valid productUrl placeholders.",
-      "reason": "No seed data is shown. backend/migration.mo initializes productCategories as an empty Map, and backend/main.mo shows an empty Map initialization for productCategories with no population evidenced.",
-      "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo (truncated)"
+        "backend/migration.mo (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added a separate backend module backend/migration.mo and wired migration into backend/main.mo, potentially introducing backend logic outside backend/main.mo.",
-      "reason": "Build constraints state the backend must remain a single Motoko actor with all logic in backend/main.mo (no additional backend services). The diff adds backend/migration.mo and imports/uses it in main.mo.",
+      "description": "Category tile image selection logic that maps category name/description to local generated asset images (e.g., /assets/generated/category-*.png) on the product categories page.",
+      "reason": "BuildRequest focuses on backend catalog expansion and resilience to external image failures for product images; it does not request adding local category thumbnail selection logic for the categories listing page.",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
+        "frontend/src/pages/products/ProductCategoriesPage.tsx (truncated)"
       ]
     },
     {
-      "description": "Product/ProductCategory schema diverges from requested catalog model (embedded products within category; product includes roomType/stylePreference/description and required priceINR rather than optional; missing productUrl/brand/categoryId/tags).",
-      "reason": "These fields/structures were not requested and conflict with the specified minimum fields and API shape for the catalog.",
+      "description": "Backend upgrade migration scaffolding via a dedicated migration module and `(with migration = Migration.run)` integration.",
+      "reason": "BuildRequest requests automatic availability of seeded catalog but does not explicitly require an upgrade migration system or a new migration module; this is additional infrastructure beyond the stated requirements.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
+        "backend/main.mo (truncated)",
+        "backend/migration.mo (truncated)"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
     "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/navigation/SiteHeader.tsx",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/components/products/SafeExternalImage.tsx",
     "frontend/src/pages/products/ProductCategoriesPage.tsx",
-    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
     "project_state.json"
   ]
 }

@@ -7,11 +7,12 @@ import Nat "mo:core/Nat";
 import Order "mo:core/Order";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
+import Migration "migration";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
+// Apply migration function on upgrade
 (with migration = Migration.run)
 actor {
   // ===== Types =====
@@ -107,6 +108,7 @@ actor {
     name : Text;
     description : Text;
     priceINR : Nat;
+    inventory : Nat;
     imageUrl : Text;
     roomType : RoomType;
     stylePreference : StylePreference;
@@ -152,7 +154,7 @@ actor {
   let consultations = Map.empty<Text, ConsultationRequest>();
   let notes = Map.empty<Text, List.List<ProjectNote>>();
   let userProfiles = Map.empty<Principal, UserProfile>();
-  let productCategories = Map.empty<Text, ProductCategory>(); // New product category store
+  var productCategories = Map.empty<Text, ProductCategory>(); // Var allows re-setting during migration
 
   // Authorization state
   let accessControlState = AccessControl.initState();
@@ -344,58 +346,6 @@ actor {
         Runtime.trap("Category not found");
       };
       case (?category) { category.products };
-    };
-  };
-
-  public shared ({ caller }) func addProductCategory(category : ProductCategory) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can add categories");
-    };
-    productCategories.add(category.id, category);
-  };
-
-  // Initial seed for product categories
-  public shared ({ caller }) func initializeProductCategories() : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can initialize categories");
-    };
-
-    let seedCategories = [
-      {
-        id = "living-room-furniture";
-        name = "Living Room Furniture";
-        description = "Sofas, Coffee Tables, TV Units, etc.";
-        products = [
-          {
-            id = "sofa-1";
-            name = "Modern 3-Seater Sofa";
-            description = "Comfortable modern sofa";
-            priceINR = 40000;
-            imageUrl = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
-            roomType = #livingRoom;
-            stylePreference = #modern;
-          },
-        ];
-      },
-      {
-        id = "bedroom-furniture";
-        name = "Bedroom Furniture";
-        description = "Beds, Wardrobes, Nightstands";
-        products = [
-          {
-            id = "bed-1";
-            name = "King Size Bed";
-            description = "Elegant king size bed";
-            priceINR = 55000;
-            imageUrl = "https://images.unsplash.com/photo-1519710164239-da123dc03ef4";
-            roomType = #bedroom;
-            stylePreference = #traditional;
-          },
-        ];
-      },
-    ];
-    for (category in seedCategories.values()) {
-      productCategories.add(category.id, category);
     };
   };
 };

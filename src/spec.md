@@ -1,14 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a Havenly-like “Shop” experience with backend-managed product categories and products, including admin-managed catalog APIs and public browsing pages.
+**Goal:** Expand the automatically seeded product catalog so /products includes comprehensive room-wise furniture categories plus new Furnishing and Decor categories, all populated with products using free external sample image URLs.
 
 **Planned changes:**
-- Backend: Add ProductCategory and Product data types plus query APIs to list categories and products by category (optionally fetch product by id).
-- Backend: Add admin-gated mutation APIs to create/update categories and products, following the existing admin authorization pattern.
-- Backend: Add seed data (at least 6 categories, at least 3 products per category) using static imageUrl paths to frontend public assets and valid placeholder productUrl links.
-- Frontend: Add React Query hooks to fetch all categories and products by category, using stable query keys and waiting until the backend actor is ready.
-- Frontend: Add public routes for category browsing (e.g., /products) and category detail (e.g., /products/$categoryId) with loading/empty/error states and product cards linking out safely.
-- Frontend: Add a new header navigation link (desktop + mobile) to the categories landing page with consistent styling and active state behavior.
+- Expand backend-seeded room-wise categories (Living Room, Bedroom, Dining Room, Home Office, Kids Room) so each includes multiple furniture products and is available on fresh deploy without manual/admin setup.
+- Add new seeded product categories named exactly “Furnishing” and “Decor”, each with multiple products (e.g., curtains/rugs/cushions/bedding; wall art/lamps/mirrors/vases) using external (http/https) free sample image URLs.
+- Ensure the UI remains resilient when external product images fail to load by continuing to render grids with the existing SafeExternalImage fallback behavior.
 
-**User-visible outcome:** Users can navigate to a new “Shop/Products” section from the site header, browse a list of product categories, open a category to see a grid of products, and click through to external product pages.
+**User-visible outcome:** Visiting /products shows more categories (including Furnishing and Decor), and each category page displays a non-empty product grid sourced from automatically seeded backend data, even if some external images fail to load.

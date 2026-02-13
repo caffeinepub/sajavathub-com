@@ -1,131 +1,78 @@
 {
   "kind": "build_request",
-  "title": "Add Havenly-like product category browsing (Shop) with backend-managed catalog",
+  "title": "Expand product catalog with room-wise furniture plus Furnishing and Decor categories (seeded with free sample images)",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "Implement backend support for a Havenly-like product category catalog, including data types and query/mutation APIs to manage categories and their products.",
+      "id": "REQ-21",
+      "text": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "add product category same as https://havenly.com/"
+          "add all types of furniture products under different room category. also add furnishing and decor category. take free sample images from internet"
         ]
       },
       "acceptanceCriteria": [
-        "Backend defines a ProductCategory type (at minimum: id, name, description, imageUrl, sortOrder) and a Product type (at minimum: id, categoryId, name, brand, imageUrl, productUrl, optional priceINR, optional tags).",
-        "Backend exposes query endpoints to list all product categories and to list products by category (and optionally fetch a single product by id).",
-        "Backend exposes admin-gated mutation endpoints to create/update categories and products (following the same admin authorization pattern used by addPackage/addDesigner).",
-        "All new endpoints compile and are callable from the generated frontend actor bindings."
+        "Calling getProductCategories returns a non-empty list of categories on a fresh deploy (no manual admin actions required).",
+        "At minimum, the catalog includes categories for Living Room, Bedroom, Dining Room, Home Office, and Kids Room, each containing multiple furniture products (not empty).",
+        "Each seeded product has non-empty: id, name, description, imageUrl, and a valid roomType + stylePreference value.",
+        "Calling getProductsByCategory(categoryId) for each seeded category returns a non-empty product list."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Add React Query hooks to load the product categories and category products from the backend actor, following existing patterns in frontend/src/hooks/useQueries.ts.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add product category same as https://havenly.com/"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Frontend provides hooks to fetch: (1) all product categories, (2) products for a given category id, using TanStack React Query.",
-        "Hooks are disabled until the actor is ready (consistent with existing useGetPackages/useGetDesigners patterns).",
-        "Queries use stable queryKeys (e.g., ['productCategories'] and ['productsByCategory', categoryId])."
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "text": "Create a public product category browsing experience similar in concept to Havenly: a categories landing page with category cards and a category detail page showing products for that category.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add product category same as https://havenly.com/"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new public route exists for categories (e.g., /products) that lists all categories with image, name, and short description, sorted by sortOrder.",
-        "A new public route exists for category detail (e.g., /products/$categoryId) that shows the selected category title/description and a grid of products.",
-        "Each product card shows at minimum: image, name, brand (if present), and either priceINR (formatted as INR) or hides price cleanly when absent.",
-        "Each product card includes a clear external link CTA (e.g., “View product”) using the productUrl; external links open in a new tab and use safe rel attributes.",
-        "Loading, empty, and error states are handled gracefully on both pages."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Add navigation entry points to the new product category pages in the site header (desktop + mobile) so users can discover the product categories from anywhere on the marketing site.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add product category same as https://havenly.com/"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Site header navigation includes a new link (label in English) that routes to the categories landing page (e.g., “Shop” or “Products”).",
-        "The new navigation link is present in both desktop navigation and the mobile sheet menu.",
-        "Navigation styling remains consistent with existing header links and active state behavior."
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Add initial seed data for product categories and products so the new UI is populated in development without requiring manual admin actions.",
+      "id": "REQ-22",
+      "text": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "add product category same as https://havenly.com/"
+          "also add furnishing and decor category. take free sample images from internet"
         ]
       },
       "acceptanceCriteria": [
-        "Backend includes a small, sensible default set of categories (at least 6) and products (at least 3 per category) that can be returned by the query APIs.",
-        "Seed data uses static imageUrl paths that point to frontend public assets (e.g., /assets/generated/...) and uses realistic productUrl placeholders (valid URLs).",
-        "Seeding does not require authentication to view categories/products; only mutations remain admin-gated."
+        "getProductCategories includes categories with name exactly \"Furnishing\" and \"Decor\".",
+        "Both \"Furnishing\" and \"Decor\" categories have multiple seeded products (not empty).",
+        "All seeded products in these categories include external imageUrl values (http/https) that are intended to be free-to-use sample images.",
+        "The existing frontend product category detail page can render these categories/products without requiring any frontend code changes (i.e., data shape matches current Product and ProductCategory types)."
+      ]
+    },
+    {
+      "id": "REQ-23",
+      "text": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "take free sample images from internet"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Newly seeded products reference external image URLs from free image sources (e.g., Unsplash-style direct links).",
+        "If an external image fails to load, the UI falls back to the existing SafeExternalImage fallback image and does not break the product grid layout.",
+        "The /products page lists the expanded set of categories (including Furnishing and Decor) and each category page renders a product grid with the seeded items."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor with all logic in backend/main.mo (no additional backend services).",
-    "Do not edit files under frontend/src/components/ui or any path listed in frontend.immutablePaths.",
-    "User-facing text must be in English."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit any frontend files under frontend/src/components/ui (read-only UI component sources).",
+    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT (compose around them instead).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Implementing a shopping cart, checkout flow, or payments.",
-    "Implementing real-time inventory, vendor syncing, or third-party commerce integrations.",
-    "Implementing user reviews/ratings for products."
+    "Adding admin UI for managing categories/products.",
+    "Uploading/hosting/caching external images on-chain or in canister assets.",
+    "Implementing licensing/attribution workflows for third-party images."
   ],
   "imageRequirements": {
-    "required": [
-      "Square category thumbnail illustration/photo: Indian living room furnishings (category-living-room.dim_800x800.png)",
-      "Square category thumbnail illustration/photo: Indian bedroom furnishings (category-bedroom.dim_800x800.png)",
-      "Square category thumbnail illustration/photo: Indian dining room furnishings (category-dining.dim_800x800.png)",
-      "Square category thumbnail illustration/photo: Indian home office furnishings (category-office.dim_800x800.png)",
-      "Square category thumbnail illustration/photo: Indian decor & lighting styling elements (category-decor-lighting.dim_800x800.png)",
-      "Square category thumbnail illustration/photo: Indian rugs & textiles styling elements (category-rugs-textiles.dim_800x800.png)"
-    ],
+    "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

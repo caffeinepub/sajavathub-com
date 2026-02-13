@@ -17,7 +17,7 @@ export function useGetPackages() {
   return useQuery<Package[]>({
     queryKey: ['packages'],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getPackages();
     },
     enabled: !!actor && !isFetching,
@@ -30,7 +30,7 @@ export function useGetDesigners() {
   return useQuery<Designer[]>({
     queryKey: ['designers'],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getDesigners();
     },
     enabled: !!actor && !isFetching,
@@ -43,7 +43,7 @@ export function useGetUserProjectBriefs(userId: string) {
   return useQuery<ProjectBrief[]>({
     queryKey: ['userProjectBriefs', userId],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       const principal = { toText: () => userId } as any;
       return actor.getUserProjectBriefs(principal);
     },
@@ -57,7 +57,7 @@ export function useGetProjectBrief(projectId: string) {
   return useQuery<ProjectBrief | null>({
     queryKey: ['projectBrief', projectId],
     queryFn: async () => {
-      if (!actor) return null;
+      if (!actor) throw new Error('Actor not available');
       return actor.getProjectBrief(projectId);
     },
     enabled: !!actor && !isFetching && !!projectId,
@@ -100,7 +100,7 @@ export function useGetConsultationsForProject(projectId: string) {
   return useQuery<ConsultationRequest[]>({
     queryKey: ['consultations', projectId],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getConsultationsForProject(projectId);
     },
     enabled: !!actor && !isFetching && !!projectId,
@@ -113,7 +113,7 @@ export function useGetNotesForProject(projectId: string) {
   return useQuery<ProjectNote[]>({
     queryKey: ['projectNotes', projectId],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getNotesForProject(projectId);
     },
     enabled: !!actor && !isFetching && !!projectId,
@@ -156,7 +156,7 @@ export function useGetProductCategories() {
   return useQuery<ProductCategory[]>({
     queryKey: ['productCategories'],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getProductCategories();
     },
     enabled: !!actor && !isFetching,
@@ -169,7 +169,7 @@ export function useGetProductsByCategory(categoryId: string) {
   return useQuery<Product[]>({
     queryKey: ['productsByCategory', categoryId],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) throw new Error('Actor not available');
       return actor.getProductsByCategory(categoryId);
     },
     enabled: !!actor && !isFetching && !!categoryId,

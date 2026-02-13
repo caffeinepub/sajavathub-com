@@ -7,7 +7,7 @@
   "frontend/src/components/auth/ProfileSetupDialog.tsx": "Modal dialog that prompts new users to create their profile (name, email, phone) on first login, preventing modal flash by checking profile fetch state and using undefined for optional address field.",
   "frontend/src/hooks/useCurrentUserProfile.ts": "React Query hook for fetching the current user's profile with proper loading state management to prevent UI flashing.",
   "frontend/src/hooks/useUserRole.ts": "React Query hooks for fetching user role and admin status from the backend.",
-  "frontend/src/hooks/useQueries.ts": "Centralized React Query hooks for all backend operations including packages, designers, project briefs, consultations, notes, user profiles, product categories, and products by category with proper cache invalidation.",
+  "frontend/src/hooks/useQueries.ts": "Centralized React Query hooks for all backend operations with proper error handling that throws errors when actor is unavailable instead of returning empty arrays, ensuring loading states are correctly reflected in the UI.",
   "frontend/src/utils/format.ts": "Utility functions for formatting INR currency, dates, and timestamps in Indian locale format.",
   "frontend/src/state/onboardingStore.ts": "Zustand store for managing onboarding quiz state (room type, styles, budget, timeline, selected package) across multiple steps.",
   "frontend/src/pages/HomePage.tsx": "Marketing homepage with hero section featuring generated Indian living room image, value propositions, how-it-works overview, and CTAs for authenticated/unauthenticated users.",
@@ -24,6 +24,7 @@
   "frontend/src/pages/projects/ProjectWorkspacePage.tsx": "Individual project workspace showing brief details, budget, timeline, and chronological notes thread with add-note form for non-real-time communication.",
   "frontend/src/index.css": "Global styles with India-inspired OKLCH color system featuring warm sandstone backgrounds, terracotta primary accent, and charcoal text for both light and dark modes.",
   "frontend/tailwind.config.js": "Tailwind configuration extending theme with custom fonts (Inter, Lora), India-inspired color tokens, custom shadows, and design system tokens.",
-  "frontend/src/pages/products/ProductCategoriesPage.tsx": "Public product categories landing page displaying a grid of category cards with images, names, descriptions, and type-safe links to category detail pages using TanStack Router params with loading, empty, and error states.",
-  "frontend/src/pages/products/ProductCategoryDetailPage.tsx": "Public category detail page showing category title/description and a responsive grid of product cards with images, names, descriptions, prices (formatted as INR or hidden when absent), and external product links opening in new tabs."
+  "frontend/src/pages/products/ProductCategoriesPage.tsx": "Public product categories landing page with proper loading states and a helper function to map category names/descriptions to appropriate local generated images, supporting all room categories plus new Furnishing and Decor categories.",
+  "frontend/src/pages/products/ProductCategoryDetailPage.tsx": "Public category detail page that checks categoriesFetched state before showing \"Category Not Found\" error, ensuring proper loading sequence for both anonymous and authenticated users.",
+  "frontend/src/components/products/SafeExternalImage.tsx": "Reusable React component that renders external image URLs with automatic fallback to a local placeholder when images fail to load, now with useEffect to reset state when src prop changes to prevent stale fallback images during navigation."
 }

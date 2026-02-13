@@ -2,16 +2,16 @@ import { useParams, Link } from '@tanstack/react-router';
 import { useGetProductsByCategory, useGetProductCategories } from '../../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, ArrowLeft, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { formatINR } from '../../utils/format';
+import SafeExternalImage from '../../components/products/SafeExternalImage';
 
 export default function ProductCategoryDetailPage() {
   const { categoryId } = useParams({ strict: false }) as { categoryId: string };
   const { data: products, isLoading: productsLoading, error: productsError } = useGetProductsByCategory(categoryId);
-  const { data: categories, isLoading: categoriesLoading } = useGetProductCategories();
+  const { data: categories, isLoading: categoriesLoading, isFetched: categoriesFetched } = useGetProductCategories();
 
   const category = categories?.find((cat) => cat.id === categoryId);
 
@@ -56,7 +56,7 @@ export default function ProductCategoryDetailPage() {
     );
   }
 
-  if (!category) {
+  if (categoriesFetched && !category) {
     return (
       <div className="container mx-auto px-4 py-12">
         <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
@@ -82,8 +82,8 @@ export default function ProductCategoryDetailPage() {
       </Link>
 
       <div className="mb-12">
-        <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{category.name}</h1>
-        <p className="text-lg text-muted-foreground">{category.description}</p>
+        <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{category?.name || 'Loading...'}</h1>
+        <p className="text-lg text-muted-foreground">{category?.description || ''}</p>
       </div>
 
       {products && products.length === 0 ? (
@@ -95,14 +95,10 @@ export default function ProductCategoryDetailPage() {
           {products?.map((product) => (
             <Card key={product.id} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg">
               <div className="aspect-square overflow-hidden">
-                <img
+                <SafeExternalImage
                   src={product.imageUrl}
                   alt={product.name}
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/assets/generated/portfolio-1.dim_1200x800.png';
-                  }}
                 />
               </div>
               <CardHeader className="flex-1">

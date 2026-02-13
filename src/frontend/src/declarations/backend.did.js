@@ -45,29 +45,6 @@ export const Package = IDL.Record({
   'description' : IDL.Text,
   'priceINR' : IDL.Nat,
 });
-export const RoomType = IDL.Variant({
-  'bedroom' : IDL.Null,
-  'other' : IDL.Text,
-  'kidsRoom' : IDL.Null,
-  'office' : IDL.Null,
-  'livingRoom' : IDL.Null,
-  'diningRoom' : IDL.Null,
-});
-export const Product = IDL.Record({
-  'id' : IDL.Text,
-  'stylePreference' : StylePreference,
-  'name' : IDL.Text,
-  'description' : IDL.Text,
-  'imageUrl' : IDL.Text,
-  'priceINR' : IDL.Nat,
-  'roomType' : RoomType,
-});
-export const ProductCategory = IDL.Record({
-  'id' : IDL.Text,
-  'name' : IDL.Text,
-  'description' : IDL.Text,
-  'products' : IDL.Vec(Product),
-});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -77,6 +54,14 @@ export const BudgetRange = IDL.Record({
   'max' : IDL.Nat,
   'min' : IDL.Nat,
   'currency' : IDL.Text,
+});
+export const RoomType = IDL.Variant({
+  'bedroom' : IDL.Null,
+  'other' : IDL.Text,
+  'kidsRoom' : IDL.Null,
+  'office' : IDL.Null,
+  'livingRoom' : IDL.Null,
+  'diningRoom' : IDL.Null,
 });
 export const ProjectBrief = IDL.Record({
   'id' : IDL.Text,
@@ -106,13 +91,28 @@ export const ConsultationRequest = IDL.Record({
   'submissionDate' : Time,
   'requestedTime' : Time,
 });
+export const Product = IDL.Record({
+  'id' : IDL.Text,
+  'stylePreference' : StylePreference,
+  'inventory' : IDL.Nat,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'imageUrl' : IDL.Text,
+  'priceINR' : IDL.Nat,
+  'roomType' : RoomType,
+});
+export const ProductCategory = IDL.Record({
+  'id' : IDL.Text,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'products' : IDL.Vec(Product),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addDesigner' : IDL.Func([Designer], [], []),
   'addNote' : IDL.Func([ProjectNote], [], []),
   'addPackage' : IDL.Func([Package], [], []),
-  'addProductCategory' : IDL.Func([ProductCategory], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -142,7 +142,6 @@ export const idlService = IDL.Service({
       [IDL.Vec(ProjectBrief)],
       ['query'],
     ),
-  'initializeProductCategories' : IDL.Func([], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
@@ -188,29 +187,6 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'priceINR' : IDL.Nat,
   });
-  const RoomType = IDL.Variant({
-    'bedroom' : IDL.Null,
-    'other' : IDL.Text,
-    'kidsRoom' : IDL.Null,
-    'office' : IDL.Null,
-    'livingRoom' : IDL.Null,
-    'diningRoom' : IDL.Null,
-  });
-  const Product = IDL.Record({
-    'id' : IDL.Text,
-    'stylePreference' : StylePreference,
-    'name' : IDL.Text,
-    'description' : IDL.Text,
-    'imageUrl' : IDL.Text,
-    'priceINR' : IDL.Nat,
-    'roomType' : RoomType,
-  });
-  const ProductCategory = IDL.Record({
-    'id' : IDL.Text,
-    'name' : IDL.Text,
-    'description' : IDL.Text,
-    'products' : IDL.Vec(Product),
-  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -220,6 +196,14 @@ export const idlFactory = ({ IDL }) => {
     'max' : IDL.Nat,
     'min' : IDL.Nat,
     'currency' : IDL.Text,
+  });
+  const RoomType = IDL.Variant({
+    'bedroom' : IDL.Null,
+    'other' : IDL.Text,
+    'kidsRoom' : IDL.Null,
+    'office' : IDL.Null,
+    'livingRoom' : IDL.Null,
+    'diningRoom' : IDL.Null,
   });
   const ProjectBrief = IDL.Record({
     'id' : IDL.Text,
@@ -249,13 +233,28 @@ export const idlFactory = ({ IDL }) => {
     'submissionDate' : Time,
     'requestedTime' : Time,
   });
+  const Product = IDL.Record({
+    'id' : IDL.Text,
+    'stylePreference' : StylePreference,
+    'inventory' : IDL.Nat,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'imageUrl' : IDL.Text,
+    'priceINR' : IDL.Nat,
+    'roomType' : RoomType,
+  });
+  const ProductCategory = IDL.Record({
+    'id' : IDL.Text,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'products' : IDL.Vec(Product),
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addDesigner' : IDL.Func([Designer], [], []),
     'addNote' : IDL.Func([ProjectNote], [], []),
     'addPackage' : IDL.Func([Package], [], []),
-    'addProductCategory' : IDL.Func([ProductCategory], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -297,7 +296,6 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ProjectBrief)],
         ['query'],
       ),
-    'initializeProductCategories' : IDL.Func([], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),

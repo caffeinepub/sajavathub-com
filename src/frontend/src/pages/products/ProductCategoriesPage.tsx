@@ -7,7 +7,7 @@ import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function ProductCategoriesPage() {
-  const { data: categories, isLoading, error } = useGetProductCategories();
+  const { data: categories, isLoading, error, isFetched } = useGetProductCategories();
 
   if (isLoading) {
     return (
@@ -51,7 +51,7 @@ export default function ProductCategoriesPage() {
     return aOrder - bOrder;
   });
 
-  if (sortedCategories.length === 0) {
+  if (isFetched && sortedCategories.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="mb-12 text-center">
@@ -66,6 +66,33 @@ export default function ProductCategoriesPage() {
       </div>
     );
   }
+
+  // Helper function to get category image based on category name or description
+  const getCategoryImage = (category: { id: string; name: string; description: string }) => {
+    const name = category.name.toLowerCase();
+    const desc = category.description.toLowerCase();
+    
+    if (name.includes('living') || desc.includes('living room')) {
+      return '/assets/generated/category-living-room.dim_800x800.png';
+    }
+    if (name.includes('bedroom') || desc.includes('bedroom')) {
+      return '/assets/generated/category-bedroom.dim_800x800.png';
+    }
+    if (name.includes('dining') || desc.includes('dining')) {
+      return '/assets/generated/category-dining.dim_800x800.png';
+    }
+    if (name.includes('office') || desc.includes('office')) {
+      return '/assets/generated/category-office.dim_800x800.png';
+    }
+    if (name.includes('decor') || desc.includes('decor') || desc.includes('wall art') || desc.includes('lamps')) {
+      return '/assets/generated/category-decor-lighting.dim_800x800.png';
+    }
+    if (name.includes('furnishing') || desc.includes('curtains') || desc.includes('rugs') || desc.includes('textiles')) {
+      return '/assets/generated/category-rugs-textiles.dim_800x800.png';
+    }
+    // Default fallback
+    return '/assets/generated/category-rugs-textiles.dim_800x800.png';
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -82,12 +109,7 @@ export default function ProductCategoriesPage() {
             <Card className="group overflow-hidden transition-all hover:shadow-lg">
               <div className="aspect-square overflow-hidden">
                 <img
-                  src={category.description.includes('Living Room') ? '/assets/generated/category-living-room.dim_800x800.png' :
-                       category.description.includes('Bedroom') ? '/assets/generated/category-bedroom.dim_800x800.png' :
-                       category.description.includes('Dining') ? '/assets/generated/category-dining.dim_800x800.png' :
-                       category.description.includes('Office') ? '/assets/generated/category-office.dim_800x800.png' :
-                       category.description.includes('Decor') ? '/assets/generated/category-decor-lighting.dim_800x800.png' :
-                       '/assets/generated/category-rugs-textiles.dim_800x800.png'}
+                  src={getCategoryImage(category)}
                   alt={category.name}
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />

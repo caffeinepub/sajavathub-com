@@ -118,6 +118,7 @@ export interface UserProfile {
 export interface Product {
     id: string;
     stylePreference: StylePreference;
+    inventory: bigint;
     name: string;
     description: string;
     imageUrl: string;
@@ -133,7 +134,6 @@ export interface backendInterface {
     addDesigner(designer: Designer): Promise<void>;
     addNote(note: ProjectNote): Promise<void>;
     addPackage(pkg: Package): Promise<void>;
-    addProductCategory(category: ProductCategory): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createProjectBrief(brief: ProjectBrief): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -147,7 +147,6 @@ export interface backendInterface {
     getProjectBrief(id: string): Promise<ProjectBrief | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserProjectBriefs(userId: Principal): Promise<Array<ProjectBrief>>;
-    initializeProductCategories(): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     requestConsultation(request: ConsultationRequest): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
