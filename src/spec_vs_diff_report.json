@@ -1,0 +1,98 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T09:37:00.496Z",
+  "summary": "The diff adds new frontend routes/pages for product category browsing and a new \"Shop\" header link, plus introduces new backend Product/ProductCategory types and a productCategories store. However, key backend catalog API requirements (types/fields, query/mutation endpoints, admin gating, and seed data) are not evidenced, and some implemented structures diverge from the requested catalog model. The addition of backend/migration.mo also appears to violate the single-actor/single-file backend constraint.",
+  "missing_requirements": [
+    {
+      "id": "REQ-11",
+      "requirement": "Backend ProductCategory and Product types must match required fields (ProductCategory: id, name, description, imageUrl, sortOrder; Product: id, categoryId, name, brand, imageUrl, productUrl, optional priceINR, optional tags).",
+      "reason": "backend/main.mo defines Product and ProductCategory, but ProductCategory lacks imageUrl and sortOrder and instead contains an embedded products array; Product lacks categoryId, brand, productUrl, optional priceINR/tags (and includes different fields like roomType/stylePreference/description/priceINR as required).",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "requirement": "Backend exposes query endpoints to list all product categories and list products by category (optionally fetch product by id).",
+      "reason": "Diff shows new types and a productCategories Map, but does not show any new public query functions like getProductCategories or getProductsByCategory.",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "requirement": "Backend exposes admin-gated mutation endpoints to create/update categories and products following existing admin authorization pattern.",
+      "reason": "Diff shows admin gating for addPackage, but no new admin-gated mutations for categories/products are shown.",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "requirement": "Add React Query hooks useGetProductCategories and useGetProductsByCategory with stable queryKeys ['productCategories'] and ['productsByCategory', categoryId], disabled until actor is ready.",
+      "reason": "The diff snippet of frontend/src/hooks/useQueries.ts shows imports of ProductCategory/Product but does not show the actual hooks or queryKey/enabled configuration for product categories/products (file is truncated).",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts (truncated)",
+        "frontend/src/pages/products/ProductCategoriesPage.tsx",
+        "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "requirement": "Categories landing page lists categories sorted by sortOrder and displays category image, name, short description.",
+      "reason": "ProductCategoriesPage sorts categories by a computed value from category.id (split('-').length) rather than a sortOrder field, and selects images via string-matching on category.description instead of using category.imageUrl.",
+      "evidence": [
+        "frontend/src/pages/products/ProductCategoriesPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "requirement": "Category detail page product cards show image, name, brand (if present), and priceINR formatted as INR or hidden when absent; includes an external link CTA opening in new tab with safe rel attributes.",
+      "reason": "ProductCategoryDetailPage is truncated at the product card rendering (\"src={product.i...\") so the presence of brand display, conditional price handling, and external link target/rel cannot be verified from the provided diff summary.",
+      "evidence": [
+        "frontend/src/pages/products/ProductCategoryDetailPage.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "requirement": "Backend includes initial seed data: at least 6 categories and at least 3 products per category returned by query APIs; uses static imageUrl paths to frontend public assets and valid productUrl placeholders.",
+      "reason": "No seed data is shown. backend/migration.mo initializes productCategories as an empty Map, and backend/main.mo shows an empty Map initialization for productCategories with no population evidenced.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo (truncated)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Added a separate backend module backend/migration.mo and wired migration into backend/main.mo, potentially introducing backend logic outside backend/main.mo.",
+      "reason": "Build constraints state the backend must remain a single Motoko actor with all logic in backend/main.mo (no additional backend services). The diff adds backend/migration.mo and imports/uses it in main.mo.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Product/ProductCategory schema diverges from requested catalog model (embedded products within category; product includes roomType/stylePreference/description and required priceINR rather than optional; missing productUrl/brand/categoryId/tags).",
+      "reason": "These fields/structures were not requested and conflict with the specified minimum fields and API shape for the catalog.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/navigation/SiteHeader.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+    "project_state.json"
+  ]
+}

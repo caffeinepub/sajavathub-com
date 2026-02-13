@@ -1,0 +1,106 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T09:37:00.499Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-11",
+        "summary": "Implement backend support for a Havenly-like product category catalog, including data types and query/mutation APIs to manage categories and their products.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Add React Query hooks to load the product categories and category products from the backend actor, following existing patterns in frontend/src/hooks/useQueries.ts.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Create a public product category browsing experience similar in concept to Havenly: a categories landing page with category cards and a category detail page showing products for that category.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/products/ProductCategoriesPage.tsx",
+          "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/public/assets/generated/category-living-room.dim_800x800.png",
+          "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
+          "frontend/public/assets/generated/category-dining.dim_800x800.png",
+          "frontend/public/assets/generated/category-office.dim_800x800.png",
+          "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
+          "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/products/ProductCategoriesPage.tsx",
+          "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/public/assets/generated/category-living-room.dim_800x800.png",
+          "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
+          "frontend/public/assets/generated/category-dining.dim_800x800.png",
+          "frontend/public/assets/generated/category-office.dim_800x800.png",
+          "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
+          "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png"
+        ]
+      },
+      {
+        "id": "REQ-14",
+        "summary": "Add navigation entry points to the new product category pages in the site header (desktop + mobile) so users can discover the product categories from anywhere on the marketing site.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/navigation/SiteHeader.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/navigation/SiteHeader.tsx"
+        ]
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Add initial seed data for product categories and products so the new UI is populated in development without requiring manual admin actions.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
+    "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
+    "frontend/public/assets/generated/category-dining.dim_800x800.png",
+    "frontend/public/assets/generated/category-living-room.dim_800x800.png",
+    "frontend/public/assets/generated/category-office.dim_800x800.png",
+    "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/navigation/SiteHeader.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

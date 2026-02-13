@@ -1,0 +1,97 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Havenly-like Shop category browsing (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-12",
+      "summary": "Add React Query hooks for product categories and products-by-category using the backend actor.",
+      "acceptanceCriteria": [
+        "Frontend provides hooks to fetch: (1) all product categories, (2) products for a given category id, using TanStack React Query.",
+        "Hooks are disabled until the actor is ready (consistent with existing useGetPackages/useGetDesigners patterns).",
+        "Queries use stable queryKeys (e.g., ['productCategories'] and ['productsByCategory', categoryId])."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add TanStack React Query hooks for catalog browsing: useGetProductCategories() (queryKey ['productCategories']) and useGetProductsByCategory(categoryId) (queryKey ['productsByCategory', categoryId]). Follow existing patterns: return safe defaults when actor is unavailable, and set enabled to !!actor && !isFetching (and also require categoryId for the category products query)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "summary": "Create public Shop pages: a categories landing page and a category detail page with product grid and external product links.",
+      "acceptanceCriteria": [
+        "A new public route exists for categories (e.g., /products) that lists all categories with image, name, and short description, sorted by sortOrder.",
+        "A new public route exists for category detail (e.g., /products/$categoryId) that shows the selected category title/description and a grid of products.",
+        "Each product card shows at minimum: image, name, brand (if present), and either priceINR (formatted as INR) or hides price cleanly when absent.",
+        "Each product card includes a clear external link CTA (e.g., “View product”) using the productUrl; external links open in a new tab and use safe rel attributes.",
+        "Loading, empty, and error states are handled gracefully on both pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/products/ProductCategoriesPage.tsx",
+          "operation": "create",
+          "description": "Create a public categories landing page for /products. Load categories via useGetProductCategories, sort by sortOrder (ascending), and render category cards (image, name, short description) linking to /products/$categoryId. Use shadcn-ui components (e.g., Card/Button) to match existing design patterns; verify the component's usage instructions before implementing. Include loading, empty, and error UI states in English."
+        },
+        {
+          "path": "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+          "operation": "create",
+          "description": "Create a public category detail page for /products/$categoryId. Resolve categoryId from the route params, show the category title/description, and render a responsive grid of product cards loaded via useGetProductsByCategory(categoryId). Each product card must include: image, name, optional brand, optional priceINR formatted using existing formatINR helper (hide when absent), and an external CTA link to productUrl opening in a new tab with safe rel attributes. Use shadcn-ui components (e.g., Card/Badge/Button) to keep styling consistent; verify the component's usage instructions before implementing. Include loading, empty, and error UI states in English."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register the new public TanStack Router routes for Shop browsing: /products (categories landing) and /products/$categoryId (category detail). Ensure the pages are reachable through the root SiteLayout and are not wrapped in RequireAuth."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-living-room.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Living Room to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-bedroom.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Bedroom to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-dining.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Dining to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-office.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Home Office to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-decor-lighting.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Decor & Lighting to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/category-rugs-textiles.dim_800x800.png",
+          "operation": "create",
+          "description": "Add the generated square category thumbnail asset for Rugs & Textiles to be referenced by backend-provided imageUrl values and displayed in the /products UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "summary": "Add a persistent header navigation link to the new Shop pages (desktop and mobile).",
+      "acceptanceCriteria": [
+        "Site header navigation includes a new link (label in English) that routes to the categories landing page (e.g., “Shop” or “Products”).",
+        "The new navigation link is present in both desktop navigation and the mobile sheet menu.",
+        "Navigation styling remains consistent with existing header links and active state behavior."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/navigation/SiteHeader.tsx",
+          "operation": "modify",
+          "description": "Add a new English navigation entry (e.g., label 'Shop') pointing to /products in the shared navLinks list so it appears in both desktop navigation and the mobile sheet menu, preserving existing styling and active state behavior."
+        }
+      ]
+    }
+  ]
+}
