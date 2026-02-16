@@ -1,51 +1,67 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T10:42:47.037Z",
-  "summary": "Diff adds a backend migration module and integrates it into backend/main.mo, adds/updates SafeExternalImage to handle external image failures, and updates the product categories page UI logic (including category image selection). However, the diff evidence is insufficient to confirm that all required seeded categories/products (including Furnishing and Decor) are actually created and available on a fresh deploy, because the seeding/migration content is truncated and only shows partial Living Room product data.",
+  "generatedAt": "2026-02-16T10:02:46.741Z",
+  "summary": "Diff adds new UI components for room-package browsing (package list grid, package detail header, included products panel with sorting and product cards) plus loading skeleton components and a sorting utility. The main section (StylePackagesSection) is updated to fetch packages/products and wire selection/add-to-cart. However, the diff summary does not provide evidence for some required empty/loading state behaviors, and it shows an auto-select-first-package behavior that may conflict with the intent of REQ-1.",
   "missing_requirements": [
     {
-      "id": "REQ-21",
-      "requirement": "Seed comprehensive room-wise furniture categories (Living Room, Bedroom, Dining Room, Home Office, Kids Room) with multiple products each, automatically available on fresh deploy; seeded products must have non-empty id/name/description/imageUrl and valid roomType/stylePreference; getProductsByCategory must return non-empty for each seeded category.",
-      "reason": "The migration/seeding shown is truncated and only provides explicit evidence of some Living Room products. There is no visible evidence in the provided diff summary that Bedroom, Dining Room, Home Office, and Kids Room categories are seeded with multiple products each, nor that fresh-deploy initialization guarantees non-empty getProductCategories without manual actions.",
+      "id": "REQ-1",
+      "requirement": "Do not automatically use only the first returned package; users should be able to view and choose among multiple matching room packages.",
+      "reason": "The modified code explicitly auto-selects the first package when packages load, which suggests the UI may still default to the first package rather than requiring an explicit user choice (and may undermine the requirement’s intent of not automatically using the first package).",
       "evidence": [
-        "backend/migration.mo (truncated)",
-        "backend/main.mo (truncated)"
+        "frontend/src/components/packages/StylePackagesSection.tsx (\"// Auto-select first package when packages load\" useEffect that sets selectedRoomPackageId = packages[0].id)"
       ]
     },
     {
-      "id": "REQ-22",
-      "requirement": "Add backend categories named exactly \"Furnishing\" and \"Decor\" and seed each with multiple products using external (http/https) free sample image URLs; data shape must match existing frontend Product/ProductCategory types with no frontend changes required.",
-      "reason": "No explicit evidence in the provided truncated migration code shows categories with name exactly \"Furnishing\" and \"Decor\" or their seeded product lists. The diff summary does not show getProductCategories output or category creation for these names.",
+      "id": "REQ-4",
+      "requirement": "Show a clear empty message when packages are available but the selected package has zero resolved products (no blank grid).",
+      "reason": "IncludedProductsPanel always renders a grid and maps products; there is no explicit empty-state rendering shown for the products panel when products.length === 0, and the StylePackagesSection rendering logic that could provide this message is truncated/not shown.",
       "evidence": [
-        "backend/migration.mo (truncated)"
+        "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+        "frontend/src/components/packages/StylePackagesSection.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Coherent loading/empty states for both package list and included products panel, with independent loading states (packages vs products).",
+      "reason": "Loading-state components were added, but the diff summary does not show the conditional rendering that displays package-loading vs products-loading independently, nor the empty-state handling when zero packages match (and hiding the detail panel). The key render logic in StylePackagesSection is truncated.",
+      "evidence": [
+        "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+        "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
+        "frontend/src/components/packages/StylePackagesSection.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "No console errors when switching style/room selections rapidly (handle state transitions without invalid IDs).",
+      "reason": "The hook call uses `useGetProductsForRoomPackage(selectedRoomPackageId || '')`; the diff does not show guarding/disable logic in the query hook or UI that prevents requests/renders with an empty/invalid package ID, and the relevant logic is not fully visible due to truncation.",
+      "evidence": [
+        "frontend/src/components/packages/StylePackagesSection.tsx (calls useGetProductsForRoomPackage(selectedRoomPackageId || ''))",
+        "frontend/src/hooks/useQueries.ts (only referenced via summary; code not shown)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Category tile image selection logic that maps category name/description to local generated asset images (e.g., /assets/generated/category-*.png) on the product categories page.",
-      "reason": "BuildRequest focuses on backend catalog expansion and resilience to external image failures for product images; it does not request adding local category thumbnail selection logic for the categories listing page.",
+      "description": "Included product cards display product description text in addition to the required image/name/price/stock.",
+      "reason": "REQ-3 requires image, name, price, and stock indicator; description display is extra behavior not requested (though harmless).",
       "evidence": [
-        "frontend/src/pages/products/ProductCategoriesPage.tsx (truncated)"
-      ]
-    },
-    {
-      "description": "Backend upgrade migration scaffolding via a dedicated migration module and `(with migration = Migration.run)` integration.",
-      "reason": "BuildRequest requests automatic availability of seeded catalog but does not explicitly require an upgrade migration system or a new migration module; this is additional infrastructure beyond the stated requirements.",
-      "evidence": [
-        "backend/main.mo (truncated)",
-        "backend/migration.mo (truncated)"
+        "frontend/src/components/packages/room-packages/IncludedProductCard.tsx (CardDescription renders product.description)"
       ]
     }
   ],
   "confidence": 0.62,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/products/SafeExternalImage.tsx",
-    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/components/packages/StylePackagesSection.tsx",
+    "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+    "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+    "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+    "frontend/src/utils/roomPackageSort.ts",
     "project_state.json"
   ]
 }

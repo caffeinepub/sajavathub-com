@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Expand the automatically seeded product catalog so /products includes comprehensive room-wise furniture categories plus new Furnishing and Decor categories, all populated with products using free external sample image URLs.
+**Goal:** Improve the `/products/room-category` “Package Products by Room” UI so users can browse and select among multiple matching room packages, and view a clearer, more organized package detail and included-products experience.
 
 **Planned changes:**
-- Expand backend-seeded room-wise categories (Living Room, Bedroom, Dining Room, Home Office, Kids Room) so each includes multiple furniture products and is available on fresh deploy without manual/admin setup.
-- Add new seeded product categories named exactly “Furnishing” and “Decor”, each with multiple products (e.g., curtains/rugs/cushions/bedding; wall art/lamps/mirrors/vases) using external (http/https) free sample image URLs.
-- Ensure the UI remains resilient when external product images fail to load by continuing to render grids with the existing SafeExternalImage fallback behavior.
+- Update the browsing flow to show a list/grid of all room packages matching the selected Design Style + Room Type, and allow selecting a package to update the detail/products panel.
+- Restructure the selected room package detail header to consistently show name, description, style badge, room-type badge, formatted INR price, and a primary “Add Entire Package to Cart” action with responsive layout.
+- Improve included products display with clearer product cards (image, name, INR price, stock status), an item count summary, and a sort control (at least by price and/or name).
+- Add coherent, independent loading/empty states for the package list and for the included products panel, and ensure rapid switching between selections does not cause console errors or invalid UI states.
 
-**User-visible outcome:** Visiting /products shows more categories (including Furnishing and Decor), and each category page displays a non-empty product grid sourced from automatically seeded backend data, even if some external images fail to load.
+**User-visible outcome:** After choosing a Design Style and Room Type, users can browse multiple matching room packages, select one to see its details and included products, sort/scan products more easily, and always understand what is loading vs. unavailable.

@@ -1,26 +1,109 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Harden /products UI against external image hotlink failures for newly seeded catalog items",
+  "title": "Room Package browsing UI improvements for /products/room-category",
   "requirements": [
     {
-      "id": "REQ-23",
-      "summary": "Keep product browsing UI resilient when externally hotlinked product images fail to load, while continuing to render expanded categories and product grids.",
+      "id": "REQ-1",
+      "summary": "Show and allow selection among multiple room packages for the chosen style + room type (not auto-picking the first).",
       "acceptanceCriteria": [
-        "If an external product image fails to load on a category detail page, the UI falls back to the existing SafeExternalImage fallback image and the product grid layout remains intact.",
-        "The /products page can display the expanded set of categories (including Furnishing and Decor) without breaking category tiles.",
-        "Category detail pages continue to render a product grid for seeded items even when some external images fail."
+        "After selecting a Design Style and Room Type, the UI shows a list/grid of matching room packages (not just a single package).",
+        "Selecting a package in the list updates the package detail panel and the included products list for the selected package.",
+        "If zero packages match, the existing empty state remains visible and no package detail panel is shown."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/products/SafeExternalImage.tsx",
+          "path": "frontend/src/components/packages/StylePackagesSection.tsx",
           "operation": "modify",
-          "description": "Improve SafeExternalImage robustness by resetting internal state when the `src` prop changes (so navigation/re-renders don’t keep a stale fallback), and ensure the fallback behavior remains reliable for hotlinked image failures."
+          "description": "Refactor to maintain an explicit selectedRoomPackageId state, render a selectable packages list/grid (instead of `packages[0]`), and drive the details/products panel from the user-selected package."
         },
         {
-          "path": "frontend/src/pages/products/ProductCategoriesPage.tsx",
+          "path": "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+          "operation": "create",
+          "description": "Create a reusable package list/grid component that renders multiple RoomPackage options and supports selection highlighting/click-to-select. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx",
+          "operation": "create",
+          "description": "Create a compact, clickable room package card/list-item (name, badges, price) used by the package list/grid. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Restructure the selected room package detail header to clearly present key info and a primary 'Add Entire Package to Cart' action in a responsive layout.",
+      "acceptanceCriteria": [
+        "For a selected room package, the detail header consistently displays: name, description, style label, room type label, and formatted INR price.",
+        "The \"Add Entire Package to Cart\" button remains disabled when the included products list is empty and shows the existing toast error messaging when appropriate.",
+        "Layout is responsive: on small screens content stacks vertically; on larger screens it uses a clear two-column or well-spaced layout without overlapping elements."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/packages/StylePackagesSection.tsx",
           "operation": "modify",
-          "description": "Update category tile image selection logic to explicitly handle new seeded categories (e.g., Furnishing) and ensure category tiles always render a valid local generated image asset even if backend descriptions vary."
+          "description": "Replace the current inlined selected-package header with a dedicated detail header component, ensuring consistent placement of name/description/badges/price and a primary 'Add Entire Package to Cart' action that reuses existing toast behavior and disabled logic."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx",
+          "operation": "create",
+          "description": "Create a responsive detail header component for the selected RoomPackage (name, description, style badge, room-type badge, formatted INR price, primary CTA). Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Improve included products display with clearer product cards plus basic organization controls (sort and item count summary).",
+      "acceptanceCriteria": [
+        "When products are loaded for a selected package, the UI shows an item count summary (e.g., \"Included Products (3)\").",
+        "A sort control is available that can reorder the displayed products by at least one of: price (low→high/high→low) and name (A→Z/Z→A).",
+        "Each product card displays: image, product name, formatted INR price, and an in-stock/out-of-stock indicator (reusing existing inventory logic)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/packages/StylePackagesSection.tsx",
+          "operation": "modify",
+          "description": "Add an included-products toolbar with item count summary and a sort control; apply the selected sort to the displayed products before rendering."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+          "operation": "create",
+          "description": "Create an included-products panel that renders: (1) header/count summary, (2) sort control, and (3) a product card grid. Reuse existing inventory logic (inventory > 0) and SafeExternalImage for images. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+          "operation": "create",
+          "description": "Create a clear product card layout showing image (via SafeExternalImage), name, formatted INR price, and stock status badge, designed to work inside the included-products grid. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/utils/roomPackageSort.ts",
+          "operation": "create",
+          "description": "Add a small utility to define sort options and perform stable sorting of Product arrays by name and price (both ascending/descending) without mutating the original array."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Provide coherent, independent loading/empty states for package list vs included products, and ensure rapid selection changes do not cause console errors.",
+      "acceptanceCriteria": [
+        "When packages are loading, a package-loading state is shown; when products are loading for a selected package, a products-loading state is shown independently.",
+        "If packages are available but a selected package has zero resolved products, show a clear empty message for products (do not show a blank grid).",
+        "No console errors occur when switching style/room selections rapidly (UI should handle state transitions without rendering with invalid IDs)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/packages/StylePackagesSection.tsx",
+          "operation": "modify",
+          "description": "Separate package-list loading/empty states from products-panel loading/empty states; ensure product fetching is only enabled when a valid selectedRoomPackageId exists; reset selectedRoomPackageId predictably when filters change and when a new package list arrives to avoid transient invalid selections."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+          "operation": "create",
+          "description": "Create a dedicated packages-loading UI block (e.g., skeleton/cards) to be shown while packages are loading. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
+          "operation": "create",
+          "description": "Create a dedicated products-loading UI block (e.g., skeleton/grid placeholders) to be shown while included products are loading. Use composed shadcn/ui components (do not modify `frontend/src/components/ui/*`). Verify the component's usage instructions before implementing."
         }
       ]
     }

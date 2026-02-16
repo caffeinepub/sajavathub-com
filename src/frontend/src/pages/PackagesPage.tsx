@@ -6,6 +6,8 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useGetPackages } from '../hooks/useQueries';
 import { formatINR } from '../utils/format';
 import { useOnboardingStore } from '../state/onboardingStore';
+import PackagesInfoSections from '../components/packages/PackagesInfoSections';
+import StylePackagesSection from '../components/packages/StylePackagesSection';
 
 export default function PackagesPage() {
   const { data: packages, isLoading } = useGetPackages();
@@ -20,7 +22,7 @@ export default function PackagesPage() {
       <div className="container mx-auto px-4 py-20">
         <div className="text-center">
           <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="text-muted-foreground">Loading packages...</p>
+          <p className="text-muted-foreground">Loading design services...</p>
         </div>
       </div>
     );
@@ -31,10 +33,11 @@ export default function PackagesPage() {
       <section className="bg-gradient-to-b from-background to-muted/30 py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-4xl font-bold md:text-5xl">Design Packages</h1>
+            <h1 className="mb-6 text-4xl font-bold md:text-5xl">
+              Interior Design Services Tailored to Your Style
+            </h1>
             <p className="text-lg text-muted-foreground md:text-xl">
-              Choose the perfect package for your interior design needs. All packages include
-              personalized service from expert designers.
+              Partner with expert designers to transform your space. From concept to completion, we bring your vision to life with personalized design solutions that fit your lifestyle and budget.
             </p>
           </div>
         </div>
@@ -87,23 +90,26 @@ export default function PackagesPage() {
             </div>
           ) : (
             <div className="text-center">
-              <p className="text-muted-foreground">No packages available at the moment.</p>
+              <p className="text-muted-foreground">No design services available at the moment.</p>
             </div>
           )}
         </div>
       </section>
 
+      <StylePackagesSection />
+
+      <PackagesInfoSections />
+
       <section className="bg-muted/30 py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold">Not Sure Which Package to Choose?</h2>
+            <h2 className="mb-4 text-3xl font-bold">Find Your Perfect Design Match</h2>
             <p className="mb-8 text-lg text-muted-foreground">
-              Take our style quiz to get personalized package recommendations based on your needs and
-              budget.
+              Take our style quiz to discover which design service is right for you. Get personalized recommendations based on your space, style preferences, and budget.
             </p>
             <Button asChild size="lg">
               <Link to="/onboarding/quiz">
-                Take the Quiz <ArrowRight className="ml-2 h-5 w-5" />
+                Take the Style Quiz <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>

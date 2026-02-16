@@ -1,134 +1,40 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
-  "summary": "Plan and build an Indian website named sajavathub.com, similar in concept and functionality to https://havenly.com/.",
-  "architectural_notes": [
-    "Plan to populate categories/products primarily via expanded backend seed data, including external image URLs from free sources (e.g., Unsplash/Freepik), so the UI is populated without admin actions.",
-    "Ensure product categories are visible end-to-end: backend must expose categories/products via APIs + seed data, and frontend must include routing/navigation and queries to render categories."
-  ],
-  "known_issues": [
-    "Using external image URLs from the internet may introduce licensing/attribution and hotlink reliability risks; consider hosting/caching later.",
-    "Product categories are not visible in the UI; likely a frontend routing/navigation/query integration issue and/or backend API/seed data not being loaded correctly."
-  ],
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-create-the-core-site-structure-and-routing-for-an-indian-interior-design-service-website-named-sajavathub-com-with-a-public-marketing-area-and-an-authenticated-client-area",
-      "title": "Create the core site structure and routing for an Indian interior design service website named \"sajavathub.com\" with a public marketing area and an authenticated client area.",
+      "id": "feature-update-the-package-products-by-room-browsing-experience-frontend-so-users-can-view-and-choose-among-multiple-room-packages-returned-for-the-selected-style-room-type-instead-of-automatically-using-the-first-package-only",
+      "title": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-internet-identity-sign-in-and-sign-out-and-show-authenticated-state-in-the-ui-e-g-account-menu-dashboard-entry-point",
-      "title": "Implement Internet Identity sign-in and sign-out, and show authenticated state in the UI (e.g., account menu / dashboard entry point).",
+      "id": "feature-restructure-the-room-package-detail-presentation-to-make-package-information-and-actions-clearer-show-package-name-description-style-badge-room-type-badge-package-price-and-a-primary-add-entire-package-to-cart-action-in-a-consistent-layout-that-works-on-mobile-and-desktop",
+      "title": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-build-a-havenly-like-onboarding-flow-a-multi-step-style-quiz-that-collects-room-type-budget-range-in-inr-style-preferences-and-timeline-then-produces-a-summarized-project-brief-the-user-can-review-and-submit",
-      "title": "Build a Havenly-like onboarding flow: a multi-step style quiz that collects room type, budget range (in INR), style preferences, and timeline, then produces a summarized \"Project Brief\" the user can review and submit.",
+      "id": "feature-improve-how-included-products-within-a-room-package-are-displayed-add-a-clearer-product-card-layout-with-image-name-price-and-stock-status-and-provide-basic-organization-controls-at-minimum-a-sort-control-for-price-name-and-a-count-summary-like-x-items-included",
+      "title": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-a-packages-pricing-page-similar-in-concept-to-havenly-service-tiers-with-india-focused-copy-in-english-and-a-backend-managed-package-catalog-that-the-frontend-loads-dynamically",
-      "title": "Create a Packages / Pricing page similar in concept to Havenly (service tiers) with India-focused copy in English, and a backend-managed package catalog that the frontend loads dynamically.",
+      "id": "feature-ensure-the-package-products-by-room-page-route-products-room-category-has-coherent-loading-empty-states-for-both-the-package-list-and-the-included-products-panel-so-users-always-understand-what-is-loading-vs-what-is-unavailable",
+      "title": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
       "reqIds": [
         "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-designers-portfolio-browsing-experience-inspired-by-havenly-with-filterable-designer-cards-and-a-designer-detail-view-showing-portfolio-images-and-style-tags",
-      "title": "Implement a Designers / Portfolio browsing experience (inspired by Havenly) with filterable designer cards and a designer detail view showing portfolio images and style tags.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-client-dashboard-that-shows-the-user-s-project-briefs-selected-package-and-project-status-and-allows-the-user-to-request-a-consultation-as-an-appointment-request-form",
-      "title": "Add a client Dashboard that shows the user’s project briefs, selected package, and project status, and allows the user to request a consultation (as an appointment request form).",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-lightweight-project-workspace-page-for-each-project-brief-where-the-user-can-view-the-brief-summary-and-leave-non-real-time-messages-notes-comment-thread-associated-with-the-project",
-      "title": "Create a lightweight \"Project Workspace\" page for each project brief where the user can view the brief summary and leave non-real-time messages/notes (comment thread) associated with the project.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-cohesive-india-inspired-visual-theme-distinct-from-havenly-but-similar-in-polish-across-the-site-warm-neutrals-sandstone-terracotta-accents-clean-typography-and-consistent-spacing-and-component-styling",
-      "title": "Apply a cohesive, India-inspired visual theme (distinct from Havenly but similar in polish) across the site: warm neutrals, sandstone/terracotta accents, clean typography, and consistent spacing and component styling.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-required-static-generated-images-to-the-frontend-and-use-them-in-the-ui-hero-branding-portfolio-placeholders-by-placing-them-under-frontend-public-assets-generated-and-referencing-them-directly-from-the-frontend",
-      "title": "Add required static generated images to the frontend and use them in the UI (hero/branding/portfolio placeholders) by placing them under frontend/public/assets/generated and referencing them directly from the frontend.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-react-query-hooks-to-load-the-product-categories-and-category-products-from-the-backend-actor-following-existing-patterns-in-frontend-src-hooks-usequeries-ts",
-      "title": "Add React Query hooks to load the product categories and category products from the backend actor, following existing patterns in frontend/src/hooks/useQueries.ts.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-public-product-category-browsing-experience-similar-in-concept-to-havenly-a-categories-landing-page-with-category-cards-and-a-category-detail-page-showing-products-for-that-category",
-      "title": "Create a public product category browsing experience similar in concept to Havenly: a categories landing page with category cards and a category detail page showing products for that category.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-navigation-entry-points-to-the-new-product-category-pages-in-the-site-header-desktop-mobile-so-users-can-discover-the-product-categories-from-anywhere-on-the-marketing-site",
-      "title": "Add navigation entry points to the new product category pages in the site header (desktop + mobile) so users can discover the product categories from anywhere on the marketing site.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-populate-all-newly-added-expanded-seeded-products-with-free-to-use-sample-image-urls-from-the-public-internet-and-ensure-the-frontend-continues-to-render-reliably-if-any-external-image-fails-to-load",
-      "title": "Populate all newly added/expanded seeded products with free-to-use sample image URLs from the public internet and ensure the frontend continues to render reliably if any external image fails to load.",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-the-frontend-product-categories-browsing-experience-so-categories-are-visible-on-the-products-page-and-category-detail-pages-load-products-reliably-for-both-anonymous-and-authenticated-users",
-      "title": "Fix the frontend product categories browsing experience so categories are visible on the \"/products\" page and category detail pages load products reliably for both anonymous and authenticated users.",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-all-newly-added-seeded-products-across-all-categories-use-free-sample-image-urls-from-the-public-internet-and-keep-the-ui-resilient-to-image-hotlink-failures-i-e-the-product-grids-should-still-render-even-if-some-external-images-fail",
-      "title": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
-      "reqIds": [
-        "REQ-23"
       ],
       "version": 1
     }
@@ -136,89 +42,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Create Indian website sajavathub.com similar to havenly.com",
+      "summary": "Adjust how package products are displayed when grouped by room",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-9",
-      "summary": "Implement backend data models and API methods in the single Motoko actor to support: user profile, packages, designers, portfolio items, project briefs, consultation requests, and project notes; include basic access control so users can only read/write their own projects and notes.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Add product categories similar to havenly.com (category browsing/navigation for products)",
+      "id": "AR-2",
+      "summary": "Update how room packages are shown and/or structured in the UI",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Implement backend support for a Havenly-like product category catalog, including data types and query/mutation APIs to manage categories and their products.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Add initial seed data for product categories and products so the new UI is populated in development without requiring manual admin actions.",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Expand product catalog: add comprehensive room-wise furniture products and add new Furnishing and Decor categories; use free sample image URLs for products (e.g., Unsplash/Freepik) via expanded backend seed data.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Expand the backend product category seed data so the product catalog includes comprehensive room-wise furniture categories and product lists for at least: Living Room, Bedroom, Dining Room, Home Office, and Kids Room.",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-18",
-      "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" with comprehensive product lists (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases).",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Ensure the product category catalog is automatically available from the backend without requiring any manual/admin initialization, so the public \"/products\" page can always display categories.",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-20",
-      "summary": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-21",
-      "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
-      "reqIds": [
-        "REQ-22"
-      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "sajavathub.com",
+  "projectName": "Improve Room Package browsing UI (Package Products by Room) and restructure how room packages/products are displayed",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -9,6 +9,11 @@ import type {
   UserProfile,
   ProductCategory,
   Product,
+  ProductBrand,
+  Order,
+  RoomPackage,
+  StylePreference,
+  RoomType,
 } from '../backend';
 
 export function useGetPackages() {
@@ -173,5 +178,107 @@ export function useGetProductsByCategory(categoryId: string) {
       return actor.getProductsByCategory(categoryId);
     },
     enabled: !!actor && !isFetching && !!categoryId,
+  });
+}
+
+export function useGetProductBrands() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<ProductBrand[]>({
+    queryKey: ['productBrands'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getProductBrands();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetProductsByBrand(brandId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Product[]>({
+    queryKey: ['productsByBrand', brandId],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getProductsByBrand(brandId);
+    },
+    enabled: !!actor && !isFetching && !!brandId,
+  });
+}
+
+export function usePlaceOrder() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (order: Order) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.placeOrder(order);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userOrders'] });
+    },
+    onError: (error: any) => {
+      console.error('Place order error:', error);
+      throw new Error(error.message || 'Failed to place order');
+    },
+  });
+}
+
+// Room Package Hooks
+export function useGetRoomPackages() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<RoomPackage[]>({
+    queryKey: ['roomPackages'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getRoomPackages();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetRoomPackageById(packageId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<RoomPackage | null>({
+    queryKey: ['roomPackage', packageId],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getRoomPackageById(packageId);
+    },
+    enabled: !!actor && !isFetching && !!packageId,
+  });
+}
+
+export function useGetProductsForRoomPackage(packageId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Product[]>({
+    queryKey: ['roomPackageProducts', packageId],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getProductsForRoomPackage(packageId);
+    },
+    enabled: !!actor && !isFetching && !!packageId,
+  });
+}
+
+export function useGetRoomPackagesByStyleAndRoomType(
+  style: StylePreference | null,
+  roomType: RoomType | null
+) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<RoomPackage[]>({
+    queryKey: ['roomPackagesByStyleAndRoom', style, roomType],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      if (!style || !roomType) return [];
+      return actor.getRoomPackagesByStyleAndRoomType(style, roomType);
+    },
+    enabled: !!actor && !isFetching && !!style && !!roomType,
   });
 }

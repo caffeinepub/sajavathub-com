@@ -31,7 +31,7 @@ export default function RequireAuth({ children }: RequireAuthProps) {
           </div>
           <h1 className="mb-4 text-3xl font-bold">Sign In Required</h1>
           <p className="mb-8 text-muted-foreground">
-            Please sign in to access your dashboard and manage your interior design projects.
+            Please sign in to place orders and access your dashboard.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Button onClick={login} disabled={isLoggingIn} size="lg">

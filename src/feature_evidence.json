@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-all-newly-added-seeded-products-across-all-categories-use-free-sample-image-urls-from-the-public-internet-and-keep-the-ui-resilient-to-image-hotlink-failures-i-e-the-product-grids-should-still-render-even-if-some-external-images-fail",
-      "featureTitle": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
+      "featureId": "feature-update-the-package-products-by-room-browsing-experience-frontend-so-users-can-view-and-choose-among-multiple-room-packages-returned-for-the-selected-style-room-type-instead-of-automatically-using-the-first-package-only",
+      "featureTitle": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
       "files": [
-        "frontend/src/components/products/SafeExternalImage.tsx",
-        "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        "frontend/src/components/packages/StylePackagesSection.tsx",
+        "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+        "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,7 +18,70 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-23"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-restructure-the-room-package-detail-presentation-to-make-package-information-and-actions-clearer-show-package-name-description-style-badge-room-type-badge-package-price-and-a-primary-add-entire-package-to-cart-action-in-a-consistent-layout-that-works-on-mobile-and-desktop",
+      "featureTitle": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
+      "files": [
+        "frontend/src/components/packages/StylePackagesSection.tsx",
+        "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-improve-how-included-products-within-a-room-package-are-displayed-add-a-clearer-product-card-layout-with-image-name-price-and-stock-status-and-provide-basic-organization-controls-at-minimum-a-sort-control-for-price-name-and-a-count-summary-like-x-items-included",
+      "featureTitle": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
+      "files": [
+        "frontend/src/components/packages/StylePackagesSection.tsx",
+        "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+        "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+        "frontend/src/utils/roomPackageSort.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-package-products-by-room-page-route-products-room-category-has-coherent-loading-empty-states-for-both-the-package-list-and-the-included-products-panel-so-users-always-understand-what-is-loading-vs-what-is-unavailable",
+      "featureTitle": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
+      "files": [
+        "frontend/src/components/packages/StylePackagesSection.tsx",
+        "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
+        "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

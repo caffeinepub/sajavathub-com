@@ -1,75 +1,98 @@
 {
   "kind": "build_request",
-  "title": "Expand product catalog with room-wise furniture plus Furnishing and Decor categories (seeded with free sample images)",
+  "title": "Improve Room Package browsing UI (Package Products by Room) and restructure how room packages/products are displayed",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-21",
-      "text": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
-      "target": "backend",
+      "id": "REQ-1",
+      "text": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4",
+          "msg-6",
+          "msg-8"
         ],
         "quotes": [
-          "add all types of furniture products under different room category. also add furnishing and decor category. take free sample images from internet"
+          "yes"
         ]
       },
       "acceptanceCriteria": [
-        "Calling getProductCategories returns a non-empty list of categories on a fresh deploy (no manual admin actions required).",
-        "At minimum, the catalog includes categories for Living Room, Bedroom, Dining Room, Home Office, and Kids Room, each containing multiple furniture products (not empty).",
-        "Each seeded product has non-empty: id, name, description, imageUrl, and a valid roomType + stylePreference value.",
-        "Calling getProductsByCategory(categoryId) for each seeded category returns a non-empty product list."
+        "After selecting a Design Style and Room Type, the UI shows a list/grid of matching room packages (not just a single package).",
+        "Selecting a package in the list updates the package detail panel and the included products list for the selected package.",
+        "If zero packages match, the existing empty state remains visible and no package detail panel is shown."
       ]
     },
     {
-      "id": "REQ-22",
-      "text": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
-      "target": "backend",
+      "id": "REQ-2",
+      "text": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4",
+          "msg-6",
+          "msg-8"
         ],
         "quotes": [
-          "also add furnishing and decor category. take free sample images from internet"
+          "yes"
         ]
       },
       "acceptanceCriteria": [
-        "getProductCategories includes categories with name exactly \"Furnishing\" and \"Decor\".",
-        "Both \"Furnishing\" and \"Decor\" categories have multiple seeded products (not empty).",
-        "All seeded products in these categories include external imageUrl values (http/https) that are intended to be free-to-use sample images.",
-        "The existing frontend product category detail page can render these categories/products without requiring any frontend code changes (i.e., data shape matches current Product and ProductCategory types)."
+        "For a selected room package, the detail header consistently displays: name, description, style label, room type label, and formatted INR price.",
+        "The \"Add Entire Package to Cart\" button remains disabled when the included products list is empty and shows the existing toast error messaging when appropriate.",
+        "Layout is responsive: on small screens content stacks vertically; on larger screens it uses a clear two-column or well-spaced layout without overlapping elements."
       ]
     },
     {
-      "id": "REQ-23",
-      "text": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
-      "target": "both",
+      "id": "REQ-3",
+      "text": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4",
+          "msg-6",
+          "msg-8"
         ],
         "quotes": [
-          "take free sample images from internet"
+          "yes"
         ]
       },
       "acceptanceCriteria": [
-        "Newly seeded products reference external image URLs from free image sources (e.g., Unsplash-style direct links).",
-        "If an external image fails to load, the UI falls back to the existing SafeExternalImage fallback image and does not break the product grid layout.",
-        "The /products page lists the expanded set of categories (including Furnishing and Decor) and each category page renders a product grid with the seeded items."
+        "When products are loaded for a selected package, the UI shows an item count summary (e.g., \"Included Products (3)\").",
+        "A sort control is available that can reorder the displayed products by at least one of: price (low→high/high→low) and name (A→Z/Z→A).",
+        "Each product card displays: image, product name, formatted INR price, and an in-stock/out-of-stock indicator (reusing existing inventory logic)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6",
+          "msg-8"
+        ],
+        "quotes": [
+          "yes"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When packages are loading, a package-loading state is shown; when products are loading for a selected package, a products-loading state is shown independently.",
+        "If packages are available but a selected package has zero resolved products, show a clear empty message for products (do not show a blank grid).",
+        "No console errors occur when switching style/room selections rapidly (UI should handle state transitions without rendering with invalid IDs)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit any frontend files under frontend/src/components/ui (read-only UI component sources).",
-    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT (compose around them instead).",
-    "Use English for any user-facing text."
+    "Do not change the existing route path `/products/room-category`.",
+    "Do not edit any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything under `frontend/src/components/ui` (compose instead of modifying).",
+    "Keep backend architecture as a single Motoko actor; no additional backend services."
   ],
   "nonGoals": [
-    "Adding admin UI for managing categories/products.",
-    "Uploading/hosting/caching external images on-chain or in canister assets.",
-    "Implementing licensing/attribution workflows for third-party images."
+    "No changes to backend data models, room package seed data, or package/product query methods unless strictly required for the UI changes.",
+    "No new authentication flows or role/permission changes.",
+    "No checkout/cart business logic changes beyond what is required to support the updated display."
   ],
   "imageRequirements": {
     "required": [],

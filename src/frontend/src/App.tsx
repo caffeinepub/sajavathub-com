@@ -12,8 +12,15 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import ProjectWorkspacePage from './pages/projects/ProjectWorkspacePage';
 import OnboardingQuizPage from './pages/onboarding/OnboardingQuizPage';
 import ProjectBriefReviewPage from './pages/onboarding/ProjectBriefReviewPage';
+import ShopLandingPage from './pages/products/ShopLandingPage';
 import ProductCategoriesPage from './pages/products/ProductCategoriesPage';
 import ProductCategoryDetailPage from './pages/products/ProductCategoryDetailPage';
+import ProductBrandsPage from './pages/products/ProductBrandsPage';
+import ProductBrandDetailPage from './pages/products/ProductBrandDetailPage';
+import RoomCategoryPage from './pages/products/RoomCategoryPage';
+import RoomVisualizerPage from './pages/RoomVisualizerPage';
+import CartPage from './pages/cart/CartPage';
+import CheckoutPage from './pages/checkout/CheckoutPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RequireAuth from './routes/RequireAuth';
 import { Toaster } from '@/components/ui/sonner';
@@ -58,6 +65,12 @@ const designerDetailRoute = createRoute({
   component: DesignerDetailPage,
 });
 
+const shopRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/shop',
+  component: ShopLandingPage,
+});
+
 const productsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/products',
@@ -68,6 +81,46 @@ const productCategoryDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/products/$categoryId',
   component: ProductCategoryDetailPage,
+});
+
+const productBrandsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/brands',
+  component: ProductBrandsPage,
+});
+
+const productBrandDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/brands/$brandId',
+  component: ProductBrandDetailPage,
+});
+
+const roomCategoryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/room-category',
+  component: RoomCategoryPage,
+});
+
+const roomVisualizerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/room-visualizer',
+  component: RoomVisualizerPage,
+});
+
+const cartRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/cart',
+  component: CartPage,
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout',
+  component: () => (
+    <RequireAuth>
+      <CheckoutPage />
+    </RequireAuth>
+  ),
 });
 
 const faqRoute = createRoute({
@@ -120,8 +173,15 @@ const routeTree = rootRoute.addChildren([
   packagesRoute,
   designersRoute,
   designerDetailRoute,
+  shopRoute,
   productsRoute,
   productCategoryDetailRoute,
+  productBrandsRoute,
+  productBrandDetailRoute,
+  roomCategoryRoute,
+  roomVisualizerRoute,
+  cartRoute,
+  checkoutRoute,
   faqRoute,
   onboardingQuizRoute,
   briefReviewRoute,

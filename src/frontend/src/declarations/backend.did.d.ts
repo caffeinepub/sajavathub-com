@@ -24,12 +24,37 @@ export interface ConsultationRequest {
   'submissionDate' : Time,
   'requestedTime' : Time,
 }
+export interface DeliveryAddress {
+  'country' : string,
+  'city' : string,
+  'postalCode' : string,
+  'fullName' : string,
+  'state' : string,
+  'addressLine1' : string,
+  'addressLine2' : [] | [string],
+  'phoneNumber' : string,
+}
 export interface Designer {
   'id' : string,
   'bio' : string,
   'portfolio' : Array<PortfolioItem>,
   'styles' : Array<StylePreference>,
   'name' : string,
+}
+export interface Order {
+  'id' : string,
+  'status' : string,
+  'deliveryAddress' : DeliveryAddress,
+  'paymentMethod' : PaymentMethod,
+  'createdAt' : Time,
+  'totalAmount' : bigint,
+  'buyerId' : Principal,
+  'items' : Array<OrderItem>,
+}
+export interface OrderItem {
+  'productId' : string,
+  'quantity' : bigint,
+  'price' : bigint,
 }
 export interface Package {
   'id' : string,
@@ -38,6 +63,9 @@ export interface Package {
   'description' : string,
   'priceINR' : bigint,
 }
+export type PaymentMethod = { 'upi' : null } |
+  { 'wallet' : null } |
+  { 'netBanking' : null };
 export interface PortfolioItem {
   'id' : string,
   'description' : string,
@@ -51,8 +79,15 @@ export interface Product {
   'name' : string,
   'description' : string,
   'imageUrl' : string,
+  'brandId' : string,
   'priceINR' : bigint,
   'roomType' : RoomType,
+}
+export interface ProductBrand {
+  'id' : string,
+  'name' : string,
+  'description' : string,
+  'logoUrl' : string,
 }
 export interface ProductCategory {
   'id' : string,
@@ -77,6 +112,15 @@ export interface ProjectNote {
   'projectId' : string,
   'message' : string,
   'timestamp' : Time,
+}
+export interface RoomPackage {
+  'id' : string,
+  'productIds' : Array<string>,
+  'name' : string,
+  'description' : string,
+  'style' : StylePreference,
+  'priceINR' : bigint,
+  'roomType' : RoomType,
 }
 export type RoomType = { 'bedroom' : null } |
   { 'other' : string } |
@@ -108,6 +152,7 @@ export interface _SERVICE {
   'addDesigner' : ActorMethod<[Designer], undefined>,
   'addNote' : ActorMethod<[ProjectNote], undefined>,
   'addPackage' : ActorMethod<[Package], undefined>,
+  'addRoomPackage' : ActorMethod<[RoomPackage], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createProjectBrief' : ActorMethod<[ProjectBrief], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -118,13 +163,31 @@ export interface _SERVICE {
   >,
   'getDesigners' : ActorMethod<[], Array<Designer>>,
   'getNotesForProject' : ActorMethod<[string], Array<ProjectNote>>,
+  'getOrder' : ActorMethod<[string], [] | [Order]>,
   'getPackages' : ActorMethod<[], Array<Package>>,
+  'getProductBrands' : ActorMethod<[], Array<ProductBrand>>,
   'getProductCategories' : ActorMethod<[], Array<ProductCategory>>,
+  'getProductsByBrand' : ActorMethod<[string], Array<Product>>,
   'getProductsByCategory' : ActorMethod<[string], Array<Product>>,
+  'getProductsForRoomPackage' : ActorMethod<[string], Array<Product>>,
   'getProjectBrief' : ActorMethod<[string], [] | [ProjectBrief]>,
+  'getRoomPackageById' : ActorMethod<[string], [] | [RoomPackage]>,
+  'getRoomPackages' : ActorMethod<[], Array<RoomPackage>>,
+  'getRoomPackagesByRoomType' : ActorMethod<[RoomType], Array<RoomPackage>>,
+  'getRoomPackagesByStyle' : ActorMethod<[StylePreference], Array<RoomPackage>>,
+  'getRoomPackagesByStyleAndRoomType' : ActorMethod<
+    [StylePreference, RoomType],
+    Array<RoomPackage>
+  >,
+  'getStyleOptionsForRoomType' : ActorMethod<
+    [RoomType],
+    Array<StylePreference>
+  >,
+  'getUserOrders' : ActorMethod<[Principal], Array<Order>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserProjectBriefs' : ActorMethod<[Principal], Array<ProjectBrief>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'placeOrder' : ActorMethod<[Order], undefined>,
   'requestConsultation' : ActorMethod<[ConsultationRequest], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
 }

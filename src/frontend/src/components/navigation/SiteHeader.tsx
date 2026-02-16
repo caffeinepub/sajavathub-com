@@ -1,8 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from '../../hooks/useCurrentUserProfile';
+import { useCartStore } from '../../state/cartStore';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function SiteHeader() {
@@ -20,6 +22,7 @@ export default function SiteHeader() {
   const { data: userProfile } = useGetCallerUserProfile();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const cartItemCount = useCartStore((state) => state.getItemCount());
 
   const isAuthenticated = !!identity;
 
@@ -42,11 +45,12 @@ export default function SiteHeader() {
   };
 
   const navLinks = [
-    { to: '/how-it-works', label: 'How It Works' },
+    { to: '/shop', label: 'Shop' },
     { to: '/packages', label: 'Packages' },
     { to: '/designers', label: 'Designers' },
-    { to: '/products', label: 'Shop' },
+    { to: '/room-visualizer', label: 'AI Room Visualizer' },
     { to: '/faq', label: 'FAQ' },
+    { to: '/how-it-works', label: 'How It Works' },
   ];
 
   return (
@@ -67,6 +71,33 @@ export default function SiteHeader() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center space-x-6 md:flex">
+          {/* Category Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-sm font-medium text-foreground/80 hover:text-foreground">
+                Category
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link to="/products/room-category" className="cursor-pointer">
+                  Package Products by Room
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/products" className="cursor-pointer">
+                  Products by Category
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/products/brands" className="cursor-pointer">
+                  Products by Brand
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {navLinks.map((link) => (
             <Link
               key={link.to}
@@ -79,8 +110,21 @@ export default function SiteHeader() {
           ))}
         </nav>
 
-        {/* Desktop Auth */}
+        {/* Desktop Auth & Cart */}
         <div className="hidden items-center space-x-4 md:flex">
+          <Button variant="ghost" size="icon" className="relative" asChild>
+            <Link to="/cart">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full px-1 text-xs"
+                >
+                  {cartItemCount}
+                </Badge>
+              )}
+            </Link>
+          </Button>
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -108,62 +152,104 @@ export default function SiteHeader() {
         </div>
 
         {/* Mobile Menu */}
-        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <nav className="flex flex-col space-y-4 pt-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
-                  activeProps={{ className: 'text-foreground' }}
-                  onClick={() => setMobileMenuOpen(false)}
+        <div className="flex items-center gap-2 md:hidden">
+          <Button variant="ghost" size="icon" className="relative" asChild>
+            <Link to="/cart">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full px-1 text-xs"
                 >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="border-t border-border pt-4">
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/app/dashboard"
-                      className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
+                  {cartItemCount}
+                </Badge>
+              )}
+            </Link>
+          </Button>
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <nav className="flex flex-col space-y-4 pt-8">
+                {/* Category Section in Mobile */}
+                <div className="border-b border-border pb-4">
+                  <p className="mb-2 text-sm font-semibold text-muted-foreground">Category</p>
+                  <Link
+                    to="/products/room-category"
+                    className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Package Products by Room
+                  </Link>
+                  <Link
+                    to="/products"
+                    className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Products by Category
+                  </Link>
+                  <Link
+                    to="/products/brands"
+                    className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Products by Brand
+                  </Link>
+                </div>
+
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
+                    activeProps={{ className: 'text-foreground' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                
+                <div className="border-t border-border pt-4">
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to="/app/dashboard"
+                        className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <Button
+                        onClick={() => {
+                          handleLogout();
+                          setMobileMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="mt-4 w-full"
+                      >
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
                     <Button
                       onClick={() => {
-                        handleLogout();
+                        handleLogin();
                         setMobileMenuOpen(false);
                       }}
-                      variant="outline"
-                      className="mt-4 w-full"
+                      disabled={isLoggingIn}
+                      className="w-full"
                     >
-                      Sign Out
+                      {isLoggingIn ? 'Signing In...' : 'Sign In'}
                     </Button>
-                  </>
-                ) : (
-                  <Button
-                    onClick={() => {
-                      handleLogin();
-                      setMobileMenuOpen(false);
-                    }}
-                    disabled={isLoggingIn}
-                    className="w-full"
-                  >
-                    {isLoggingIn ? 'Signing In...' : 'Sign In'}
-                  </Button>
-                )}
-              </div>
-            </nav>
-          </SheetContent>
-        </Sheet>
+                  )}
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );

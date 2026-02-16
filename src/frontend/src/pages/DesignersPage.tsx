@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetDesigners } from '../hooks/useQueries';
+import SafeExternalImage from '../components/products/SafeExternalImage';
 import type { StylePreference } from '../backend';
 
 const stylePreferenceLabels: Record<string, string> = {
@@ -74,11 +75,13 @@ export default function DesignersPage() {
               <Label htmlFor="search">Search Designers</Label>
               <Input
                 id="search"
+                type="text"
                 placeholder="Search by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="style">Filter by Style</Label>
               <Select value={styleFilter} onValueChange={setStyleFilter}>
@@ -98,45 +101,45 @@ export default function DesignersPage() {
             </div>
           </div>
 
-          {filteredDesigners.length > 0 ? (
+          {filteredDesigners.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-muted-foreground">No designers found matching your criteria.</p>
+            </div>
+          ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {filteredDesigners.map((designer) => (
                 <Link key={designer.id} to="/designers/$designerId" params={{ designerId: designer.id }}>
-                  <Card className="h-full transition-shadow hover:shadow-lg">
-                    <CardContent className="p-0">
-                      <div className="aspect-square overflow-hidden rounded-t-lg bg-muted">
-                        <img
-                          src={
-                            designer.portfolio[0]?.imageUrl ||
-                            '/assets/generated/portfolio-1.dim_1200x800.png'
-                          }
-                          alt={designer.name}
-                          className="h-full w-full object-cover transition-transform hover:scale-105"
+                  <Card className="group overflow-hidden transition-all hover:shadow-lg">
+                    <div className="aspect-[4/3] overflow-hidden">
+                      {designer.portfolio.length > 0 ? (
+                        <SafeExternalImage
+                          src={designer.portfolio[0].imageUrl}
+                          alt={`${designer.name}'s portfolio`}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          fallbackSrc="/assets/generated/portfolio-1.dim_1200x800.png"
                         />
-                      </div>
-                      <div className="p-6">
-                        <h3 className="mb-2 text-xl font-semibold">{designer.name}</h3>
-                        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-                          {designer.bio}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {designer.styles.slice(0, 3).map((style, idx) => (
-                            <Badge key={idx} variant="secondary">
-                              {getStyleLabel(style)}
-                            </Badge>
-                          ))}
-                        </div>
+                      ) : (
+                        <img
+                          src="/assets/generated/portfolio-1.dim_1200x800.png"
+                          alt={`${designer.name}'s portfolio`}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      )}
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="mb-2 text-xl font-semibold">{designer.name}</h3>
+                      <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{designer.bio}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {designer.styles.map((style, index) => (
+                          <Badge key={index} variant="secondary">
+                            {getStyleLabel(style)}
+                          </Badge>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
                 </Link>
               ))}
-            </div>
-          ) : (
-            <div className="py-12 text-center">
-              <p className="text-muted-foreground">
-                No designers found matching your criteria. Try adjusting your filters.
-              </p>
             </div>
           )}
         </div>

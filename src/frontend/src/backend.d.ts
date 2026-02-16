@@ -26,6 +26,11 @@ export interface Designer {
     styles: Array<StylePreference>;
     name: string;
 }
+export interface OrderItem {
+    productId: string;
+    quantity: bigint;
+    price: bigint;
+}
 export interface ConsultationRequest {
     id: string;
     status: string;
@@ -34,6 +39,12 @@ export interface ConsultationRequest {
     notes: string;
     submissionDate: Time;
     requestedTime: Time;
+}
+export interface ProductBrand {
+    id: string;
+    name: string;
+    description: string;
+    logoUrl: string;
 }
 export interface Package {
     id: string;
@@ -68,6 +79,25 @@ export interface ProjectNote {
     message: string;
     timestamp: Time;
 }
+export interface Order {
+    id: string;
+    status: string;
+    deliveryAddress: DeliveryAddress;
+    paymentMethod: PaymentMethod;
+    createdAt: Time;
+    totalAmount: bigint;
+    buyerId: Principal;
+    items: Array<OrderItem>;
+}
+export interface RoomPackage {
+    id: string;
+    productIds: Array<string>;
+    name: string;
+    description: string;
+    style: StylePreference;
+    priceINR: bigint;
+    roomType: RoomType;
+}
 export interface BudgetRange {
     max: bigint;
     min: bigint;
@@ -101,6 +131,16 @@ export interface PortfolioItem {
     style: StylePreference;
     imageUrl: string;
 }
+export interface DeliveryAddress {
+    country: string;
+    city: string;
+    postalCode: string;
+    fullName: string;
+    state: string;
+    addressLine1: string;
+    addressLine2?: string;
+    phoneNumber: string;
+}
 export interface ProductCategory {
     id: string;
     name: string;
@@ -122,8 +162,14 @@ export interface Product {
     name: string;
     description: string;
     imageUrl: string;
+    brandId: string;
     priceINR: bigint;
     roomType: RoomType;
+}
+export enum PaymentMethod {
+    upi = "upi",
+    wallet = "wallet",
+    netBanking = "netBanking"
 }
 export enum UserRole {
     admin = "admin",
@@ -134,6 +180,7 @@ export interface backendInterface {
     addDesigner(designer: Designer): Promise<void>;
     addNote(note: ProjectNote): Promise<void>;
     addPackage(pkg: Package): Promise<void>;
+    addRoomPackage(pkg: RoomPackage): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createProjectBrief(brief: ProjectBrief): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -141,13 +188,25 @@ export interface backendInterface {
     getConsultationsForProject(projectId: string): Promise<Array<ConsultationRequest>>;
     getDesigners(): Promise<Array<Designer>>;
     getNotesForProject(projectId: string): Promise<Array<ProjectNote>>;
+    getOrder(orderId: string): Promise<Order | null>;
     getPackages(): Promise<Array<Package>>;
+    getProductBrands(): Promise<Array<ProductBrand>>;
     getProductCategories(): Promise<Array<ProductCategory>>;
+    getProductsByBrand(brandId: string): Promise<Array<Product>>;
     getProductsByCategory(categoryId: string): Promise<Array<Product>>;
+    getProductsForRoomPackage(packageId: string): Promise<Array<Product>>;
     getProjectBrief(id: string): Promise<ProjectBrief | null>;
+    getRoomPackageById(packageId: string): Promise<RoomPackage | null>;
+    getRoomPackages(): Promise<Array<RoomPackage>>;
+    getRoomPackagesByRoomType(roomType: RoomType): Promise<Array<RoomPackage>>;
+    getRoomPackagesByStyle(style: StylePreference): Promise<Array<RoomPackage>>;
+    getRoomPackagesByStyleAndRoomType(style: StylePreference, roomType: RoomType): Promise<Array<RoomPackage>>;
+    getStyleOptionsForRoomType(roomType: RoomType): Promise<Array<StylePreference>>;
+    getUserOrders(userId: Principal): Promise<Array<Order>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserProjectBriefs(userId: Principal): Promise<Array<ProjectBrief>>;
     isCallerAdmin(): Promise<boolean>;
+    placeOrder(order: Order): Promise<void>;
     requestConsultation(request: ConsultationRequest): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
 }

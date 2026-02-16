@@ -1,5 +1,5 @@
 import { useParams, Link } from '@tanstack/react-router';
-import { useGetProductsByCategory, useGetProductCategories } from '../../hooks/useQueries';
+import { useGetProductsByBrand, useGetProductBrands } from '../../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
@@ -8,14 +8,14 @@ import { formatINR } from '../../utils/format';
 import SafeExternalImage from '../../components/products/SafeExternalImage';
 import AddToCartButton from '../../components/cart/AddToCartButton';
 
-export default function ProductCategoryDetailPage() {
-  const { categoryId } = useParams({ strict: false }) as { categoryId: string };
-  const { data: products, isLoading: productsLoading, error: productsError } = useGetProductsByCategory(categoryId);
-  const { data: categories, isLoading: categoriesLoading, isFetched: categoriesFetched } = useGetProductCategories();
+export default function ProductBrandDetailPage() {
+  const { brandId } = useParams({ strict: false }) as { brandId: string };
+  const { data: products, isLoading: productsLoading, error: productsError } = useGetProductsByBrand(brandId);
+  const { data: brands, isLoading: brandsLoading, isFetched: brandsFetched } = useGetProductBrands();
 
-  const category = categories?.find((cat) => cat.id === categoryId);
+  const brand = brands?.find((b) => b.id === brandId);
 
-  if (productsLoading || categoriesLoading) {
+  if (productsLoading || brandsLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
         <Skeleton className="mb-8 h-10 w-48" />
@@ -41,9 +41,9 @@ export default function ProductCategoryDetailPage() {
   if (productsError) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/products/brands" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Categories
+          Back to Brands
         </Link>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -56,18 +56,18 @@ export default function ProductCategoryDetailPage() {
     );
   }
 
-  if (categoriesFetched && !category) {
+  if (brandsFetched && !brand) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/products/brands" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Categories
+          Back to Brands
         </Link>
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Category Not Found</AlertTitle>
+          <AlertTitle>Brand Not Found</AlertTitle>
           <AlertDescription>
-            The category you're looking for doesn't exist or has been removed.
+            The brand you're looking for doesn't exist or has been removed.
           </AlertDescription>
         </Alert>
       </div>
@@ -77,16 +77,16 @@ export default function ProductCategoryDetailPage() {
   if (!products || products.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/products/brands" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Categories
+          Back to Brands
         </Link>
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{category?.name}</h1>
-          <p className="text-lg text-muted-foreground">{category?.description}</p>
+          <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{brand?.name}</h1>
+          <p className="text-lg text-muted-foreground">{brand?.description}</p>
         </div>
         <div className="mx-auto max-w-md text-center">
-          <p className="text-muted-foreground">No products available in this category at the moment.</p>
+          <p className="text-muted-foreground">No products available from this brand at the moment.</p>
         </div>
       </div>
     );
@@ -94,14 +94,14 @@ export default function ProductCategoryDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+      <Link to="/products/brands" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Categories
+        Back to Brands
       </Link>
 
       <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{category?.name}</h1>
-        <p className="text-lg text-muted-foreground">{category?.description}</p>
+        <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">{brand?.name}</h1>
+        <p className="text-lg text-muted-foreground">{brand?.description}</p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

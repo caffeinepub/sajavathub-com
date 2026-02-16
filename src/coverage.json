@@ -1,53 +1,91 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T10:42:47.040Z",
+  "generatedAt": "2026-02-16T10:02:46.744Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 1,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-21",
-        "summary": "Expand the backend-seeded product category catalog so the public \"/products\" experience includes comprehensive room-wise furniture categories, each populated with many furniture products, and ensure the catalog is automatically available without any manual/admin initialization.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-22",
-        "summary": "Add two new backend product categories named \"Furnishing\" and \"Decor\" and seed each category with a comprehensive product list (e.g., Furnishing: curtains, rugs, cushions, bedding; Decor: wall art, lamps, mirrors, vases), using free sample product image URLs from the public internet.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-23",
-        "summary": "Ensure all newly added seeded products across all categories use free sample image URLs from the public internet and keep the UI resilient to image hotlink failures (i.e., the product grids should still render even if some external images fail).",
+        "id": "REQ-1",
+        "summary": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/products/SafeExternalImage.tsx",
-          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/products/SafeExternalImage.tsx",
-          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+          "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+          "frontend/src/utils/roomPackageSort.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+          "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+          "frontend/src/utils/roomPackageSort.ts"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+          "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/packages/StylePackagesSection.tsx",
+          "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+          "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/products/SafeExternalImage.tsx",
-    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/components/packages/StylePackagesSection.tsx",
+    "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
+    "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
+    "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx",
+    "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
+    "frontend/src/utils/roomPackageSort.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

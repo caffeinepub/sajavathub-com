@@ -71,23 +71,45 @@ export default function ProductCategoriesPage() {
   const getCategoryImage = (category: { id: string; name: string; description: string }) => {
     const name = category.name.toLowerCase();
     const desc = category.description.toLowerCase();
+    const id = category.id.toLowerCase();
     
-    if (name.includes('living') || desc.includes('living room')) {
+    if (name.includes('living') || desc.includes('living room') || id.includes('living')) {
       return '/assets/generated/category-living-room.dim_800x800.png';
     }
-    if (name.includes('bedroom') || desc.includes('bedroom')) {
+    if (name.includes('bedroom') || desc.includes('bedroom') || id.includes('bedroom')) {
       return '/assets/generated/category-bedroom.dim_800x800.png';
     }
-    if (name.includes('dining') || desc.includes('dining')) {
+    if (name.includes('dining') || desc.includes('dining') || id.includes('dining')) {
       return '/assets/generated/category-dining.dim_800x800.png';
     }
-    if (name.includes('office') || desc.includes('office')) {
+    if (name.includes('office') || desc.includes('office') || id.includes('office')) {
       return '/assets/generated/category-office.dim_800x800.png';
     }
-    if (name.includes('decor') || desc.includes('decor') || desc.includes('wall art') || desc.includes('lamps')) {
+    // Home Decor category - accessories, wall art, decorative items
+    if (
+      name.includes('decor') || 
+      desc.includes('decor') || 
+      desc.includes('accessories') ||
+      desc.includes('wall art') || 
+      desc.includes('vase') ||
+      desc.includes('beauty') ||
+      id.includes('homedecor') ||
+      id.includes('decor')
+    ) {
       return '/assets/generated/category-decor-lighting.dim_800x800.png';
     }
-    if (name.includes('furnishing') || desc.includes('curtains') || desc.includes('rugs') || desc.includes('textiles')) {
+    // Home Furnishing category - textiles, soft furnishings, curtains, rugs
+    if (
+      name.includes('furnishing') || 
+      desc.includes('furnishing') ||
+      desc.includes('curtains') || 
+      desc.includes('rugs') || 
+      desc.includes('textiles') ||
+      desc.includes('cushion') ||
+      desc.includes('functional') ||
+      id.includes('homefurnishing') ||
+      id.includes('furnishing')
+    ) {
       return '/assets/generated/category-rugs-textiles.dim_800x800.png';
     }
     // Default fallback

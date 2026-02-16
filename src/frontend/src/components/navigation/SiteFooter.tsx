@@ -1,10 +1,12 @@
 import { SiInstagram, SiFacebook, SiX } from 'react-icons/si';
+import { getOrderedLocations } from '../../utils/locations';
 
 export default function SiteFooter() {
   const currentYear = new Date().getFullYear();
   const appIdentifier = encodeURIComponent(
     typeof window !== 'undefined' ? window.location.hostname : 'sajavathub'
   );
+  const locations = getOrderedLocations();
 
   return (
     <footer className="border-t border-border bg-muted/30">
@@ -89,10 +91,9 @@ export default function SiteFooter() {
           <div>
             <h3 className="mb-4 text-sm font-semibold">Locations</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Mumbai</li>
-              <li>Delhi</li>
-              <li>Bangalore</li>
-              <li>Pune</li>
+              {locations.map((location) => (
+                <li key={location}>{location}</li>
+              ))}
             </ul>
           </div>
         </div>
