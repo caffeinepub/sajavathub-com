@@ -1,106 +1,76 @@
-import { useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Send } from 'lucide-react';
 import { useGetProjectBrief, useGetNotesForProject, useAddNote } from '../../hooks/useQueries';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle, ArrowLeft, Send } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useState } from 'react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { formatDate, formatDateTime, formatINR } from '../../utils/format';
-import { toast } from 'sonner';
-import type { StylePreference, RoomType } from '../../backend';
-
-function getStyleLabel(style: StylePreference): string {
-  if ('__kind__' in style) {
-    const labels: Record<string, string> = {
-      modern: 'Modern',
-      traditional: 'Traditional',
-      contemporary: 'Contemporary',
-      boho: 'Boho',
-      minimalist: 'Minimalist',
-      rustic: 'Rustic',
-    };
-    return labels[style.__kind__] || style.__kind__;
-  }
-  return 'Other';
-}
-
-function getRoomLabel(room: RoomType): string {
-  if ('__kind__' in room) {
-    const labels: Record<string, string> = {
-      livingRoom: 'Living Room',
-      bedroom: 'Bedroom',
-      diningRoom: 'Dining Room',
-      office: 'Home Office',
-      kidsRoom: "Kids' Room",
-    };
-    return labels[room.__kind__] || room.__kind__;
-  }
-  return 'Other';
-}
+import { formatINR, formatDateTime } from '../../utils/format';
+import type { ProjectNote } from '../../backend';
 
 export default function ProjectWorkspacePage() {
-  const { projectId } = useParams({ from: '/app/projects/$projectId' });
+  const { projectId } = useParams({ from: '/projects/$projectId' });
   const { identity } = useInternetIdentity();
-  const { data: brief, isLoading: briefLoading } = useGetProjectBrief(projectId);
+  const [noteMessage, setNoteMessage] = useState('');
+
+  const { data: brief, isLoading: briefLoading, error: briefError } = useGetProjectBrief(projectId);
   const { data: notes, isLoading: notesLoading } = useGetNotesForProject(projectId);
-  const addNote = useAddNote();
-  const [newNote, setNewNote] = useState('');
+  const addNoteMutation = useAddNote();
 
-  const handleAddNote = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddNote = async () => {
+    if (!identity || !noteMessage.trim()) return;
 
-    if (!identity) {
-      toast.error('Please sign in to add notes');
-      return;
-    }
-
-    if (!newNote.trim()) {
-      toast.error('Please enter a note');
-      return;
-    }
+    const note: ProjectNote = {
+      id: `note-${Date.now()}`,
+      userId: identity.getPrincipal(),
+      projectId,
+      message: noteMessage.trim(),
+      timestamp: BigInt(Date.now() * 1000000),
+    };
 
     try {
-      const noteId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      await addNote.mutateAsync({
-        id: noteId,
-        userId: identity.getPrincipal(),
-        projectId,
-        message: newNote.trim(),
-        timestamp: BigInt(Date.now() * 1000000),
-      });
-      setNewNote('');
-      toast.success('Note added successfully');
+      await addNoteMutation.mutateAsync(note);
+      setNoteMessage('');
     } catch (error) {
       console.error('Failed to add note:', error);
-      toast.error('Failed to add note. Please try again.');
     }
   };
 
   if (briefLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="text-muted-foreground">Loading project...</p>
+        <Skeleton className="mb-8 h-12 w-64" />
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <Skeleton className="h-96 w-full" />
+          </div>
+          <div>
+            <Skeleton className="h-64 w-full" />
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!brief) {
+  if (briefError || !brief) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h1 className="mb-4 text-3xl font-bold">Project Not Found</h1>
-          <p className="mb-8 text-muted-foreground">
-            The project you're looking for doesn't exist or you don't have access to it.
-          </p>
-          <Button asChild>
-            <Link to="/app/dashboard">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load project details. Please try again later.
+          </AlertDescription>
+        </Alert>
+        <div className="mt-6">
+          <Button asChild variant="outline">
+            <Link to="/dashboard">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
             </Link>
           </Button>
         </div>
@@ -108,53 +78,53 @@ export default function ProjectWorkspacePage() {
     );
   }
 
+  const formatRoomType = (rt: any): string => {
+    if (typeof rt === 'object' && rt !== null) {
+      const key = Object.keys(rt)[0];
+      return key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+    }
+    return String(rt);
+  };
+
+  const sortedNotes = notes ? [...notes].sort((a, b) => Number(a.timestamp) - Number(b.timestamp)) : [];
+
   return (
     <div className="container mx-auto px-4 py-12">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link to="/app/dashboard">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+      <div className="mb-8">
+        <Link to="/dashboard">
+          <Button variant="ghost" className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
         </Link>
-      </Button>
+        <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
+          {formatRoomType(brief.roomType)} Project
+        </h1>
+        <Badge variant={brief.status === 'active' ? 'default' : 'secondary'}>
+          {brief.status}
+        </Badge>
+      </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card className="mb-8">
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-3xl">{getRoomLabel(brief.roomType)} Design</CardTitle>
-                  <CardDescription>Created on {formatDate(brief.submissionDate)}</CardDescription>
-                </div>
-                <Badge>{brief.status}</Badge>
-              </div>
+              <CardTitle>Project Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="mb-2 font-semibold">Style Preferences</h3>
-                <div className="flex flex-wrap gap-2">
-                  {brief.stylePreferences.map((style, idx) => (
-                    <Badge key={idx} variant="secondary">
-                      {getStyleLabel(style)}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
+            <CardContent className="space-y-4">
               <div>
                 <h3 className="mb-2 font-semibold">Budget Range</h3>
                 <p className="text-muted-foreground">
                   {formatINR(brief.budget.min)} - {formatINR(brief.budget.max)}
                 </p>
               </div>
-
               <div>
                 <h3 className="mb-2 font-semibold">Timeline</h3>
                 <p className="text-muted-foreground">{brief.timeline}</p>
               </div>
-
               {brief.selectedPackage && (
                 <div>
-                  <h3 className="mb-2 font-semibold">Selected Package</h3>
+                  <h3 className="mb-2 font-semibold">Package</h3>
                   <Badge>{brief.selectedPackage}</Badge>
                 </div>
               )}
@@ -164,51 +134,42 @@ export default function ProjectWorkspacePage() {
           <Card>
             <CardHeader>
               <CardTitle>Project Notes</CardTitle>
-              <CardDescription>
-                Communicate with your designer and track project updates
-              </CardDescription>
+              <CardDescription>Communication thread with your designer</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleAddNote} className="mb-6">
+              <div className="mb-6 space-y-4">
+                {notesLoading ? (
+                  <Skeleton className="h-24 w-full" />
+                ) : sortedNotes.length === 0 ? (
+                  <p className="text-center text-muted-foreground">No notes yet. Start the conversation!</p>
+                ) : (
+                  sortedNotes.map((note) => (
+                    <div key={note.id} className="rounded-lg border p-4">
+                      <p className="mb-2">{note.message}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDateTime(note.timestamp)}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="space-y-4">
                 <Textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Add a note or message..."
-                  rows={3}
-                  className="mb-2"
+                  placeholder="Add a note or question..."
+                  value={noteMessage}
+                  onChange={(e) => setNoteMessage(e.target.value)}
+                  rows={4}
                 />
-                <Button type="submit" disabled={addNote.isPending}>
+                <Button
+                  onClick={handleAddNote}
+                  disabled={!noteMessage.trim() || addNoteMutation.isPending}
+                  className="w-full"
+                >
                   <Send className="mr-2 h-4 w-4" />
-                  {addNote.isPending ? 'Sending...' : 'Add Note'}
+                  {addNoteMutation.isPending ? 'Sending...' : 'Send Note'}
                 </Button>
-              </form>
-
-              <Separator className="my-6" />
-
-              {notesLoading ? (
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Loading notes...</p>
-                </div>
-              ) : notes && notes.length > 0 ? (
-                <div className="space-y-4">
-                  {notes
-                    .sort((a, b) => Number(b.timestamp - a.timestamp))
-                    .map((note) => (
-                      <div key={note.id} className="rounded-lg border p-4">
-                        <p className="mb-2 text-sm text-muted-foreground">
-                          {formatDateTime(note.timestamp)}
-                        </p>
-                        <p className="whitespace-pre-wrap">{note.message}</p>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    No notes yet. Add your first note to start the conversation.
-                  </p>
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -216,15 +177,15 @@ export default function ProjectWorkspacePage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Next Steps</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/designers">Browse Designers</Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/packages">View Packages</Link>
-              </Button>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Your designer will review your project brief and reach out with initial concepts.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Use the notes section to communicate with your designer and share feedback.
+              </p>
             </CardContent>
           </Card>
         </div>

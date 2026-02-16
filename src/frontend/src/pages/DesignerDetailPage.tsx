@@ -1,123 +1,116 @@
 import { useParams, Link } from '@tanstack/react-router';
+import { useGetDesigners } from '../hooks/useQueries';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
-import { useGetDesigners } from '../hooks/useQueries';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import SafeExternalImage from '../components/products/SafeExternalImage';
-import type { StylePreference } from '../backend';
-
-const stylePreferenceLabels: Record<string, string> = {
-  modern: 'Modern',
-  traditional: 'Traditional',
-  contemporary: 'Contemporary',
-  boho: 'Boho',
-  minimalist: 'Minimalist',
-  rustic: 'Rustic',
-};
-
-function getStyleLabel(style: StylePreference): string {
-  if ('__kind__' in style) {
-    return stylePreferenceLabels[style.__kind__] || style.__kind__;
-  }
-  return 'Other';
-}
 
 export default function DesignerDetailPage() {
-  const { designerId } = useParams({ strict: false }) as { designerId: string };
-  const { data: designers, isLoading } = useGetDesigners();
-
-  const designer = designers?.find((d) => d.id === designerId);
+  const { designerId } = useParams({ from: '/designers/$designerId' });
+  const { data: designers, isLoading, error } = useGetDesigners();
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-20">
-        <div className="text-center">
-          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="text-muted-foreground">Loading designer profile...</p>
+      <div className="container mx-auto px-4 py-12">
+        <div className="mb-8">
+          <Skeleton className="mb-4 h-12 w-64" />
+          <Skeleton className="mb-2 h-6 w-48" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="aspect-video w-full" />
+          ))}
         </div>
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load designer information. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const designer = designers?.find((d) => d.id === designerId);
 
   if (!designer) {
     return (
-      <div className="container mx-auto px-4 py-20">
-        <Link to="/designers" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Designers
-        </Link>
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold">Designer Not Found</h1>
-          <p className="text-muted-foreground">The designer you're looking for doesn't exist.</p>
-        </div>
+      <div className="container mx-auto px-4 py-12">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Not Found</AlertTitle>
+          <AlertDescription>
+            Designer not found. Please check the URL or browse our{' '}
+            <Link to="/designers" className="underline">
+              designer directory
+            </Link>
+            .
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
-  const portfolioImages = designer.portfolio.length > 0
-    ? designer.portfolio
-    : [
-        { id: '1', imageUrl: '/assets/generated/portfolio-1.dim_1200x800.png', style: { __kind__: 'modern' } as StylePreference, description: 'Portfolio sample' },
-        { id: '2', imageUrl: '/assets/generated/portfolio-2.dim_1200x800.png', style: { __kind__: 'contemporary' } as StylePreference, description: 'Portfolio sample' },
-        { id: '3', imageUrl: '/assets/generated/portfolio-3.dim_1200x800.png', style: { __kind__: 'minimalist' } as StylePreference, description: 'Portfolio sample' },
-      ];
+  const formatStyleName = (style: any): string => {
+    if (typeof style === 'object' && style !== null) {
+      const key = Object.keys(style)[0];
+      if (key === 'other' && typeof style[key] === 'string') {
+        return style[key];
+      }
+      return key.charAt(0).toUpperCase() + key.slice(1);
+    }
+    return String(style);
+  };
 
   return (
-    <div className="flex flex-col">
-      <section className="relative">
-        <div className="aspect-[21/9] w-full overflow-hidden bg-muted">
-          <SafeExternalImage
-            src={portfolioImages[0].imageUrl}
-            alt={`${designer.name}'s work`}
-            className="h-full w-full object-cover"
-            fallbackSrc="/assets/generated/portfolio-1.dim_1200x800.png"
-          />
+    <div className="container mx-auto px-4 py-12">
+      <div className="mb-12">
+        <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground">{designer.name}</h1>
+        <div className="mb-4 flex flex-wrap gap-2">
+          {designer.styles.map((style, index) => (
+            <Badge key={index} variant="secondary">
+              {formatStyleName(style)}
+            </Badge>
+          ))}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-      </section>
+        <p className="mb-6 text-lg text-muted-foreground">{designer.bio}</p>
+        <Button asChild size="lg">
+          <Link to="/quiz">Get Started with {designer.name.split(' ')[0]}</Link>
+        </Button>
+      </div>
 
-      <section className="container mx-auto px-4 py-12">
-        <Link to="/designers" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Designers
-        </Link>
-
-        <div className="mb-12 grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <h1 className="mb-4 text-4xl font-bold">{designer.name}</h1>
-            <p className="mb-6 text-lg text-muted-foreground">{designer.bio}</p>
-            <div className="flex flex-wrap gap-2">
-              {designer.styles.map((style, index) => (
-                <Badge key={index} variant="secondary" className="text-sm">
-                  {getStyleLabel(style)}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-start">
-            <Button asChild size="lg" className="w-full lg:w-auto">
-              <Link to="/onboarding/quiz">Get Started with {designer.name.split(' ')[0]}</Link>
-            </Button>
-          </div>
-        </div>
-
-        <div>
-          <h2 className="mb-6 text-2xl font-bold">Portfolio</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {portfolioImages.map((item) => (
-              <div key={item.id} className="group overflow-hidden rounded-lg">
+      <div className="mb-8">
+        <h2 className="mb-6 text-2xl font-bold text-foreground">Portfolio</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {designer.portfolio.map((item) => (
+            <Card key={item.id} className="overflow-hidden">
+              <div className="aspect-video overflow-hidden">
                 <SafeExternalImage
                   src={item.imageUrl}
                   alt={item.description}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  fallbackSrc="/assets/generated/portfolio-1.dim_1200x800.png"
+                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
-            ))}
-          </div>
+              <CardHeader>
+                <CardTitle className="text-lg">{formatStyleName(item.style)}</CardTitle>
+                <CardDescription>{item.description}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 }

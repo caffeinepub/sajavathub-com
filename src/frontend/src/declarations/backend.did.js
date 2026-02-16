@@ -100,6 +100,38 @@ export const ConsultationRequest = IDL.Record({
   'submissionDate' : Time,
   'requestedTime' : Time,
 });
+export const FurnitureSubCategory = IDL.Variant({
+  'bedSideTables' : IDL.Null,
+  'sofa' : IDL.Null,
+  'sofaChairs' : IDL.Null,
+  'cornerTable' : IDL.Null,
+  'studyTable' : IDL.Null,
+  'kingSizeBed' : IDL.Null,
+  'recliners' : IDL.Null,
+  'crockeryUnit' : IDL.Null,
+  'queenSizeBed' : IDL.Null,
+  'dressingTable' : IDL.Null,
+  'centerTable' : IDL.Null,
+  'diningTable' : IDL.Null,
+});
+export const Product = IDL.Record({
+  'id' : IDL.Text,
+  'stylePreference' : StylePreference,
+  'inventory' : IDL.Nat,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'imageUrl' : IDL.Text,
+  'brandId' : IDL.Text,
+  'priceINR' : IDL.Nat,
+  'roomType' : RoomType,
+});
+export const FurnitureCategory = IDL.Record({
+  'id' : IDL.Text,
+  'subCategory' : FurnitureSubCategory,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'products' : IDL.Vec(Product),
+});
 export const DeliveryAddress = IDL.Record({
   'country' : IDL.Text,
   'city' : IDL.Text,
@@ -136,17 +168,6 @@ export const ProductBrand = IDL.Record({
   'description' : IDL.Text,
   'logoUrl' : IDL.Text,
 });
-export const Product = IDL.Record({
-  'id' : IDL.Text,
-  'stylePreference' : StylePreference,
-  'inventory' : IDL.Nat,
-  'name' : IDL.Text,
-  'description' : IDL.Text,
-  'imageUrl' : IDL.Text,
-  'brandId' : IDL.Text,
-  'priceINR' : IDL.Nat,
-  'roomType' : RoomType,
-});
 export const ProductCategory = IDL.Record({
   'id' : IDL.Text,
   'name' : IDL.Text,
@@ -170,6 +191,11 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getDesigners' : IDL.Func([], [IDL.Vec(Designer)], ['query']),
+  'getFurnitureCategories' : IDL.Func(
+      [],
+      [IDL.Vec(FurnitureCategory)],
+      ['query'],
+    ),
   'getNotesForProject' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(ProjectNote)],
@@ -181,6 +207,16 @@ export const idlService = IDL.Service({
   'getProductCategories' : IDL.Func([], [IDL.Vec(ProductCategory)], ['query']),
   'getProductsByBrand' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
   'getProductsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
+  'getProductsByFurnitureCategory' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(Product)],
+      ['query'],
+    ),
+  'getProductsByFurnitureSubCategory' : IDL.Func(
+      [FurnitureSubCategory],
+      [IDL.Vec(Product)],
+      ['query'],
+    ),
   'getProductsForRoomPackage' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(Product)],
@@ -224,10 +260,16 @@ export const idlService = IDL.Service({
       [IDL.Vec(ProjectBrief)],
       ['query'],
     ),
+  'globalProductSearch' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'placeOrder' : IDL.Func([Order], [], []),
   'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'searchFurnitureProducts' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(Product)],
+      ['query'],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -325,6 +367,38 @@ export const idlFactory = ({ IDL }) => {
     'submissionDate' : Time,
     'requestedTime' : Time,
   });
+  const FurnitureSubCategory = IDL.Variant({
+    'bedSideTables' : IDL.Null,
+    'sofa' : IDL.Null,
+    'sofaChairs' : IDL.Null,
+    'cornerTable' : IDL.Null,
+    'studyTable' : IDL.Null,
+    'kingSizeBed' : IDL.Null,
+    'recliners' : IDL.Null,
+    'crockeryUnit' : IDL.Null,
+    'queenSizeBed' : IDL.Null,
+    'dressingTable' : IDL.Null,
+    'centerTable' : IDL.Null,
+    'diningTable' : IDL.Null,
+  });
+  const Product = IDL.Record({
+    'id' : IDL.Text,
+    'stylePreference' : StylePreference,
+    'inventory' : IDL.Nat,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'imageUrl' : IDL.Text,
+    'brandId' : IDL.Text,
+    'priceINR' : IDL.Nat,
+    'roomType' : RoomType,
+  });
+  const FurnitureCategory = IDL.Record({
+    'id' : IDL.Text,
+    'subCategory' : FurnitureSubCategory,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'products' : IDL.Vec(Product),
+  });
   const DeliveryAddress = IDL.Record({
     'country' : IDL.Text,
     'city' : IDL.Text,
@@ -361,17 +435,6 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'logoUrl' : IDL.Text,
   });
-  const Product = IDL.Record({
-    'id' : IDL.Text,
-    'stylePreference' : StylePreference,
-    'inventory' : IDL.Nat,
-    'name' : IDL.Text,
-    'description' : IDL.Text,
-    'imageUrl' : IDL.Text,
-    'brandId' : IDL.Text,
-    'priceINR' : IDL.Nat,
-    'roomType' : RoomType,
-  });
   const ProductCategory = IDL.Record({
     'id' : IDL.Text,
     'name' : IDL.Text,
@@ -395,6 +458,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getDesigners' : IDL.Func([], [IDL.Vec(Designer)], ['query']),
+    'getFurnitureCategories' : IDL.Func(
+        [],
+        [IDL.Vec(FurnitureCategory)],
+        ['query'],
+      ),
     'getNotesForProject' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(ProjectNote)],
@@ -411,6 +479,16 @@ export const idlFactory = ({ IDL }) => {
     'getProductsByBrand' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
     'getProductsByCategory' : IDL.Func(
         [IDL.Text],
+        [IDL.Vec(Product)],
+        ['query'],
+      ),
+    'getProductsByFurnitureCategory' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Product)],
+        ['query'],
+      ),
+    'getProductsByFurnitureSubCategory' : IDL.Func(
+        [FurnitureSubCategory],
         [IDL.Vec(Product)],
         ['query'],
       ),
@@ -461,10 +539,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ProjectBrief)],
         ['query'],
       ),
+    'globalProductSearch' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'placeOrder' : IDL.Func([Order], [], []),
     'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'searchFurnitureProducts' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Product)],
+        ['query'],
+      ),
   });
 };
 

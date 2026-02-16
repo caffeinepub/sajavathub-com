@@ -1,13 +1,35 @@
 import { useParams } from '@tanstack/react-router';
-import { useGetProductsByCategory } from '../../hooks/useQueries';
+import { useGetProductsByFurnitureSubCategory } from '../../hooks/useQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import ProductListingCard from '../../components/products/ProductListingCard';
+import { FurnitureSubCategory } from '../../backend';
 
-export default function ProductCategoryDetailPage() {
-  const { categoryId } = useParams({ from: '/products/$categoryId' });
-  const { data: products, isLoading, error } = useGetProductsByCategory(categoryId);
+export default function FurnitureSubCategoryPage() {
+  const { subCategory } = useParams({ from: '/products/furniture/$subCategory' });
+  const { data: products, isLoading, error } = useGetProductsByFurnitureSubCategory(
+    subCategory as FurnitureSubCategory
+  );
+
+  // Convert enum key to display label
+  const getDisplayLabel = (key: string): string => {
+    const labels: Record<string, string> = {
+      sofa: 'Sofa',
+      centerTable: 'Center Table',
+      diningTable: 'Dining Table',
+      cornerTable: 'Corner Table',
+      kingSizeBed: 'King Size Bed',
+      queenSizeBed: 'Queen Size Bed',
+      bedSideTables: 'Bed Side Tables',
+      dressingTable: 'Dressing Table',
+      studyTable: 'Study Table',
+      sofaChairs: 'Sofa Chairs',
+      recliners: 'Recliners',
+      crockeryUnit: 'Crockery Unit',
+    };
+    return labels[key] || key;
+  };
 
   if (isLoading) {
     return (
@@ -37,7 +59,7 @@ export default function ProductCategoryDetailPage() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            Failed to load products for this category. Please try again later.
+            Failed to load furniture products. Please try again later.
           </AlertDescription>
         </Alert>
       </div>
@@ -49,12 +71,12 @@ export default function ProductCategoryDetailPage() {
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-            Category Products
+            {getDisplayLabel(subCategory)}
           </h1>
         </div>
         <Alert>
           <AlertDescription>
-            No products available in this category at the moment.
+            No products available in this furniture category at the moment.
           </AlertDescription>
         </Alert>
       </div>
@@ -65,7 +87,7 @@ export default function ProductCategoryDetailPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-          {categoryId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          {getDisplayLabel(subCategory)}
         </h1>
         <p className="text-muted-foreground">
           {products.length} {products.length === 1 ? 'product' : 'products'} available

@@ -10,9 +10,9 @@ import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
-// Attach migration
-
+(with migration = Migration.run)
 actor {
   // ===== Types =====
   public type RoomType = {
@@ -114,6 +114,29 @@ actor {
     brandId : Text;
   };
 
+  public type FurnitureSubCategory = {
+    #sofa;
+    #centerTable;
+    #diningTable;
+    #cornerTable;
+    #kingSizeBed;
+    #queenSizeBed;
+    #bedSideTables;
+    #dressingTable;
+    #studyTable;
+    #sofaChairs;
+    #recliners;
+    #crockeryUnit;
+  };
+
+  public type FurnitureCategory = {
+    id : Text;
+    name : Text;
+    description : Text;
+    subCategory : FurnitureSubCategory;
+    products : [Product];
+  };
+
   public type ProductCategory = {
     id : Text;
     name : Text;
@@ -198,265 +221,17 @@ actor {
     };
   };
 
-  // Seed packages as part of persistent backend state
-  let packages = Map.fromIter<Text, Package>([
-    (
-      "dcebox",
-      {
-        id = "dcebox";
-        name = "Design Consultation Box";
-        priceINR = 3999;
-        description = "Expert Room Design - Design Consultation Box provides everything you need to bring your dream space to life. Our experienced designers will expertly select and coordinate furniture, décor, and accessories tailored to your unique style, lifestyle, and budget.";
-        features = [
-          "Home Rendering and Custom Product Selection",
-          "Shopping List",
-          "Option to add on a Designer Consultation",
-        ];
-      },
-    ),
-    (
-      "pro",
-      {
-        id = "pro";
-        name = "Pro Design Package";
-        priceINR = 5999;
-        description = "Advanced Design Package - The Pro Design Package goes beyond the essentials, offering an elevated interior design experience tailored to your unique taste and needs. Perfect for those seeking a complete transformation, this package includes everything from concept to execution, ensuring a seamless and impressive result.";
-        features = [
-          "Designer Consultation (In Person or Video)",
-          "Home Rendering and Custom Product Selection",
-          "Material and Paint Recommendations",
-          "Product + Room Shopping List",
-        ];
-      },
-    ),
-    (
-      "premier",
-      {
-        id = "premier";
-        name = "Premier Design";
-        priceINR = 9999;
-        description = "High-End Design Package - Our Premier Design package is the ultimate choice for those who desire nothing but the best. This exclusive, high-end service caters to clients looking for luxury, sophistication, and complete customization. From initial concept to final installation, our team of elite designers will guide you through a truly exceptional design journey.";
-        features = [
-          "Most Experienced Designers",
-          "In Person or Video Consultation",
-          "Home Planning",
-          "Comprehensive Room Rendering",
-          "Custom Product Selection",
-          "Design Optimized Shopping List",
-        ];
-      },
-    ),
-  ].values());
-
-  // Seed designers as persistent backend state
-  let designers = Map.fromIter<Text, Designer>([
-    (
-      "laura_almeida",
-      {
-        id = "laura_almeida";
-        name = "Laura Almeida";
-        bio = "Laura is a seasoned Architectural Designer with over 15 years of experience in both residential and commercial projects. Her expertise encompasses a wide range of styles, from traditional to contemporary, ensuring that each design is uniquely tailored to her clients' visions.";
-        styles = [#modern, #contemporary, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "maria_ribeiro",
-      {
-        id = "maria_ribeiro";
-        name = "Maria Ribeiro";
-        bio = "Maria is a renowned Urban Architect known for her sustainable and innovative approach to design. With a focus on community and functionality, Maria transforms spaces into vibrant, eco-friendly environments that foster a sense of well-being and connection.";
-        styles = [#rustic, #contemporary, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "jonathan_silva",
-      {
-        id = "jonathan_silva";
-        name = "Jonathan Silva";
-        bio = "Jonathan is a talented interior designer with a keen eye for detail and a passion for creating harmonious living spaces. His ability to blend textures, colors, and patterns results in aesthetically pleasing and inviting environments for his clients.";
-        styles = [#rustic, #boho, #traditional];
-        portfolio = [];
-      },
-    ),
-    (
-      "gabriel_fernandes",
-      {
-        id = "gabriel_fernandes";
-        name = "Gabriel Fernandes";
-        bio = "Gabriel is a versatile designer who excels at merging classic and contemporary design elements. His signature style, characterized by clean lines and subtle sophistication, delivers a timeless aesthetic that withstands changing trends.";
-        styles = [#modern, #contemporary, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "elisabete_borges",
-      {
-        id = "elisabete_borges";
-        name = "Elisabete Borges";
-        bio = "Elisabete is an award-winning interior designer celebrated for her exquisite use of color and texture. Her approach combines classic elegance with modern luxury, resulting in spaces that are both inviting and visually captivating.";
-        styles = [#modern, #traditional, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "ricardo_monteiro",
-      {
-        id = "ricardo_monteiro";
-        name = "Ricardo Monteiro";
-        bio = "Ricardo is a visionary landscape architect who brings a holistic perspective to design. His commitment to sustainability and appreciation of natural beauty has transformed many outdoor spaces into stunning and functional environments.";
-        styles = [#modern, #boho, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "teresa_martins",
-      {
-        id = "teresa_martins";
-        name = "Teresa Martins";
-        bio = "Teresa is a creative design strategist specializing in innovative spatial planning. Her functional yet stylish approach optimizes space utilization and enhances the overall flow and comfort of residential and commercial interiors.";
-        styles = [#boho, #contemporary, #minimalist];
-        portfolio = [];
-      },
-    ),
-    (
-      "ana_sousa",
-      {
-        id = "ana_sousa";
-        name = "Ana Sousa";
-        bio = "Ana is a passionate advocate for sustainable design and eco-friendly materials. Her commitment to wellness and natural elements enhances the overall ambiance and health of the spaces she transforms.";
-        styles = [#modern, #contemporary, #minimalist];
-        portfolio = [];
-      },
-    ),
-  ].values());
-
+  let packages = Map.empty<Text, Package>();
+  let designers = Map.empty<Text, Designer>();
   let briefs = Map.empty<Text, ProjectBrief>();
   let consultations = Map.empty<Text, ConsultationRequest>();
   let notes = Map.empty<Text, List.List<ProjectNote>>();
   let userProfiles = Map.empty<Principal, UserProfile>();
   let orders = Map.empty<Text, Order>();
-
-  var productCategories = Map.fromIter<Text, ProductCategory>([
-    (
-      "homeDecor",
-      {
-        id = "homeDecor";
-        name = "Home Decor";
-        description = "Stylish accessories to enhance your home's beauty";
-        products = [
-          {
-            id = "vase1";
-            name = "Elegant Porcelain Vase";
-            description = "A beautiful centerpiece for your living room or dining table.";
-            priceINR = 1200;
-            inventory = 50;
-            imageUrl = "/images/vase1.jpg";
-            roomType = #livingRoom;
-            stylePreference = #modern;
-            brandId = "brand1";
-          },
-          {
-            id = "wallArt1";
-            name = "Abstract Wall Art";
-            description = "A modern interpretation that perfectly complements any contemporary space.";
-            priceINR = 2200;
-            inventory = 30;
-            imageUrl = "/images/wallArt1.jpg";
-            roomType = #livingRoom;
-            stylePreference = #contemporary;
-            brandId = "brand2";
-          },
-        ];
-      },
-    ),
-    (
-      "homeFurnishing",
-      {
-        id = "homeFurnishing";
-        name = "Home Furnishing";
-        description = "High-quality decor and functional accessories to refine your living spaces";
-        products = [
-          {
-            id = "cushionSet";
-            name = "Luxury Cushion Set";
-            description = "Includes 4 decorative pillows in a sophisticated neutral color palette.";
-            priceINR = 1800;
-            inventory = 25;
-            imageUrl = "/images/cushionSet.jpg";
-            roomType = #livingRoom;
-            stylePreference = #minimalist;
-            brandId = "brand1";
-          },
-          {
-            id = "tableRunner";
-            name = "Artisan Table Runner";
-            description = "Handcrafted linen table runner with floral patterns.";
-            priceINR = 900;
-            inventory = 60;
-            imageUrl = "/images/tableRunner.jpg";
-            roomType = #diningRoom;
-            stylePreference = #traditional;
-            brandId = "brand2";
-          },
-        ];
-      },
-    ),
-  ].values());
-
+  let furnitureCategories = Map.empty<Text, FurnitureCategory>();
+  let productCategories = Map.empty<Text, ProductCategory>();
+  let roomPackages = Map.empty<Text, RoomPackage>();
   let productBrands = Map.empty<Text, ProductBrand>();
-  // Store persistent room packages (curated product sets)
-  var roomPackages = Map.fromIter<Text, RoomPackage>([
-    (
-      "living-modern",
-      {
-        id = "living-modern";
-        name = "Modern Living Room Package";
-        roomType = #livingRoom;
-        style = #modern;
-        description = "A sleek, contemporary living room design featuring bold lines and minimalist decor.";
-        productIds = ["sofa-modern", "coffee-table-minimal", "area-rug-abstract"];
-        priceINR = 20000;
-      },
-    ),
-    (
-      "bedroom-rustic",
-      {
-        id = "bedroom-rustic";
-        name = "Rustic Bedroom Package";
-        roomType = #bedroom;
-        style = #rustic;
-        description = "Embrace the charm of aged wood, natural textures, and organic warmth with our Rustic Bedroom package.";
-        productIds = ["platform-bed-rustic", "reclaimed-nightstands", "wool-area-rug"];
-        priceINR = 25000;
-      },
-    ),
-    (
-      "dining-minimal",
-      {
-        id = "dining-minimal";
-        name = "Minimalist Dining Room Package";
-        roomType = #diningRoom;
-        style = #minimalist;
-        description = "Clean lines, neutral tones, and clutter-free design come together in our Minimalist Dining Room package.";
-        productIds = ["dining-table-minimalist", "upholstered-chairs-set", "glass-vase-centerpiece"];
-        priceINR = 18000;
-      },
-    ),
-    (
-      "office-boho",
-      {
-        id = "office-boho";
-        name = "Bohemian Home Office Package";
-        roomType = #office;
-        style = #boho;
-        description = "Mix patterns, textures, and colors for a creative and inspiring workspace with our Bohemian Home Office package.";
-        productIds = ["midcentury-desk", "acrylic-chair", "woven-wall-hanging"];
-        priceINR = 15000;
-      },
-    ),
-  ].values());
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -796,5 +571,76 @@ actor {
       func(order) { order.buyerId == userId }
     );
     filtered;
+  };
+
+  // Public browsing: Get furniture categories (accessible to all including guests)
+  public query func getFurnitureCategories() : async [FurnitureCategory] {
+    furnitureCategories.values().toArray();
+  };
+
+  // Public browsing: Get products by furniture category (accessible to all including guests)
+  public query func getProductsByFurnitureCategory(categoryId : Text) : async [Product] {
+    switch (furnitureCategories.get(categoryId)) {
+      case (null) {
+        Runtime.trap("Furniture category not found");
+      };
+      case (?category) { category.products };
+    };
+  };
+
+  // Public browsing: Get products by furniture subcategory (accessible to all including guests)
+  public query func getProductsByFurnitureSubCategory(subCategory : FurnitureSubCategory) : async [Product] {
+    var subCategoryProducts : [Product] = [];
+    for (category in furnitureCategories.values()) {
+      if (category.subCategory == subCategory) {
+        subCategoryProducts := subCategoryProducts.concat(category.products);
+      };
+    };
+    subCategoryProducts;
+  };
+
+  // Public browsing: Search furniture products (accessible to all including guests)
+  public query func searchFurnitureProducts(searchTerm : Text) : async [Product] {
+    var matchingProducts : [Product] = [];
+    for (category in furnitureCategories.values()) {
+      let categoryProducts = category.products.filter(
+        func(p) {
+          p.name.toLower().contains(#text(searchTerm.toLower())) or
+          p.description.toLower().contains(#text(searchTerm.toLower()));
+        }
+      );
+      matchingProducts := matchingProducts.concat(categoryProducts);
+    };
+    matchingProducts;
+  };
+
+  // Public browsing: Global product search across all categories (accessible to all including guests)
+  public query func globalProductSearch(searchTerm : Text) : async [Product] {
+    let lowerSearchTerm = searchTerm.toLower();
+    var matchingProducts : [Product] = [];
+
+    // Product categories
+    for (category in productCategories.values()) {
+      let categoryProducts = category.products.filter(
+        func(p) {
+          p.name.toLower().contains(#text(lowerSearchTerm)) or
+          p.description.toLower().contains(#text(lowerSearchTerm));
+        }
+      );
+      matchingProducts := matchingProducts.concat(categoryProducts);
+    };
+
+    // Furniture categories
+    for (category in furnitureCategories.values()) {
+      let categoryProducts = category.products.filter(
+        func(p) {
+          p.name.toLower().contains(#text(lowerSearchTerm)) or
+          p.description.toLower().contains(#text(lowerSearchTerm));
+        }
+      );
+      matchingProducts := matchingProducts.concat(categoryProducts);
+    };
+
+    matchingProducts;
   };
 };

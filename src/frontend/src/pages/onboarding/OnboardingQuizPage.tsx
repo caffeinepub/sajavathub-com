@@ -2,248 +2,217 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useOnboardingStore } from '../../state/onboardingStore';
 import type { RoomType, StylePreference } from '../../backend';
 
-const TOTAL_STEPS = 4;
-
 export default function OnboardingQuizPage() {
-  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const totalSteps = 4;
+
   const {
     roomType,
-    stylePreferences,
-    budget,
-    timeline,
     setRoomType,
+    stylePreferences,
     setStylePreferences,
+    budget,
     setBudget,
+    timeline,
     setTimeline,
   } = useOnboardingStore();
 
-  const [selectedRoom, setSelectedRoom] = useState<string>(
-    roomType ? ('__kind__' in roomType ? roomType.__kind__ : 'other') : ''
-  );
-  const [selectedStyles, setSelectedStyles] = useState<string[]>(
-    stylePreferences.map((s) => ('__kind__' in s ? s.__kind__ : 'other'))
-  );
-  const [budgetMin, setBudgetMin] = useState(budget?.min ? Number(budget.min) : 50000);
-  const [budgetMax, setBudgetMax] = useState(budget?.max ? Number(budget.max) : 200000);
-  const [selectedTimeline, setSelectedTimeline] = useState(timeline || '');
+  const roomTypes: { value: RoomType; label: string }[] = [
+    { value: { __kind__: 'livingRoom', livingRoom: null }, label: 'Living Room' },
+    { value: { __kind__: 'bedroom', bedroom: null }, label: 'Bedroom' },
+    { value: { __kind__: 'diningRoom', diningRoom: null }, label: 'Dining Room' },
+    { value: { __kind__: 'office', office: null }, label: 'Office' },
+    { value: { __kind__: 'kidsRoom', kidsRoom: null }, label: 'Kids Room' },
+  ];
+
+  const styleOptions: { value: StylePreference; label: string }[] = [
+    { value: { __kind__: 'modern', modern: null }, label: 'Modern' },
+    { value: { __kind__: 'traditional', traditional: null }, label: 'Traditional' },
+    { value: { __kind__: 'contemporary', contemporary: null }, label: 'Contemporary' },
+    { value: { __kind__: 'boho', boho: null }, label: 'Boho' },
+    { value: { __kind__: 'minimalist', minimalist: null }, label: 'Minimalist' },
+    { value: { __kind__: 'rustic', rustic: null }, label: 'Rustic' },
+  ];
+
+  const toggleStyle = (style: StylePreference) => {
+    const styleStr = JSON.stringify(style);
+    const isSelected = stylePreferences.some((s) => JSON.stringify(s) === styleStr);
+    
+    if (isSelected) {
+      setStylePreferences(stylePreferences.filter((s) => JSON.stringify(s) !== styleStr));
+    } else {
+      setStylePreferences([...stylePreferences, style]);
+    }
+  };
 
   const handleNext = () => {
-    if (currentStep === 1 && selectedRoom) {
-      const roomTypeValue: RoomType =
-        selectedRoom === 'livingRoom'
-          ? { __kind__: 'livingRoom', livingRoom: null }
-          : selectedRoom === 'bedroom'
-          ? { __kind__: 'bedroom', bedroom: null }
-          : selectedRoom === 'diningRoom'
-          ? { __kind__: 'diningRoom', diningRoom: null }
-          : selectedRoom === 'office'
-          ? { __kind__: 'office', office: null }
-          : selectedRoom === 'kidsRoom'
-          ? { __kind__: 'kidsRoom', kidsRoom: null }
-          : { __kind__: 'other', other: 'Other' };
-      setRoomType(roomTypeValue);
-    } else if (currentStep === 2 && selectedStyles.length > 0) {
-      const styleValues: StylePreference[] = selectedStyles.map((style) => {
-        switch (style) {
-          case 'modern':
-            return { __kind__: 'modern', modern: null };
-          case 'traditional':
-            return { __kind__: 'traditional', traditional: null };
-          case 'contemporary':
-            return { __kind__: 'contemporary', contemporary: null };
-          case 'boho':
-            return { __kind__: 'boho', boho: null };
-          case 'minimalist':
-            return { __kind__: 'minimalist', minimalist: null };
-          case 'rustic':
-            return { __kind__: 'rustic', rustic: null };
-          default:
-            return { __kind__: 'other', other: style };
-        }
-      });
-      setStylePreferences(styleValues);
-    } else if (currentStep === 3) {
-      setBudget({
-        min: BigInt(budgetMin),
-        max: BigInt(budgetMax),
-        currency: 'INR',
-      });
-    } else if (currentStep === 4 && selectedTimeline) {
-      setTimeline(selectedTimeline);
-      navigate({ to: '/onboarding/review' });
-      return;
-    }
-
-    if (currentStep < TOTAL_STEPS) {
-      setCurrentStep(currentStep + 1);
+    if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      navigate({ to: '/review' });
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    } else {
-      navigate({ to: '/' });
+    if (step > 1) {
+      setStep(step - 1);
     }
   };
 
   const canProceed = () => {
-    if (currentStep === 1) return selectedRoom !== '';
-    if (currentStep === 2) return selectedStyles.length > 0;
-    if (currentStep === 3) return budgetMin > 0 && budgetMax > budgetMin;
-    if (currentStep === 4) return selectedTimeline !== '';
-    return false;
+    switch (step) {
+      case 1:
+        return roomType !== null;
+      case 2:
+        return stylePreferences.length > 0;
+      case 3:
+        return budget !== null && Number(budget.min) > 0 && Number(budget.max) > Number(budget.min);
+      case 4:
+        return timeline.trim().length > 0;
+      default:
+        return false;
+    }
   };
 
-  const toggleStyle = (style: string) => {
-    setSelectedStyles((prev) =>
-      prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]
-    );
-  };
+  const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="mx-auto max-w-2xl">
-        <div className="mb-8">
-          <Progress value={(currentStep / TOTAL_STEPS) * 100} className="mb-2" />
-          <p className="text-sm text-muted-foreground">
-            Step {currentStep} of {TOTAL_STEPS}
-          </p>
-        </div>
+    <div className="container mx-auto max-w-2xl px-4 py-12">
+      <div className="mb-8">
+        <h1 className="mb-4 text-3xl font-bold tracking-tight text-foreground">
+          Design Style Quiz
+        </h1>
+        <Progress value={progress} className="h-2" />
+        <p className="mt-2 text-sm text-muted-foreground">
+          Step {step} of {totalSteps}
+        </p>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {currentStep === 1 && 'Which room are you designing?'}
-              {currentStep === 2 && "What's your style preference?"}
-              {currentStep === 3 && "What's your budget range?"}
-              {currentStep === 4 && "What's your timeline?"}
-            </CardTitle>
-            <CardDescription>
-              {currentStep === 1 && 'Select the room type you want to transform'}
-              {currentStep === 2 && 'Choose one or more styles that resonate with you'}
-              {currentStep === 3 && 'Set your budget range in INR'}
-              {currentStep === 4 && 'When would you like to complete this project?'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {currentStep === 1 && (
-              <RadioGroup value={selectedRoom} onValueChange={setSelectedRoom}>
-                {[
-                  { value: 'livingRoom', label: 'Living Room' },
-                  { value: 'bedroom', label: 'Bedroom' },
-                  { value: 'diningRoom', label: 'Dining Room' },
-                  { value: 'office', label: 'Home Office' },
-                  { value: 'kidsRoom', label: "Kids' Room" },
-                  { value: 'other', label: 'Other' },
-                ].map((room) => (
-                  <div key={room.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={room.value} id={room.value} />
-                    <Label htmlFor={room.value} className="cursor-pointer">
-                      {room.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            )}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {step === 1 && 'What room are you designing?'}
+            {step === 2 && 'What styles do you like?'}
+            {step === 3 && 'What is your budget?'}
+            {step === 4 && 'What is your timeline?'}
+          </CardTitle>
+          <CardDescription>
+            {step === 1 && 'Select the room type you want to design'}
+            {step === 2 && 'Choose one or more styles that appeal to you'}
+            {step === 3 && 'Enter your budget range in INR'}
+            {step === 4 && 'When would you like to complete this project?'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {step === 1 && (
+            <RadioGroup
+              value={roomType ? JSON.stringify(roomType) : ''}
+              onValueChange={(value) => setRoomType(JSON.parse(value))}
+            >
+              {roomTypes.map((room) => (
+                <div key={room.label} className="flex items-center space-x-2">
+                  <RadioGroupItem value={JSON.stringify(room.value)} id={room.label} />
+                  <Label htmlFor={room.label} className="cursor-pointer">
+                    {room.label}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
 
-            {currentStep === 2 && (
-              <div className="space-y-4">
-                {[
-                  { value: 'modern', label: 'Modern' },
-                  { value: 'traditional', label: 'Traditional' },
-                  { value: 'contemporary', label: 'Contemporary' },
-                  { value: 'boho', label: 'Boho' },
-                  { value: 'minimalist', label: 'Minimalist' },
-                  { value: 'rustic', label: 'Rustic' },
-                ].map((style) => (
-                  <div key={style.value} className="flex items-center space-x-2">
+          {step === 2 && (
+            <div className="space-y-4">
+              {styleOptions.map((style) => {
+                const isChecked = stylePreferences.some(
+                  (s) => JSON.stringify(s) === JSON.stringify(style.value)
+                );
+                return (
+                  <div key={style.label} className="flex items-center space-x-2">
                     <Checkbox
-                      id={style.value}
-                      checked={selectedStyles.includes(style.value)}
+                      id={style.label}
+                      checked={isChecked}
                       onCheckedChange={() => toggleStyle(style.value)}
                     />
-                    <Label htmlFor={style.value} className="cursor-pointer">
+                    <Label htmlFor={style.label} className="cursor-pointer">
                       {style.label}
                     </Label>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {currentStep === 3 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="budgetMin">Minimum Budget (₹)</Label>
-                  <Input
-                    id="budgetMin"
-                    type="number"
-                    value={budgetMin}
-                    onChange={(e) => setBudgetMin(Number(e.target.value))}
-                    min="0"
-                    step="10000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="budgetMax">Maximum Budget (₹)</Label>
-                  <Input
-                    id="budgetMax"
-                    type="number"
-                    value={budgetMax}
-                    onChange={(e) => setBudgetMax(Number(e.target.value))}
-                    min="0"
-                    step="10000"
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Budget range: ₹{budgetMin.toLocaleString('en-IN')} - ₹
-                  {budgetMax.toLocaleString('en-IN')}
-                </p>
-              </div>
-            )}
-
-            {currentStep === 4 && (
-              <RadioGroup value={selectedTimeline} onValueChange={setSelectedTimeline}>
-                {[
-                  { value: '1-2 weeks', label: '1-2 weeks' },
-                  { value: '3-4 weeks', label: '3-4 weeks' },
-                  { value: '1-2 months', label: '1-2 months' },
-                  { value: '3+ months', label: '3+ months' },
-                  { value: 'Flexible', label: 'Flexible' },
-                ].map((time) => (
-                  <div key={time.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={time.value} id={time.value} />
-                    <Label htmlFor={time.value} className="cursor-pointer">
-                      {time.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            )}
-
-            <div className="flex justify-between pt-6">
-              <Button variant="outline" onClick={handleBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-              <Button onClick={handleNext} disabled={!canProceed()}>
-                {currentStep === TOTAL_STEPS ? 'Review' : 'Next'}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="minBudget">Minimum Budget (INR)</Label>
+                <Input
+                  id="minBudget"
+                  type="number"
+                  value={budget ? Number(budget.min) : ''}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    setBudget({
+                      min: BigInt(value),
+                      max: budget ? budget.max : BigInt(0),
+                      currency: 'INR',
+                    });
+                  }}
+                  placeholder="50000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="maxBudget">Maximum Budget (INR)</Label>
+                <Input
+                  id="maxBudget"
+                  type="number"
+                  value={budget ? Number(budget.max) : ''}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    setBudget({
+                      min: budget ? budget.min : BigInt(0),
+                      max: BigInt(value),
+                      currency: 'INR',
+                    });
+                  }}
+                  placeholder="200000"
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div>
+              <Label htmlFor="timeline">Timeline</Label>
+              <Input
+                id="timeline"
+                type="text"
+                value={timeline}
+                onChange={(e) => setTimeline(e.target.value)}
+                placeholder="e.g., 2-3 months"
+              />
+            </div>
+          )}
+
+          <div className="flex justify-between pt-6">
+            <Button variant="outline" onClick={handleBack} disabled={step === 1}>
+              Back
+            </Button>
+            <Button onClick={handleNext} disabled={!canProceed()}>
+              {step === totalSteps ? 'Review' : 'Next'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

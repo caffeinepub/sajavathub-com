@@ -14,6 +14,7 @@ import type {
   RoomPackage,
   StylePreference,
   RoomType,
+  FurnitureSubCategory,
 } from '../backend';
 
 export function useGetPackages() {
@@ -280,5 +281,35 @@ export function useGetRoomPackagesByStyleAndRoomType(
       return actor.getRoomPackagesByStyleAndRoomType(style, roomType);
     },
     enabled: !!actor && !isFetching && !!style && !!roomType,
+  });
+}
+
+// Global Product Search Hook
+export function useGlobalProductSearch(searchTerm: string) {
+  const { actor, isFetching } = useActor();
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  return useQuery<Product[]>({
+    queryKey: ['globalProductSearch', normalizedSearchTerm],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      if (!normalizedSearchTerm) return [];
+      return actor.globalProductSearch(normalizedSearchTerm);
+    },
+    enabled: !!actor && !isFetching && normalizedSearchTerm.length > 0,
+  });
+}
+
+// Furniture Subcategory Hook
+export function useGetProductsByFurnitureSubCategory(subCategory: FurnitureSubCategory) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Product[]>({
+    queryKey: ['productsByFurnitureSubCategory', subCategory],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getProductsByFurnitureSubCategory(subCategory);
+    },
+    enabled: !!actor && !isFetching,
   });
 }

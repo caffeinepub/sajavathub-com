@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import GlobalProductSearchPanel from '../../components/products/GlobalProductSearchPanel';
 
 export default function ShopLandingPage() {
   return (
@@ -9,6 +11,18 @@ export default function ShopLandingPage() {
         <p className="text-lg text-muted-foreground">
           Browse our collection by room packages, category, or brand
         </p>
+      </div>
+
+      {/* Global Product Search */}
+      <div className="mb-16">
+        <GlobalProductSearchPanel />
+      </div>
+
+      <Separator className="my-12" />
+
+      {/* Browse Options */}
+      <div className="mb-8 text-center">
+        <h2 className="text-2xl font-bold text-foreground">Browse by</h2>
       </div>
 
       <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">

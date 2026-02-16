@@ -1,98 +1,109 @@
 {
   "kind": "build_request",
-  "title": "Improve Room Package browsing UI (Package Products by Room) and restructure how room packages/products are displayed",
+  "title": "Add global product search and a Furniture menu with subcategories in Products by Category",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8"
-        ],
-        "quotes": [
-          "yes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "After selecting a Design Style and Room Type, the UI shows a list/grid of matching room packages (not just a single package).",
-        "Selecting a package in the list updates the package detail panel and the included products list for the selected package.",
-        "If zero packages match, the existing empty state remains visible and no package detail panel is shown."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8"
-        ],
-        "quotes": [
-          "yes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "For a selected room package, the detail header consistently displays: name, description, style label, room type label, and formatted INR price.",
-        "The \"Add Entire Package to Cart\" button remains disabled when the included products list is empty and shows the existing toast error messaging when appropriate.",
-        "Layout is responsive: on small screens content stacks vertically; on larger screens it uses a clear two-column or well-spaced layout without overlapping elements."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8"
-        ],
-        "quotes": [
-          "yes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When products are loaded for a selected package, the UI shows an item count summary (e.g., \"Included Products (3)\").",
-        "A sort control is available that can reorder the displayed products by at least one of: price (low→high/high→low) and name (A→Z/Z→A).",
-        "Each product card displays: image, product name, formatted INR price, and an in-stock/out-of-stock indicator (reusing existing inventory logic)."
-      ]
-    },
-    {
       "id": "REQ-4",
-      "text": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
-      "target": "frontend",
+      "text": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8"
+          "msg-4"
         ],
         "quotes": [
-          "yes"
+          "add search option for all products."
         ]
       },
       "acceptanceCriteria": [
-        "When packages are loading, a package-loading state is shown; when products are loading for a selected package, a products-loading state is shown independently.",
-        "If packages are available but a selected package has zero resolved products, show a clear empty message for products (do not show a blank grid).",
-        "No console errors occur when switching style/room selections rapidly (UI should handle state transitions without rendering with invalid IDs)."
+        "Backend exposes a public query method that accepts a text query and returns matching products.",
+        "Search is case-insensitive.",
+        "If the query is empty/whitespace, the method returns an empty list (not a trap)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add furniture menu in products by category and give all available options of furniture for example, sofa, center table, dining table, corner table, king size bed, queen size bed, bed side tables, dressing table, study table, sofa chairs, recliners, crockery unit etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Product categories include a Furniture parent category and individual subcategories corresponding to each of the listed furniture types.",
+        "Each furniture subcategory has a stable category id and appears in the list returned by getProductCategories().",
+        "Each furniture subcategory has at least one Product seeded so the UI can display results."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add search option for all products."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A search input is available from the shopping flow (e.g., on /shop and/or /products) and is clearly labeled in English (e.g., \"Search products\").",
+        "Submitting a search shows matching products using the backend global search API.",
+        "Search results handle loading, empty, and error states with user-facing text in English.",
+        "Users can add products from search results to the cart using the existing add-to-cart behavior."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add furniture menu in products by category and give all available options of furniture for example, sofa, center table, dining table, corner table, king size bed, queen size bed, bed side tables, dressing table, study table, sofa chairs, recliners, crockery unit etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "/products shows a Furniture section/menu with links/buttons for each listed furniture option.",
+        "Clicking a furniture option navigates to the corresponding category detail page and displays that option’s products.",
+        "The Furniture section does not break or hide existing non-furniture categories; they remain accessible from /products."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add search option for all products."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new React Query hook exists for product search and calls the backend search method.",
+        "Typing into the search input does not trigger an unbounded number of requests (debounce or explicit submit).",
+        "Query keys include the search text so results cache correctly per query."
       ]
     }
   ],
   "constraints": [
-    "Do not change the existing route path `/products/room-category`.",
-    "Do not edit any files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything under `frontend/src/components/ui` (compose instead of modifying).",
-    "Keep backend architecture as a single Motoko actor; no additional backend services."
+    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
+    "Only add a migration file (backend/migration.mo) if required by state/schema changes; follow the conditional migration policy.",
+    "Do not edit files under frontend immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui). Compose existing UI components instead."
   ],
   "nonGoals": [
-    "No changes to backend data models, room package seed data, or package/product query methods unless strictly required for the UI changes.",
-    "No new authentication flows or role/permission changes.",
-    "No checkout/cart business logic changes beyond what is required to support the updated display."
+    "Do not add third-party search services or external databases.",
+    "Do not implement third-party authentication providers; keep Internet Identity as-is.",
+    "Do not redesign unrelated pages (packages, designers, checkout) beyond what is needed to add search and the furniture menu."
   ],
   "imageRequirements": {
     "required": [],

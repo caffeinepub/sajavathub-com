@@ -3,8 +3,10 @@ import { useGetProductCategories } from '../../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Sofa } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+import { FurnitureSubCategory } from '../../backend';
 
 export default function ProductCategoriesPage() {
   const { data: categories, isLoading, error, isFetched } = useGetProductCategories();
@@ -116,6 +118,22 @@ export default function ProductCategoriesPage() {
     return '/assets/generated/category-rugs-textiles.dim_800x800.png';
   };
 
+  // Furniture subcategories with display names
+  const furnitureSubCategories = [
+    { key: FurnitureSubCategory.sofa, label: 'Sofa' },
+    { key: FurnitureSubCategory.centerTable, label: 'Center Table' },
+    { key: FurnitureSubCategory.diningTable, label: 'Dining Table' },
+    { key: FurnitureSubCategory.cornerTable, label: 'Corner Table' },
+    { key: FurnitureSubCategory.kingSizeBed, label: 'King Size Bed' },
+    { key: FurnitureSubCategory.queenSizeBed, label: 'Queen Size Bed' },
+    { key: FurnitureSubCategory.bedSideTables, label: 'Bed Side Tables' },
+    { key: FurnitureSubCategory.dressingTable, label: 'Dressing Table' },
+    { key: FurnitureSubCategory.studyTable, label: 'Study Table' },
+    { key: FurnitureSubCategory.sofaChairs, label: 'Sofa Chairs' },
+    { key: FurnitureSubCategory.recliners, label: 'Recliners' },
+    { key: FurnitureSubCategory.crockeryUnit, label: 'Crockery Unit' },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-12 text-center">
@@ -123,6 +141,37 @@ export default function ProductCategoriesPage() {
         <p className="text-lg text-muted-foreground">
           Discover curated furniture and decor for every room
         </p>
+      </div>
+
+      {/* Furniture Section */}
+      <div className="mb-12">
+        <div className="mb-6 flex items-center gap-3">
+          <Sofa className="h-6 w-6 text-primary" />
+          <h2 className="text-2xl font-bold text-foreground">Furniture</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {furnitureSubCategories.map((subCat) => (
+            <Link
+              key={subCat.key}
+              to="/products/furniture/$subCategory"
+              params={{ subCategory: subCat.key }}
+            >
+              <Button
+                variant="outline"
+                className="h-auto w-full justify-start px-6 py-4 text-left transition-all hover:border-primary hover:bg-primary/5"
+              >
+                <span className="text-base font-medium">{subCat.label}</span>
+              </Button>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <Separator className="my-12" />
+
+      {/* Other Categories */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-foreground">All Categories</h2>
       </div>
 
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

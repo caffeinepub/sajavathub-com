@@ -1,40 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Product catalog enhancements: add global product search and expand Products-by-Category with a Furniture menu including detailed furniture subcategories.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-package-products-by-room-browsing-experience-frontend-so-users-can-view-and-choose-among-multiple-room-packages-returned-for-the-selected-style-room-type-instead-of-automatically-using-the-first-package-only",
-      "title": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
+      "id": "feature-add-a-frontend-global-product-search-experience-that-allows-users-to-search-across-all-products-from-the-shop-area-and-view-results-with-product-cards-consistent-with-existing-product-listing-cards-image-name-description-price-stock-add-to-cart",
+      "title": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
       "reqIds": [
-        "REQ-1"
+        "REQ-6"
       ],
       "version": 1
     },
     {
-      "id": "feature-restructure-the-room-package-detail-presentation-to-make-package-information-and-actions-clearer-show-package-name-description-style-badge-room-type-badge-package-price-and-a-primary-add-entire-package-to-cart-action-in-a-consistent-layout-that-works-on-mobile-and-desktop",
-      "title": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
+      "id": "feature-update-the-products-by-category-page-to-include-a-dedicated-furniture-menu-section-that-lists-all-available-furniture-options-sofa-center-table-dining-table-corner-table-king-size-bed-queen-size-bed-bed-side-tables-dressing-table-study-table-sofa-chairs-recliners-crockery-unit-and-lets-users-navigate-directly-to-each-furniture-subcategory-s-product-listing",
+      "title": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
       "reqIds": [
-        "REQ-2"
+        "REQ-7"
       ],
       "version": 1
     },
     {
-      "id": "feature-improve-how-included-products-within-a-room-package-are-displayed-add-a-clearer-product-card-layout-with-image-name-price-and-stock-status-and-provide-basic-organization-controls-at-minimum-a-sort-control-for-price-name-and-a-count-summary-like-x-items-included",
-      "title": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
+      "id": "feature-wire-frontend-data-hooks-for-global-product-search-using-react-query-keeping-query-keys-stable-and-ensuring-searches-are-cancellable-debounced-to-avoid-excessive-requests-while-typing",
+      "title": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
       "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-package-products-by-room-page-route-products-room-category-has-coherent-loading-empty-states-for-both-the-package-list-and-the-included-products-panel-so-users-always-understand-what-is-loading-vs-what-is-unavailable",
-      "title": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
-      "reqIds": [
-        "REQ-4"
+        "REQ-8"
       ],
       "version": 1
     }
@@ -42,18 +34,34 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Adjust how package products are displayed when grouped by room",
+      "summary": "Add a search option to search across all products (global product search).",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Update how room packages are shown and/or structured in the UI",
+      "summary": "Add a Furniture menu under Products by Category with furniture type options (e.g., sofa, center table, dining table, corner table, king/queen bed, bedside tables, dressing table, study table, sofa chairs, recliners, crockery unit, etc.).",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
+      "reqIds": [
+        "REQ-5"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Improve Room Package browsing UI (Package Products by Room) and restructure how room packages/products are displayed",
+  "projectName": "Add global product search and a Furniture menu with subcategories in Products by Category",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

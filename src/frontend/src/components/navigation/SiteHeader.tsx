@@ -48,7 +48,7 @@ export default function SiteHeader() {
     { to: '/shop', label: 'Shop' },
     { to: '/packages', label: 'Packages' },
     { to: '/designers', label: 'Designers' },
-    { to: '/room-visualizer', label: 'AI Room Visualizer' },
+    { to: '/visualizer', label: 'AI Room Visualizer' },
     { to: '/faq', label: 'FAQ' },
     { to: '/how-it-works', label: 'How It Works' },
   ];
@@ -134,7 +134,7 @@ export default function SiteHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
-                  <Link to="/app/dashboard" className="cursor-pointer">
+                  <Link to="/dashboard" className="cursor-pointer">
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
@@ -216,7 +216,7 @@ export default function SiteHeader() {
                   {isAuthenticated ? (
                     <>
                       <Link
-                        to="/app/dashboard"
+                        to="/dashboard"
                         className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                         onClick={() => setMobileMenuOpen(false)}
                       >

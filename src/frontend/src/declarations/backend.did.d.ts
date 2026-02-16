@@ -41,6 +41,25 @@ export interface Designer {
   'styles' : Array<StylePreference>,
   'name' : string,
 }
+export interface FurnitureCategory {
+  'id' : string,
+  'subCategory' : FurnitureSubCategory,
+  'name' : string,
+  'description' : string,
+  'products' : Array<Product>,
+}
+export type FurnitureSubCategory = { 'bedSideTables' : null } |
+  { 'sofa' : null } |
+  { 'sofaChairs' : null } |
+  { 'cornerTable' : null } |
+  { 'studyTable' : null } |
+  { 'kingSizeBed' : null } |
+  { 'recliners' : null } |
+  { 'crockeryUnit' : null } |
+  { 'queenSizeBed' : null } |
+  { 'dressingTable' : null } |
+  { 'centerTable' : null } |
+  { 'diningTable' : null };
 export interface Order {
   'id' : string,
   'status' : string,
@@ -162,6 +181,7 @@ export interface _SERVICE {
     Array<ConsultationRequest>
   >,
   'getDesigners' : ActorMethod<[], Array<Designer>>,
+  'getFurnitureCategories' : ActorMethod<[], Array<FurnitureCategory>>,
   'getNotesForProject' : ActorMethod<[string], Array<ProjectNote>>,
   'getOrder' : ActorMethod<[string], [] | [Order]>,
   'getPackages' : ActorMethod<[], Array<Package>>,
@@ -169,6 +189,11 @@ export interface _SERVICE {
   'getProductCategories' : ActorMethod<[], Array<ProductCategory>>,
   'getProductsByBrand' : ActorMethod<[string], Array<Product>>,
   'getProductsByCategory' : ActorMethod<[string], Array<Product>>,
+  'getProductsByFurnitureCategory' : ActorMethod<[string], Array<Product>>,
+  'getProductsByFurnitureSubCategory' : ActorMethod<
+    [FurnitureSubCategory],
+    Array<Product>
+  >,
   'getProductsForRoomPackage' : ActorMethod<[string], Array<Product>>,
   'getProjectBrief' : ActorMethod<[string], [] | [ProjectBrief]>,
   'getRoomPackageById' : ActorMethod<[string], [] | [RoomPackage]>,
@@ -186,10 +211,12 @@ export interface _SERVICE {
   'getUserOrders' : ActorMethod<[Principal], Array<Order>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserProjectBriefs' : ActorMethod<[Principal], Array<ProjectBrief>>,
+  'globalProductSearch' : ActorMethod<[string], Array<Product>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'placeOrder' : ActorMethod<[Order], undefined>,
   'requestConsultation' : ActorMethod<[ConsultationRequest], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'searchFurnitureProducts' : ActorMethod<[string], Array<Product>>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

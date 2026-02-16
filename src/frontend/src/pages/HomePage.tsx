@@ -11,9 +11,17 @@ export default function HomePage() {
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      navigate({ to: '/app/dashboard' });
+      navigate({ to: '/dashboard' });
     } else {
-      navigate({ to: '/onboarding/quiz' });
+      navigate({ to: '/quiz' });
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      await login();
+    } catch (error: any) {
+      console.error('Login error:', error);
     }
   };
 
@@ -171,17 +179,17 @@ export default function HomePage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                 {isAuthenticated ? (
                   <Button asChild size="lg">
-                    <Link to="/app/dashboard">
+                    <Link to="/dashboard">
                       Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
                 ) : (
                   <>
-                    <Button size="lg" onClick={login} disabled={isLoggingIn}>
+                    <Button size="lg" onClick={handleLogin} disabled={isLoggingIn}>
                       {isLoggingIn ? 'Signing In...' : 'Sign In'}
                     </Button>
                     <Button asChild size="lg" variant="outline">
-                      <Link to="/onboarding/quiz">Start Quiz</Link>
+                      <Link to="/quiz">Start Quiz</Link>
                     </Button>
                   </>
                 )}

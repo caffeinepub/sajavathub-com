@@ -1,91 +1,107 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T10:02:46.744Z",
+  "generatedAt": "2026-02-16T12:52:11.260Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 5,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
-          "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
-          "frontend/src/utils/roomPackageSort.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
-          "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
-          "frontend/src/utils/roomPackageSort.ts"
-        ]
-      },
-      {
         "id": "REQ-4",
-        "summary": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
+        "summary": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
-          "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx"
+          "frontend/src/components/products/ProductListingCard.tsx",
+          "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+          "frontend/src/pages/products/ShopLandingPage.tsx",
+          "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/packages/StylePackagesSection.tsx",
-          "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
-          "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx"
+          "frontend/src/components/products/ProductListingCard.tsx",
+          "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+          "frontend/src/pages/products/ShopLandingPage.tsx",
+          "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useDebouncedValue.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/products/GlobalProductSearchPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useDebouncedValue.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/products/GlobalProductSearchPanel.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/packages/StylePackagesSection.tsx",
-    "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
-    "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
-    "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
-    "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx",
-    "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
-    "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx",
-    "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx",
-    "frontend/src/utils/roomPackageSort.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/navigation/SiteHeader.tsx",
+    "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+    "frontend/src/components/products/ProductListingCard.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useDebouncedValue.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/DesignerDetailPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/HowItWorksPage.tsx",
+    "frontend/src/pages/PackagesPage.tsx",
+    "frontend/src/pages/dashboard/DashboardPage.tsx",
+    "frontend/src/pages/onboarding/OnboardingQuizPage.tsx",
+    "frontend/src/pages/onboarding/ProjectBriefReviewPage.tsx",
+    "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+    "frontend/src/pages/products/ShopLandingPage.tsx",
+    "frontend/src/pages/projects/ProjectWorkspacePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

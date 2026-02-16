@@ -19,26 +19,17 @@ export interface ProjectBrief {
     timeline: string;
 }
 export type Time = bigint;
+export interface OrderItem {
+    productId: string;
+    quantity: bigint;
+    price: bigint;
+}
 export interface Designer {
     id: string;
     bio: string;
     portfolio: Array<PortfolioItem>;
     styles: Array<StylePreference>;
     name: string;
-}
-export interface OrderItem {
-    productId: string;
-    quantity: bigint;
-    price: bigint;
-}
-export interface ConsultationRequest {
-    id: string;
-    status: string;
-    userId: Principal;
-    projectId?: string;
-    notes: string;
-    submissionDate: Time;
-    requestedTime: Time;
 }
 export interface ProductBrand {
     id: string;
@@ -89,6 +80,15 @@ export interface Order {
     buyerId: Principal;
     items: Array<OrderItem>;
 }
+export interface ConsultationRequest {
+    id: string;
+    status: string;
+    userId: Principal;
+    projectId?: string;
+    notes: string;
+    submissionDate: Time;
+    requestedTime: Time;
+}
 export interface RoomPackage {
     id: string;
     productIds: Array<string>;
@@ -97,6 +97,13 @@ export interface RoomPackage {
     style: StylePreference;
     priceINR: bigint;
     roomType: RoomType;
+}
+export interface FurnitureCategory {
+    id: string;
+    subCategory: FurnitureSubCategory;
+    name: string;
+    description: string;
+    products: Array<Product>;
 }
 export interface BudgetRange {
     max: bigint;
@@ -166,6 +173,20 @@ export interface Product {
     priceINR: bigint;
     roomType: RoomType;
 }
+export enum FurnitureSubCategory {
+    bedSideTables = "bedSideTables",
+    sofa = "sofa",
+    sofaChairs = "sofaChairs",
+    cornerTable = "cornerTable",
+    studyTable = "studyTable",
+    kingSizeBed = "kingSizeBed",
+    recliners = "recliners",
+    crockeryUnit = "crockeryUnit",
+    queenSizeBed = "queenSizeBed",
+    dressingTable = "dressingTable",
+    centerTable = "centerTable",
+    diningTable = "diningTable"
+}
 export enum PaymentMethod {
     upi = "upi",
     wallet = "wallet",
@@ -187,6 +208,7 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getConsultationsForProject(projectId: string): Promise<Array<ConsultationRequest>>;
     getDesigners(): Promise<Array<Designer>>;
+    getFurnitureCategories(): Promise<Array<FurnitureCategory>>;
     getNotesForProject(projectId: string): Promise<Array<ProjectNote>>;
     getOrder(orderId: string): Promise<Order | null>;
     getPackages(): Promise<Array<Package>>;
@@ -194,6 +216,8 @@ export interface backendInterface {
     getProductCategories(): Promise<Array<ProductCategory>>;
     getProductsByBrand(brandId: string): Promise<Array<Product>>;
     getProductsByCategory(categoryId: string): Promise<Array<Product>>;
+    getProductsByFurnitureCategory(categoryId: string): Promise<Array<Product>>;
+    getProductsByFurnitureSubCategory(subCategory: FurnitureSubCategory): Promise<Array<Product>>;
     getProductsForRoomPackage(packageId: string): Promise<Array<Product>>;
     getProjectBrief(id: string): Promise<ProjectBrief | null>;
     getRoomPackageById(packageId: string): Promise<RoomPackage | null>;
@@ -205,8 +229,10 @@ export interface backendInterface {
     getUserOrders(userId: Principal): Promise<Array<Order>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserProjectBriefs(userId: Principal): Promise<Array<ProjectBrief>>;
+    globalProductSearch(searchTerm: string): Promise<Array<Product>>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(order: Order): Promise<void>;
     requestConsultation(request: ConsultationRequest): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    searchFurnitureProducts(searchTerm: string): Promise<Array<Product>>;
 }

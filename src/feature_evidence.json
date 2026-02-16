@@ -2,12 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-package-products-by-room-browsing-experience-frontend-so-users-can-view-and-choose-among-multiple-room-packages-returned-for-the-selected-style-room-type-instead-of-automatically-using-the-first-package-only",
-      "featureTitle": "Update the \"Package Products by Room\" browsing experience (frontend) so users can view and choose among multiple room packages returned for the selected style + room type instead of automatically using the first package only.",
+      "featureId": "feature-add-a-frontend-global-product-search-experience-that-allows-users-to-search-across-all-products-from-the-shop-area-and-view-results-with-product-cards-consistent-with-existing-product-listing-cards-image-name-description-price-stock-add-to-cart",
+      "featureTitle": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
       "files": [
-        "frontend/src/components/packages/StylePackagesSection.tsx",
-        "frontend/src/components/packages/room-packages/RoomPackageList.tsx",
-        "frontend/src/components/packages/room-packages/RoomPackageListItem.tsx"
+        "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+        "frontend/src/components/products/ProductListingCard.tsx",
+        "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
+        "frontend/src/pages/products/ShopLandingPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,16 +19,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-6"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-restructure-the-room-package-detail-presentation-to-make-package-information-and-actions-clearer-show-package-name-description-style-badge-room-type-badge-package-price-and-a-primary-add-entire-package-to-cart-action-in-a-consistent-layout-that-works-on-mobile-and-desktop",
-      "featureTitle": "Restructure the room package detail presentation to make package information and actions clearer: show package name, description, style badge, room-type badge, package price, and a primary \"Add Entire Package to Cart\" action in a consistent layout that works on mobile and desktop.",
+      "featureId": "feature-update-the-products-by-category-page-to-include-a-dedicated-furniture-menu-section-that-lists-all-available-furniture-options-sofa-center-table-dining-table-corner-table-king-size-bed-queen-size-bed-bed-side-tables-dressing-table-study-table-sofa-chairs-recliners-crockery-unit-and-lets-users-navigate-directly-to-each-furniture-subcategory-s-product-listing",
+      "featureTitle": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
       "files": [
-        "frontend/src/components/packages/StylePackagesSection.tsx",
-        "frontend/src/components/packages/room-packages/RoomPackageDetailHeader.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+        "frontend/src/pages/products/ProductCategoriesPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,18 +40,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-7"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-improve-how-included-products-within-a-room-package-are-displayed-add-a-clearer-product-card-layout-with-image-name-price-and-stock-status-and-provide-basic-organization-controls-at-minimum-a-sort-control-for-price-name-and-a-count-summary-like-x-items-included",
-      "featureTitle": "Improve how included products within a room package are displayed: add a clearer product card layout with image, name, price, and stock status, and provide basic organization controls (at minimum: a sort control for price/name, and a count summary like \"X items included\").",
+      "featureId": "feature-wire-frontend-data-hooks-for-global-product-search-using-react-query-keeping-query-keys-stable-and-ensuring-searches-are-cancellable-debounced-to-avoid-excessive-requests-while-typing",
+      "featureTitle": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
       "files": [
-        "frontend/src/components/packages/StylePackagesSection.tsx",
-        "frontend/src/components/packages/room-packages/IncludedProductCard.tsx",
-        "frontend/src/components/packages/room-packages/IncludedProductsPanel.tsx",
-        "frontend/src/utils/roomPackageSort.ts"
+        "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+        "frontend/src/hooks/useDebouncedValue.ts",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -60,28 +61,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-the-package-products-by-room-page-route-products-room-category-has-coherent-loading-empty-states-for-both-the-package-list-and-the-included-products-panel-so-users-always-understand-what-is-loading-vs-what-is-unavailable",
-      "featureTitle": "Ensure the \"Package Products by Room\" page (route `/products/room-category`) has coherent loading/empty states for both the package list and the included products panel so users always understand what is loading vs. what is unavailable.",
-      "files": [
-        "frontend/src/components/packages/StylePackagesSection.tsx",
-        "frontend/src/components/packages/room-packages/ProductsLoadingState.tsx",
-        "frontend/src/components/packages/room-packages/RoomPackagesLoadingState.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-8"
       ],
       "confidence": "high"
     }
