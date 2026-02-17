@@ -82,17 +82,17 @@ export default function SiteHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link to="/products/furniture" className="cursor-pointer">
+                <Link to="/shop/furniture" className="cursor-pointer">
                   Furniture
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/products/decor" className="cursor-pointer">
+                <Link to="/shop/decor" className="cursor-pointer">
                   Decor
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/products/furnishing" className="cursor-pointer">
+                <Link to="/shop/furnishing" className="cursor-pointer">
                   Furnishing
                 </Link>
               </DropdownMenuItem>
@@ -179,21 +179,21 @@ export default function SiteHeader() {
                 <div className="border-b border-border pb-4">
                   <p className="mb-2 text-sm font-semibold text-muted-foreground">Shop by Category</p>
                   <Link
-                    to="/products/furniture"
+                    to="/shop/furniture"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Furniture
                   </Link>
                   <Link
-                    to="/products/decor"
+                    to="/shop/decor"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Decor
                   </Link>
                   <Link
-                    to="/products/furnishing"
+                    to="/shop/furnishing"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >

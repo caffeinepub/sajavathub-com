@@ -41,7 +41,7 @@ export default function CartPage() {
               <Link to="/shop">Start Shopping</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link to="/products">Browse Categories</Link>
+              <Link to="/shop/categories">Browse Categories</Link>
             </Button>
           </div>
         </div>

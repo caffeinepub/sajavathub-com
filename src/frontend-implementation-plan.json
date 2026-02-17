@@ -1,83 +1,73 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Vendors UI: Listing + OTP-based Vendor Registration (GST required)",
+  "title": "SajavatHub Vendors — Vendor registration + vendor listing UI aligned to specification",
   "requirements": [
     {
-      "id": "REQ-3",
-      "summary": "Add a Vendors page/route with navigation access and a vendor list fetched from the backend.",
+      "id": "REQ-1",
+      "summary": "Align the vendor registration UI flow (steps, fields, validations, and success/error states) to the attached vendor registration specification; ensure the Vendors area is access-controlled and all text is in English.",
       "acceptanceCriteria": [
-        "A new Vendors page/route is available in the app and is reachable from the site navigation (desktop and mobile).",
-        "The Vendors page fetches and displays vendor entries from the backend with a sensible empty state when no vendors exist.",
-        "The UI uses English user-facing text for headings, buttons, and error/empty states."
+        "All vendor registration form fields, labels, and required/optional rules match the attached document.",
+        "The registration flow steps (e.g., detail entry, verification, confirmation) match the attached document and are implemented end-to-end.",
+        "All user-facing text in the vendor registration flow is in English.",
+        "Validation messages clearly explain what is missing/invalid and prevent submission when requirements are not met."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
+          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "operation": "modify",
+          "description": "Update the multi-step vendor registration flow to match the attached specification (fields beyond vendor name/mobile/GST if required), including step sequencing, per-field validation, and explicit success/error UI states. Ensure validation blocks submission and messages are clear and English-only."
+        },
+        {
+          "path": "frontend/src/components/vendors/vendorRegistrationSchema.ts",
           "operation": "create",
-          "description": "Create the Vendors page that renders a vendor list (loading/error/empty states) and provides access to the vendor registration flow. Use existing shadcn-ui components (e.g., Card, Button, Skeleton/Alert where available) to compose the UI—Verify the component's usage instructions before implementing."
+          "description": "Create a dedicated vendor registration form schema/validator + helpers (e.g., required/optional rules, formatting rules, step-level validation) derived from the attached specification, to keep VendorRegistrationCard logic maintainable."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update vendor-related React Query hooks to support the specification-aligned registration flow (e.g., any new request/verify/register payload shapes), and ensure vendor list queries are invalidated/refetched on successful registration."
+        },
+        {
+          "path": "frontend/src/backend.d.ts",
+          "operation": "modify",
+          "description": "Sync frontend backend type declarations used by the vendor registration flow (e.g., VendorInput/Vendor) with any specification-driven backend shape changes so the UI can submit and render all required attributes."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Register a new TanStack Router route for the Vendors page (e.g., /vendors) and include it in the route tree so the page is navigable."
+          "description": "Protect the Vendors route behind authentication/authorization as required by the selected authorization component (Internet Identity + role-based access patterns). Use the existing RequireAuth wrapper so users must be logged in before accessing vendor data. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/navigation/SiteHeader.tsx",
+          "path": "frontend/src/routes/RequireAuth.tsx",
           "operation": "modify",
-          "description": "Add a 'Vendors' link to the desktop navLinks and to the mobile menu so the Vendors page is reachable from site navigation on all breakpoints. Use existing navigation/link patterns and existing shadcn-ui components already in use—Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/navigation/SiteFooter.tsx",
-          "operation": "modify",
-          "description": "Add a footer link to the Vendors page to improve discoverability and ensure navigation access beyond the header."
+          "description": "Adjust the sign-in required messaging (English-only) to cover accessing vendor registration/vendor data as well, keeping the same authentication flow. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-4",
-      "summary": "Create a two-step vendor registration UI that requires GST and verifies mobile via OTP before final submission.",
+      "id": "REQ-3",
+      "summary": "Update the Vendors page listing UI to display vendor information (fields, formatting, and statuses/labels) per the attached specification, and refresh the list after successful registration with solid loading/empty/error states.",
       "acceptanceCriteria": [
-        "The registration form enforces GST number as required on the client side (cannot proceed without it).",
-        "The user can request an OTP for the entered mobile number and then enter the OTP to verify it.",
-        "The UI prevents final submission until OTP verification succeeds (or the backend enforces and the UI reflects the error clearly).",
-        "On successful registration, the user sees a clear success message and the new vendor appears in the vendor list after refresh (or automatic query invalidation)."
+        "Vendor list cards/rows display the fields and statuses required by the attached document.",
+        "After successful vendor registration, the Vendors list updates to show the newly registered vendor without a manual refresh.",
+        "Loading, empty, and error states remain present and readable."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-          "operation": "create",
-          "description": "Implement the vendor registration UI as a reusable component with a two-step flow: vendor details (name, mobile, mandatory GST) + 'Request OTP', then OTP entry + 'Verify OTP', and only then enable 'Register'. Use existing shadcn-ui form inputs/buttons/cards and present clear English validation and error messages—Verify the component's usage instructions before implementing."
-        },
         {
           "path": "frontend/src/pages/vendors/VendorsPage.tsx",
           "operation": "modify",
-          "description": "Wire VendorRegistrationCard into the Vendors page (inline section or dialog) and ensure successful registration triggers a visible success message and refreshes the displayed vendor list."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Add React Query hooks for vendor listing, OTP request/verify, and vendor registration following existing query/mutation patterns.",
-      "acceptanceCriteria": [
-        "Frontend has dedicated query hook(s) for fetching vendors and mutation hook(s) for requesting OTP, verifying OTP, and registering a vendor.",
-        "After successful vendor registration, vendor list queries are invalidated/refetched so the UI updates without a manual reload."
-      ],
-      "file_operations": [
+          "description": "Revise the Vendors list UI to render the specification-required vendor summary/details (including any status/labels/formatting), keep loading/empty/error states readable, and ensure the list refreshes immediately after successful registration (e.g., by relying on query invalidation and/or an explicit refetch on success)."
+        },
+        {
+          "path": "frontend/src/components/vendors/VendorListItem.tsx",
+          "operation": "create",
+          "description": "Add a dedicated vendor list row/card component to encapsulate specification-driven field layout, status badges/labels, and formatting rules for display consistency across the Vendors page."
+        },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add vendor-focused React Query hooks consistent with existing patterns: a vendors list query (using backend getAllVendors) and mutations for requestOtp, verifyOtp, and registerVendor. Ensure register success invalidates/refetches the vendors query key so VendorsPage updates without manual reload."
-        },
-        {
-          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
-          "operation": "modify",
-          "description": "Adopt the new vendors query hook for data fetching and use the shared query key(s) expected by invalidation after registration."
-        },
-        {
-          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-          "operation": "modify",
-          "description": "Use the new OTP request/verify and vendor registration mutation hooks, and reflect mutation states (loading/disabled) and backend errors clearly in the UI using existing shadcn-ui feedback patterns—Verify the component's usage instructions before implementing."
+          "description": "Ensure the vendors query key + invalidation strategy supports immediate post-registration refresh (and remains compatible with the specification-required vendor fields rendered by the Vendors page)."
         }
       ]
     }

@@ -1,32 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build vendor functionality: add vendor listing/management in the frontend and implement vendor registration in the backend with mandatory GST number and OTP verification for mobile number.",
+  "summary": "Project to implement a vendor registration flow/UI per the attached specification document.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-frontend-vendors-section-that-lets-users-view-a-list-of-registered-vendors-and-access-a-vendor-registration-flow",
-      "title": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
+      "id": "feature-update-the-existing-vendor-registration-flow-ui-backend-to-match-the-fields-steps-validations-and-success-error-states-defined-in-the-attached-vendor-registration-specification-document-including-any-additional-vendor-details-beyond-vendor-name-mobile-number-and-gst",
+      "title": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-vendors-page-and-vendor-listing-ui-to-display-vendor-information-according-to-the-attached-document-fields-shown-formatting-and-any-status-labels-and-ensure-list-refreshes-appropriately-after-a-successful-registration",
+      "title": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-frontend-vendor-registration-ui-with-a-two-step-otp-verification-flow-1-enter-vendor-details-including-mandatory-gst-number-and-mobile-request-otp-2-enter-otp-to-verify-and-only-then-allow-registration-submission",
-      "title": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-react-query-hooks-and-backend-bindings-needed-to-support-vendor-listing-otp-request-verify-and-vendor-registration-following-existing-query-mutation-patterns-used-for-packages-designers-orders",
-      "title": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
-      "reqIds": [
-        "REQ-5"
       ],
       "version": 1
     }
@@ -34,45 +26,28 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add vendor features in frontend (vendors section/listing/management UI).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Implement backend vendor registration flow.",
+      "summary": "Implement vendor registration flow/UI as specified in the attached document",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Require OTP verification for vendor mobile number during registration.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Make GST number mandatory for vendor registration.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Implement backend vendor registration with a stored Vendor profile, where GST number is mandatory and the vendor’s mobile number must be OTP-verified before the registration can be completed.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Add backend OTP flow for vendor mobile verification, including an API to request an OTP for a mobile number and an API to verify the OTP, with appropriate validation and expiration handling.",
+      "summary": "Ensure the backend vendor data model and APIs support the attached document’s vendor registration requirements, including persisting all required vendor attributes and enforcing any constraints/uniqueness rules specified in the document.",
       "reqIds": [
         "REQ-2"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "If the attached document requires changes to persisted vendor state (new fields or altered types), add a conditional Motoko state migration to preserve existing vendor/OTP data across upgrades.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
     }
   ],
+  "gameProjectType": "none",
   "projectName": "SajavatHub Vendors",
   "clarification_mode": "instant",
   "clarification_rounds": 0

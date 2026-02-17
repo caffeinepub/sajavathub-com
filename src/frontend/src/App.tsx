@@ -1,6 +1,11 @@
 import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import SiteLayout from './components/layout/SiteLayout';
+import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from 'next-themes';
+
+import SiteHeader from './components/navigation/SiteHeader';
+import SiteFooter from './components/navigation/SiteFooter';
+import HomePage from './pages/HomePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import PackagesPage from './pages/PackagesPage';
 import DesignersPage from './pages/DesignersPage';
@@ -11,17 +16,17 @@ import ProjectBriefReviewPage from './pages/onboarding/ProjectBriefReviewPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProjectWorkspacePage from './pages/projects/ProjectWorkspacePage';
 import NotFoundPage from './pages/NotFoundPage';
+import ShopLandingPage from './pages/products/ShopLandingPage';
 import ProductCategoriesPage from './pages/products/ProductCategoriesPage';
 import ProductCategoryDetailPage from './pages/products/ProductCategoryDetailPage';
 import ProductBrandsPage from './pages/products/ProductBrandsPage';
 import ProductBrandDetailPage from './pages/products/ProductBrandDetailPage';
 import RoomVisualizerPage from './pages/RoomVisualizerPage';
-import ShopLandingPage from './pages/products/ShopLandingPage';
-import RoomCategoryPage from './pages/products/RoomCategoryPage';
-import FurnitureSubCategoryPage from './pages/products/FurnitureSubCategoryPage';
 import FurnitureMenuPage from './pages/products/FurnitureMenuPage';
+import FurnitureSubCategoryPage from './pages/products/FurnitureSubCategoryPage';
 import DecorLandingPage from './pages/products/DecorLandingPage';
 import FurnishingLandingPage from './pages/products/FurnishingLandingPage';
+import RoomCategoryPage from './pages/products/RoomCategoryPage';
 import CartPage from './pages/cart/CartPage';
 import CheckoutPage from './pages/checkout/CheckoutPage';
 import VendorsPage from './pages/vendors/VendorsPage';
@@ -32,22 +37,31 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });
 
+function RootLayout() {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
 const rootRoute = createRootRoute({
-  component: () => (
-    <SiteLayout>
-      <Outlet />
-    </SiteLayout>
-  ),
+  component: RootLayout,
 });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: ShopLandingPage,
+  component: HomePage,
 });
 
 const howItWorksRoute = createRoute({
@@ -114,64 +128,64 @@ const shopRoute = createRoute({
   component: ShopLandingPage,
 });
 
-const productsRoute = createRoute({
+const categoriesRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products',
+  path: '/shop/categories',
   component: ProductCategoriesPage,
 });
 
-const productCategoryRoute = createRoute({
+const categoryDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/$categoryId',
+  path: '/shop/categories/$categoryId',
   component: ProductCategoryDetailPage,
 });
 
-const productBrandsRoute = createRoute({
+const brandsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/brands',
+  path: '/shop/brands',
   component: ProductBrandsPage,
 });
 
-const productBrandDetailRoute = createRoute({
+const brandDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/brands/$brandId',
+  path: '/shop/brands/$brandId',
   component: ProductBrandDetailPage,
 });
 
-const roomVisualizerRoute = createRoute({
+const visualizerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/visualizer',
   component: RoomVisualizerPage,
 });
 
-const roomCategoryRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/products/room-category',
-  component: RoomCategoryPage,
-});
-
 const furnitureMenuRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/furniture',
+  path: '/shop/furniture',
   component: FurnitureMenuPage,
 });
 
 const furnitureSubCategoryRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/furniture/$subCategory',
+  path: '/shop/furniture/$subCategory',
   component: FurnitureSubCategoryPage,
 });
 
 const decorRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/decor',
+  path: '/shop/decor',
   component: DecorLandingPage,
 });
 
 const furnishingRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/products/furnishing',
+  path: '/shop/furnishing',
   component: FurnishingLandingPage,
+});
+
+const roomPackagesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/shop/room-packages',
+  component: RoomCategoryPage,
 });
 
 const cartRoute = createRoute({
@@ -193,7 +207,11 @@ const checkoutRoute = createRoute({
 const vendorsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/vendors',
-  component: VendorsPage,
+  component: () => (
+    <RequireAuth>
+      <VendorsPage />
+    </RequireAuth>
+  ),
 });
 
 const notFoundRoute = createRoute({
@@ -214,16 +232,16 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   projectRoute,
   shopRoute,
-  productsRoute,
-  productCategoryRoute,
-  productBrandsRoute,
-  productBrandDetailRoute,
-  roomVisualizerRoute,
-  roomCategoryRoute,
+  categoriesRoute,
+  categoryDetailRoute,
+  brandsRoute,
+  brandDetailRoute,
+  visualizerRoute,
   furnitureMenuRoute,
   furnitureSubCategoryRoute,
   decorRoute,
   furnishingRoute,
+  roomPackagesRoute,
   cartRoute,
   checkoutRoute,
   vendorsRoute,
@@ -240,8 +258,11 @@ declare module '@tanstack/react-router' {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

@@ -1,93 +1,80 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T11:00:21.314Z",
+  "generatedAt": "2026-02-17T11:12:38.679Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Implement backend vendor registration with a stored Vendor profile, where GST number is mandatory and the vendor’s mobile number must be OTP-verified before the registration can be completed.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "frontend/src/components/vendors/vendorRegistrationSchema.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/backend.d.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/routes/RequireAuth.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/routes/RequireAuth.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add backend OTP flow for vendor mobile verification, including an API to request an OTP for a mobile number and an API to verify the OTP, with appropriate validation and expiration handling.",
+        "summary": "Ensure the backend vendor data model and APIs support the attached document’s vendor registration requirements, including persisting all required vendor attributes and enforcing any constraints/uniqueness rules specified in the document.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
+        "summary": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/vendors/VendorsPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/navigation/SiteHeader.tsx",
-          "frontend/src/components/navigation/SiteFooter.tsx"
+          "frontend/src/components/vendors/VendorListItem.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
           "frontend/src/pages/vendors/VendorsPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/navigation/SiteHeader.tsx",
-          "frontend/src/components/navigation/SiteFooter.tsx"
+          "frontend/src/components/vendors/VendorListItem.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-          "frontend/src/pages/vendors/VendorsPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-          "frontend/src/pages/vendors/VendorsPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/vendors/VendorsPage.tsx",
-          "frontend/src/components/vendors/VendorRegistrationCard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/vendors/VendorsPage.tsx",
-          "frontend/src/components/vendors/VendorRegistrationCard.tsx"
-        ]
+        "summary": "If the attached document requires changes to persisted vendor state (new fields or altered types), add a conditional Motoko state migration to preserve existing vendor/OTP data across upgrades.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/navigation/SiteFooter.tsx",
     "frontend/src/components/navigation/SiteHeader.tsx",
+    "frontend/src/components/vendors/VendorListItem.tsx",
     "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/cart/CartPage.tsx",
+    "frontend/src/pages/products/FurnitureMenuPage.tsx",
+    "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+    "frontend/src/pages/products/ProductBrandsPage.tsx",
+    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/pages/products/ShopLandingPage.tsx",
     "frontend/src/pages/vendors/VendorsPage.tsx",
+    "frontend/src/routes/RequireAuth.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

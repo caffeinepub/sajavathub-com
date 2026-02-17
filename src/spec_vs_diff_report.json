@@ -1,55 +1,93 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T11:00:21.311Z",
-  "summary": "Frontend adds a new /vendors route with navigation links, a Vendors page that lists vendors, and a two-step vendor registration card that requests and verifies OTP before registering. Vendor-related React Query hooks are reported as added. Backend state migration introduces Vendor/OTP-related maps and types, but the diff summary does not provide enough evidence that backend vendor registration/OTP APIs (with required validations and expiry handling) are fully implemented in backend/main.mo.",
+  "generatedAt": "2026-02-17T11:12:38.676Z",
+  "summary": "Diff adds/updates vendor registration UI components and a Vendors page, plus many unrelated frontend changes (shop/cart/auth routing). Backend/migration changes required by the BuildRequest are not evidenced in the provided diff summary, and alignment to the attached vendor registration specification document cannot be verified from the fields shown (name/mobile/GST/OTP only).",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Implement backend vendor registration with stored Vendor profile; GST mandatory; mobile must be OTP-verified before registration completion; persisted and retrievable.",
-      "reason": "The diff shows new Vendor-related types/state in backend/migration.mo, but the backend/main.mo diff is truncated and does not show vendor registration functions or the enforcement checks (GST non-empty, OTP verified) or retrieval API for persisted vendors.",
+      "requirement": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
+      "reason": "The implemented registration UI shown only includes vendorName, mobileNumber, gstNumber, and OTP steps; there is no evidence of any additional vendor attributes/steps/validations from the attached specification document being implemented. Backend-side changes for matching the spec are also not evidenced in the diff summary.",
       "evidence": [
-        "backend/main.mo (truncated; vendor APIs/validation not visible)",
-        "backend/migration.mo"
+        "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+        "frontend/src/pages/vendors/VendorsPage.tsx"
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "Add backend OTP flow APIs to request and verify OTP with validation, expiration, latest-OTP-only verification, and tracked verification status.",
-      "reason": "While backend/migration.mo adds otp/verifiedOtp maps and an Otp type including expiryTime, the diff summary does not show the actual backend endpoints in backend/main.mo for requesting OTP, verifying OTP, enforcing expiry/latest OTP, or returning clear errors on incorrect/expired OTP.",
+      "requirement": "Ensure the backend vendor data model and APIs support the attached document’s vendor registration requirements, including persisting all required vendor attributes and enforcing any constraints/uniqueness rules specified in the document.",
+      "reason": "No backend Motoko changes are shown in the diff summary (no evidence from backend/main.mo). The new/updated frontend relies on vendor fields (id, name, gstNumber, mobileNumber, verified, createdAt), but the backend persistence, constraints/uniqueness enforcement, and API updates required by the attached document are not evidenced.",
       "evidence": [
-        "backend/main.mo (truncated; OTP APIs/logic not visible)",
-        "backend/migration.mo"
+        "frontend/src/components/vendors/VendorListItem.tsx",
+        "frontend/src/hooks/useQueries.ts (mentioned in frontend-file-summaries.txt, but content not shown)",
+        "backend/main.mo (no diff evidence provided)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
+      "reason": "Vendor listing UI displays a limited set of fields (name, GST, mobile, registered date, verified badge). There is no evidence these match the attached document’s required fields/formatting/status labels beyond this minimal set. Also, VendorsPage onSuccess only hides the registration card; list refresh behavior is not directly evidenced in the shown code (query invalidation is only described in a truncated summary).",
+      "evidence": [
+        "frontend/src/pages/vendors/VendorsPage.tsx",
+        "frontend/src/components/vendors/VendorListItem.tsx",
+        "frontend-file-summaries.txt (useQueries invalidation mentioned but not shown)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "If the attached document requires changes to persisted vendor state (new fields or altered types), add a conditional Motoko state migration to preserve existing vendor/OTP data across upgrades.",
+      "reason": "No evidence of backend schema migration work is provided (no backend/migration.mo shown/added in the diff summary). Therefore the conditional migration requirement is not evidenced as implemented.",
+      "evidence": [
+        "backend/migration.mo (not present in diff summary)",
+        "backend/main.mo (no diff evidence provided)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Changes to authentication guard and profile setup behavior (RequireAuth messaging, ProfileSetupDialog modal behavior, useCurrentUserProfile loading/flash prevention).",
-      "reason": "Not requested by the BuildRequest, which focuses on vendor registration/listing and OTP verification flows.",
+      "description": "Large set of e-commerce/shop UI additions and route changes (categories/brands/furniture menu/subcategory pages) unrelated to vendor registration alignment.",
+      "reason": "Not requested by any REQ-1..REQ-4; BuildRequest is specifically about aligning vendor registration and vendors listing with an attached specification document.",
       "evidence": [
-        "frontend-file-summaries.txt (entries for frontend/src/routes/RequireAuth.tsx, frontend/src/components/auth/ProfileSetupDialog.tsx, frontend/src/hooks/useCurrentUserProfile.ts)"
+        "frontend/src/pages/products/ShopLandingPage.tsx",
+        "frontend/src/pages/products/ProductCategoriesPage.tsx",
+        "frontend/src/pages/products/ProductBrandsPage.tsx",
+        "frontend/src/pages/products/FurnitureMenuPage.tsx",
+        "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+        "frontend/src/components/navigation/SiteHeader.tsx",
+        "frontend/src/App.tsx"
       ]
     },
     {
-      "description": "Addition/changes to unrelated marketing and designer pages (HomePage, HowItWorksPage, PackagesPage, DesignersPage/DesignerDetailPage changes like SafeExternalImage).",
-      "reason": "Not requested by the BuildRequest; scope is Vendors UI and vendor registration + OTP.",
+      "description": "Cart page updates (quantity controls/toast behavior) unrelated to vendor registration work.",
+      "reason": "Not requested by any REQ-1..REQ-4.",
       "evidence": [
-        "frontend-file-summaries.txt (entries for frontend/src/pages/HomePage.tsx, HowItWorksPage.tsx, PackagesPage.tsx, DesignersPage.tsx, DesignerDetailPage.tsx)"
+        "frontend/src/pages/cart/CartPage.tsx"
+      ]
+    },
+    {
+      "description": "Addition/update of an authentication guard (RequireAuth) and routing protection messaging beyond vendor registration scope.",
+      "reason": "BuildRequest did not request adding or changing auth guarding; only stated non-goal of third-party auth providers and that Internet Identity is supported.",
+      "evidence": [
+        "frontend/src/routes/RequireAuth.tsx",
+        "frontend/src/App.tsx"
       ]
     }
   ],
-  "confidence": 0.63,
+  "confidence": 0.68,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
     "frontend/src/App.tsx",
-    "frontend/src/components/navigation/SiteFooter.tsx",
     "frontend/src/components/navigation/SiteHeader.tsx",
+    "frontend/src/components/vendors/VendorListItem.tsx",
     "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/cart/CartPage.tsx",
+    "frontend/src/pages/products/FurnitureMenuPage.tsx",
+    "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
+    "frontend/src/pages/products/ProductBrandsPage.tsx",
+    "frontend/src/pages/products/ProductCategoriesPage.tsx",
+    "frontend/src/pages/products/ShopLandingPage.tsx",
     "frontend/src/pages/vendors/VendorsPage.tsx",
+    "frontend/src/routes/RequireAuth.tsx",
     "project_state.json"
   ]
 }

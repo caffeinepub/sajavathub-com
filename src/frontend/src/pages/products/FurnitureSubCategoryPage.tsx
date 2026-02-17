@@ -1,117 +1,77 @@
 import { useParams } from '@tanstack/react-router';
 import { useGetProductsByFurnitureSubCategory } from '../../hooks/useQueries';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import ProductListingCard from '../../components/products/ProductListingCard';
 import { FurnitureSubCategory } from '../../backend';
+import ProductListingCard from '../../components/products/ProductListingCard';
 import BackButton from '../../components/navigation/BackButton';
 import { applyFurnitureImageOverrides } from '../../data/furnitureImageOverrides';
-import { useMemo } from 'react';
 
 export default function FurnitureSubCategoryPage() {
-  const { subCategory } = useParams({ from: '/products/furniture/$subCategory' });
-  const { data: products, isLoading, error } = useGetProductsByFurnitureSubCategory(
-    subCategory as FurnitureSubCategory
-  );
+  const { subCategory } = useParams({ from: '/shop/furniture/$subCategory' });
+  const { data: products, isLoading, error } = useGetProductsByFurnitureSubCategory(subCategory as FurnitureSubCategory);
 
-  // Apply image overrides to products with missing images
-  const productsWithImages = useMemo(() => {
-    if (!products) return [];
-    return applyFurnitureImageOverrides(products, subCategory as FurnitureSubCategory);
-  }, [products, subCategory]);
+  const productsWithImages = products ? applyFurnitureImageOverrides(products, subCategory as FurnitureSubCategory) : [];
 
-  const getDisplayLabel = (key: string): string => {
-    const labels: Record<string, string> = {
-      sofa: 'Sofa',
-      centerTable: 'Center Table',
-      diningTable: 'Dining Table',
-      cornerTable: 'Corner Table',
-      kingSizeBed: 'King Size Bed',
-      queenSizeBed: 'Queen Size Bed',
-      bedSideTables: 'Bed Side Tables',
-      dressingTable: 'Dressing Table',
-      studyTable: 'Study Table',
-      sofaChairs: 'Sofa Chairs',
-      recliners: 'Recliners',
-      crockeryUnit: 'Crockery Unit',
-    };
-    return labels[key] || key;
+  const subCategoryLabels: Record<FurnitureSubCategory, string> = {
+    [FurnitureSubCategory.sofa]: 'Sofas',
+    [FurnitureSubCategory.centerTable]: 'Center Tables',
+    [FurnitureSubCategory.diningTable]: 'Dining Tables',
+    [FurnitureSubCategory.cornerTable]: 'Corner Tables',
+    [FurnitureSubCategory.kingSizeBed]: 'King Size Beds',
+    [FurnitureSubCategory.queenSizeBed]: 'Queen Size Beds',
+    [FurnitureSubCategory.bedSideTables]: 'Bedside Tables',
+    [FurnitureSubCategory.dressingTable]: 'Dressing Tables',
+    [FurnitureSubCategory.studyTable]: 'Study Tables',
+    [FurnitureSubCategory.sofaChairs]: 'Sofa Chairs',
+    [FurnitureSubCategory.recliners]: 'Recliners',
+    [FurnitureSubCategory.crockeryUnit]: 'Crockery Units',
   };
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <BackButton fallbackPath="/products/furniture" className="mb-8" />
-        <div className="mb-8">
-          <Skeleton className="mb-2 h-10 w-64" />
-          <Skeleton className="h-6 w-96" />
-        </div>
+  const label = subCategoryLabels[subCategory as FurnitureSubCategory] || subCategory;
+
+  return (
+    <div className="container mx-auto px-4 py-12">
+      <BackButton fallbackPath="/shop/furniture" />
+
+      <div className="mb-8">
+        <h1 className="mb-4 text-4xl font-bold tracking-tight">{label}</h1>
+        <p className="text-lg text-muted-foreground">
+          Browse our collection of {label.toLowerCase()}
+        </p>
+      </div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error instanceof Error ? error.message : 'Failed to load products'}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {isLoading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="space-y-4">
               <Skeleton className="aspect-square w-full" />
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
             </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <BackButton fallbackPath="/products/furniture" className="mb-8" />
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Failed to load furniture products. Please try again later.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (!productsWithImages || productsWithImages.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <BackButton fallbackPath="/products/furniture" className="mb-8" />
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-            {getDisplayLabel(subCategory)}
-          </h1>
+      ) : productsWithImages && productsWithImages.length > 0 ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {productsWithImages.map((product) => (
+            <ProductListingCard key={product.id} product={product} />
+          ))}
         </div>
-        <Alert>
-          <AlertDescription>
-            No products available in this furniture category at the moment.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-12">
-      <BackButton fallbackPath="/products/furniture" className="mb-8" />
-      
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-          {getDisplayLabel(subCategory)}
-        </h1>
-        <p className="text-muted-foreground">
-          {productsWithImages.length} {productsWithImages.length === 1 ? 'product' : 'products'} available
-        </p>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {productsWithImages.map((product) => (
-          <ProductListingCard key={product.id} product={product} />
-        ))}
-      </div>
+      ) : (
+        <div className="py-12 text-center">
+          <p className="text-lg text-muted-foreground">No products found in this category</p>
+        </div>
+      )}
     </div>
   );
 }
