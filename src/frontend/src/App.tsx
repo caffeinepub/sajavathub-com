@@ -1,7 +1,6 @@
 import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SiteLayout from './components/layout/SiteLayout';
-import HomePage from './pages/HomePage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import PackagesPage from './pages/PackagesPage';
 import DesignersPage from './pages/DesignersPage';
@@ -20,8 +19,12 @@ import RoomVisualizerPage from './pages/RoomVisualizerPage';
 import ShopLandingPage from './pages/products/ShopLandingPage';
 import RoomCategoryPage from './pages/products/RoomCategoryPage';
 import FurnitureSubCategoryPage from './pages/products/FurnitureSubCategoryPage';
+import FurnitureMenuPage from './pages/products/FurnitureMenuPage';
+import DecorLandingPage from './pages/products/DecorLandingPage';
+import FurnishingLandingPage from './pages/products/FurnishingLandingPage';
 import CartPage from './pages/cart/CartPage';
 import CheckoutPage from './pages/checkout/CheckoutPage';
+import VendorsPage from './pages/vendors/VendorsPage';
 import RequireAuth from './routes/RequireAuth';
 
 const queryClient = new QueryClient({
@@ -44,7 +47,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: HomePage,
+  component: ShopLandingPage,
 });
 
 const howItWorksRoute = createRoute({
@@ -147,10 +150,28 @@ const roomCategoryRoute = createRoute({
   component: RoomCategoryPage,
 });
 
+const furnitureMenuRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/furniture',
+  component: FurnitureMenuPage,
+});
+
 const furnitureSubCategoryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/products/furniture/$subCategory',
   component: FurnitureSubCategoryPage,
+});
+
+const decorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/decor',
+  component: DecorLandingPage,
+});
+
+const furnishingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/products/furnishing',
+  component: FurnishingLandingPage,
 });
 
 const cartRoute = createRoute({
@@ -167,6 +188,12 @@ const checkoutRoute = createRoute({
       <CheckoutPage />
     </RequireAuth>
   ),
+});
+
+const vendorsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/vendors',
+  component: VendorsPage,
 });
 
 const notFoundRoute = createRoute({
@@ -193,9 +220,13 @@ const routeTree = rootRoute.addChildren([
   productBrandDetailRoute,
   roomVisualizerRoute,
   roomCategoryRoute,
+  furnitureMenuRoute,
   furnitureSubCategoryRoute,
+  decorRoute,
+  furnishingRoute,
   cartRoute,
   checkoutRoute,
+  vendorsRoute,
   notFoundRoute,
 ]);
 

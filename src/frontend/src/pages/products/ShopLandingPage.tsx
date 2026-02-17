@@ -64,13 +64,13 @@ export default function ShopLandingPage() {
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h2 className="mb-2 text-2xl font-bold">Products by Category</h2>
                 <p className="text-sm text-white/90">
-                  Browse furniture and decor organized by room type
+                  Furniture, Furnishing, and Decor
                 </p>
               </div>
             </div>
             <CardContent className="p-6">
               <p className="text-center text-sm text-muted-foreground">
-                Explore living room, bedroom, dining, office, and more
+                Explore our three main categories
               </p>
             </CardContent>
           </Card>

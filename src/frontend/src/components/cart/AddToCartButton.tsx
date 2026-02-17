@@ -6,6 +6,7 @@ import type { Product } from '../../backend';
 
 interface AddToCartButtonProps {
   product: Product;
+  quantity?: number;
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'default' | 'sm' | 'lg';
   className?: string;
@@ -13,6 +14,7 @@ interface AddToCartButtonProps {
 
 export default function AddToCartButton({
   product,
+  quantity = 1,
   variant = 'default',
   size = 'default',
   className,
@@ -22,13 +24,19 @@ export default function AddToCartButton({
   const isOutOfStock = inventory === 0;
 
   const handleAddToCart = () => {
-    const result = addItem({
-      productId: product.id,
-      name: product.name,
-      imageUrl: product.imageUrl,
-      priceINR: Number(product.priceINR),
-      availableInventory: inventory,
-    });
+    // Ensure quantity is at least 1 and clamped to available inventory
+    const validQuantity = Math.max(1, Math.min(Math.floor(quantity || 1), inventory));
+    
+    const result = addItem(
+      {
+        productId: product.id,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        priceINR: Number(product.priceINR),
+        availableInventory: inventory,
+      },
+      validQuantity
+    );
 
     if (result.success) {
       toast.success(result.message);

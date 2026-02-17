@@ -3,8 +3,9 @@ import { useGetProductBrands } from '../../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import BackButton from '../../components/navigation/BackButton';
 
 export default function ProductBrandsPage() {
   const { data: brands, isLoading, error, isFetched } = useGetProductBrands();
@@ -12,10 +13,7 @@ export default function ProductBrandsPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Shop
-        </Link>
+        <BackButton fallbackPath="/shop" className="mb-8" />
         <div className="mb-12 text-center">
           <Skeleton className="mx-auto mb-4 h-12 w-64" />
           <Skeleton className="mx-auto h-6 w-96" />
@@ -38,10 +36,7 @@ export default function ProductBrandsPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Shop
-        </Link>
+        <BackButton fallbackPath="/shop" className="mb-8" />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -58,10 +53,7 @@ export default function ProductBrandsPage() {
   if (isFetched && sortedBrands.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Shop
-        </Link>
+        <BackButton fallbackPath="/shop" className="mb-8" />
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground">Shop by Brand</h1>
           <p className="text-lg text-muted-foreground">
@@ -77,10 +69,7 @@ export default function ProductBrandsPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <Link to="/products" className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Shop
-      </Link>
+      <BackButton fallbackPath="/shop" className="mb-8" />
       
       <div className="mb-12 text-center">
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground">Shop by Brand</h1>

@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T12:52:11.260Z",
+  "generatedAt": "2026-02-17T11:00:21.314Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,64 +11,62 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-4",
-        "summary": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
+        "id": "REQ-1",
+        "summary": "Implement backend vendor registration with a stored Vendor profile, where GST number is mandatory and the vendor’s mobile number must be OTP-verified before the registration can be completed.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Add backend OTP flow for vendor mobile verification, including an API to request an OTP for a mobile number and an API to verify the OTP, with appropriate validation and expiration handling.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/vendors/VendorsPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/navigation/SiteHeader.tsx",
+          "frontend/src/components/navigation/SiteFooter.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/vendors/VendorsPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/navigation/SiteHeader.tsx",
+          "frontend/src/components/navigation/SiteFooter.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "frontend/src/pages/vendors/VendorsPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "frontend/src/pages/vendors/VendorsPage.tsx"
+        ]
       },
       {
         "id": "REQ-5",
-        "summary": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
+        "summary": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/products/ProductListingCard.tsx",
-          "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-          "frontend/src/pages/products/ShopLandingPage.tsx",
-          "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/products/ProductListingCard.tsx",
-          "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-          "frontend/src/pages/products/ShopLandingPage.tsx",
-          "frontend/src/pages/products/ProductCategoryDetailPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/products/ProductCategoriesPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/products/ProductCategoriesPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-8",
-        "summary": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useDebouncedValue.ts",
           "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/products/GlobalProductSearchPanel.tsx"
+          "frontend/src/pages/vendors/VendorsPage.tsx",
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useDebouncedValue.ts",
           "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/products/GlobalProductSearchPanel.tsx"
+          "frontend/src/pages/vendors/VendorsPage.tsx",
+          "frontend/src/components/vendors/VendorRegistrationCard.tsx"
         ]
       }
     ]
@@ -83,25 +81,13 @@
     "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
+    "frontend/src/components/navigation/SiteFooter.tsx",
     "frontend/src/components/navigation/SiteHeader.tsx",
-    "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-    "frontend/src/components/products/ProductListingCard.tsx",
+    "frontend/src/components/vendors/VendorRegistrationCard.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useDebouncedValue.ts",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/DesignerDetailPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/HowItWorksPage.tsx",
-    "frontend/src/pages/PackagesPage.tsx",
-    "frontend/src/pages/dashboard/DashboardPage.tsx",
-    "frontend/src/pages/onboarding/OnboardingQuizPage.tsx",
-    "frontend/src/pages/onboarding/ProjectBriefReviewPage.tsx",
-    "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-    "frontend/src/pages/products/ProductCategoriesPage.tsx",
-    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-    "frontend/src/pages/products/ShopLandingPage.tsx",
-    "frontend/src/pages/projects/ProjectWorkspacePage.tsx",
+    "frontend/src/pages/vendors/VendorsPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

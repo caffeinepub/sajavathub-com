@@ -1,32 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Product catalog enhancements: add global product search and expand Products-by-Category with a Furniture menu including detailed furniture subcategories.",
+  "summary": "Build vendor functionality: add vendor listing/management in the frontend and implement vendor registration in the backend with mandatory GST number and OTP verification for mobile number.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-frontend-global-product-search-experience-that-allows-users-to-search-across-all-products-from-the-shop-area-and-view-results-with-product-cards-consistent-with-existing-product-listing-cards-image-name-description-price-stock-add-to-cart",
-      "title": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
+      "id": "feature-add-frontend-vendors-section-that-lets-users-view-a-list-of-registered-vendors-and-access-a-vendor-registration-flow",
+      "title": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
       "reqIds": [
-        "REQ-6"
+        "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-products-by-category-page-to-include-a-dedicated-furniture-menu-section-that-lists-all-available-furniture-options-sofa-center-table-dining-table-corner-table-king-size-bed-queen-size-bed-bed-side-tables-dressing-table-study-table-sofa-chairs-recliners-crockery-unit-and-lets-users-navigate-directly-to-each-furniture-subcategory-s-product-listing",
-      "title": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
+      "id": "feature-create-a-frontend-vendor-registration-ui-with-a-two-step-otp-verification-flow-1-enter-vendor-details-including-mandatory-gst-number-and-mobile-request-otp-2-enter-otp-to-verify-and-only-then-allow-registration-submission",
+      "title": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
       "reqIds": [
-        "REQ-7"
+        "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-wire-frontend-data-hooks-for-global-product-search-using-react-query-keeping-query-keys-stable-and-ensuring-searches-are-cancellable-debounced-to-avoid-excessive-requests-while-typing",
-      "title": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
+      "id": "feature-add-react-query-hooks-and-backend-bindings-needed-to-support-vendor-listing-otp-request-verify-and-vendor-registration-following-existing-query-mutation-patterns-used-for-packages-designers-orders",
+      "title": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
       "reqIds": [
-        "REQ-8"
+        "REQ-5"
       ],
       "version": 1
     }
@@ -34,34 +34,46 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add a search option to search across all products (global product search).",
+      "summary": "Add vendor features in frontend (vendors section/listing/management UI).",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Add a Furniture menu under Products by Category with furniture type options (e.g., sofa, center table, dining table, corner table, king/queen bed, bedside tables, dressing table, study table, sofa chairs, recliners, crockery unit, etc.).",
+      "summary": "Implement backend vendor registration flow.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
-      "reqIds": [
-        "REQ-4"
-      ],
+      "summary": "Require OTP verification for vendor mobile number during registration.",
+      "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
+      "summary": "Make GST number mandatory for vendor registration.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement backend vendor registration with a stored Vendor profile, where GST number is mandatory and the vendor’s mobile number must be OTP-verified before the registration can be completed.",
       "reqIds": [
-        "REQ-5"
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add backend OTP flow for vendor mobile verification, including an API to request an OTP for a mobile number and an API to verify the OTP, with appropriate validation and expiration handling.",
+      "reqIds": [
+        "REQ-2"
       ],
       "status": "pending"
     }
   ],
-  "projectName": "Add global product search and a Furniture menu with subcategories in Products by Category",
+  "projectName": "SajavatHub Vendors",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

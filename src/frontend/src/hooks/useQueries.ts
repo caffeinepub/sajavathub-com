@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
+import { useInternetIdentity } from './useInternetIdentity';
 import type {
   Package,
   Designer,
@@ -8,13 +9,18 @@ import type {
   ProjectNote,
   UserProfile,
   ProductCategory,
-  Product,
   ProductBrand,
-  Order,
+  Product,
+  FurnitureSubCategory,
   RoomPackage,
+  Order,
+  BuyerInfo,
   StylePreference,
   RoomType,
-  FurnitureSubCategory,
+  Vendor,
+  OtpRequest,
+  OtpVerification,
+  VendorInput,
 } from '../backend';
 
 export function useGetPackages() {
@@ -23,7 +29,7 @@ export function useGetPackages() {
   return useQuery<Package[]>({
     queryKey: ['packages'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getPackages();
     },
     enabled: !!actor && !isFetching,
@@ -36,37 +42,10 @@ export function useGetDesigners() {
   return useQuery<Designer[]>({
     queryKey: ['designers'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getDesigners();
     },
     enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetUserProjectBriefs(userId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ProjectBrief[]>({
-    queryKey: ['userProjectBriefs', userId],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      const principal = { toText: () => userId } as any;
-      return actor.getUserProjectBriefs(principal);
-    },
-    enabled: !!actor && !isFetching && !!userId,
-  });
-}
-
-export function useGetProjectBrief(projectId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ProjectBrief | null>({
-    queryKey: ['projectBrief', projectId],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getProjectBrief(projectId);
-    },
-    enabled: !!actor && !isFetching && !!projectId,
   });
 }
 
@@ -80,8 +59,35 @@ export function useCreateProjectBrief() {
       return actor.createProjectBrief(brief);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProjectBriefs'] });
+      queryClient.invalidateQueries({ queryKey: ['projectBriefs'] });
     },
+  });
+}
+
+export function useGetUserProjectBriefs(userId: string) {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<ProjectBrief[]>({
+    queryKey: ['projectBriefs', userId],
+    queryFn: async () => {
+      if (!actor || !identity) return [];
+      return actor.getUserProjectBriefs(identity.getPrincipal());
+    },
+    enabled: !!actor && !!identity && !isFetching,
+  });
+}
+
+export function useGetProjectBrief(projectId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<ProjectBrief | null>({
+    queryKey: ['projectBrief', projectId],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getProjectBrief(projectId);
+    },
+    enabled: !!actor && !isFetching && !!projectId,
   });
 }
 
@@ -106,21 +112,8 @@ export function useGetConsultationsForProject(projectId: string) {
   return useQuery<ConsultationRequest[]>({
     queryKey: ['consultations', projectId],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getConsultationsForProject(projectId);
-    },
-    enabled: !!actor && !isFetching && !!projectId,
-  });
-}
-
-export function useGetNotesForProject(projectId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ProjectNote[]>({
-    queryKey: ['projectNotes', projectId],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getNotesForProject(projectId);
     },
     enabled: !!actor && !isFetching && !!projectId,
   });
@@ -136,8 +129,21 @@ export function useAddNote() {
       return actor.addNote(note);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['projectNotes', variables.projectId] });
+      queryClient.invalidateQueries({ queryKey: ['notes', variables.projectId] });
     },
+  });
+}
+
+export function useGetNotesForProject(projectId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<ProjectNote[]>({
+    queryKey: ['notes', projectId],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getNotesForProject(projectId);
+    },
+    enabled: !!actor && !isFetching && !!projectId,
   });
 }
 
@@ -162,7 +168,7 @@ export function useGetProductCategories() {
   return useQuery<ProductCategory[]>({
     queryKey: ['productCategories'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getProductCategories();
     },
     enabled: !!actor && !isFetching,
@@ -173,9 +179,9 @@ export function useGetProductsByCategory(categoryId: string) {
   const { actor, isFetching } = useActor();
 
   return useQuery<Product[]>({
-    queryKey: ['productsByCategory', categoryId],
+    queryKey: ['products', 'category', categoryId],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getProductsByCategory(categoryId);
     },
     enabled: !!actor && !isFetching && !!categoryId,
@@ -188,7 +194,7 @@ export function useGetProductBrands() {
   return useQuery<ProductBrand[]>({
     queryKey: ['productBrands'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getProductBrands();
     },
     enabled: !!actor && !isFetching,
@@ -199,71 +205,51 @@ export function useGetProductsByBrand(brandId: string) {
   const { actor, isFetching } = useActor();
 
   return useQuery<Product[]>({
-    queryKey: ['productsByBrand', brandId],
+    queryKey: ['products', 'brand', brandId],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getProductsByBrand(brandId);
     },
     enabled: !!actor && !isFetching && !!brandId,
   });
 }
 
-export function usePlaceOrder() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
+export function useGetProductsByFurnitureSubCategory(subCategory: FurnitureSubCategory) {
+  const { actor, isFetching } = useActor();
 
-  return useMutation({
-    mutationFn: async (order: Order) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.placeOrder(order);
+  return useQuery<Product[]>({
+    queryKey: ['products', 'furniture', subCategory],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getProductsByFurnitureSubCategory(subCategory);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userOrders'] });
-    },
-    onError: (error: any) => {
-      console.error('Place order error:', error);
-      throw new Error(error.message || 'Failed to place order');
-    },
+    enabled: !!actor && !isFetching && !!subCategory,
   });
 }
 
-// Room Package Hooks
+export function useGlobalProductSearch(searchTerm: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Product[]>({
+    queryKey: ['products', 'search', searchTerm],
+    queryFn: async () => {
+      if (!actor || !searchTerm.trim()) return [];
+      return actor.globalProductSearch(searchTerm);
+    },
+    enabled: !!actor && !isFetching && !!searchTerm.trim(),
+  });
+}
+
 export function useGetRoomPackages() {
   const { actor, isFetching } = useActor();
 
   return useQuery<RoomPackage[]>({
     queryKey: ['roomPackages'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getRoomPackages();
     },
     enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetRoomPackageById(packageId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<RoomPackage | null>({
-    queryKey: ['roomPackage', packageId],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getRoomPackageById(packageId);
-    },
-    enabled: !!actor && !isFetching && !!packageId,
-  });
-}
-
-export function useGetProductsForRoomPackage(packageId: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Product[]>({
-    queryKey: ['roomPackageProducts', packageId],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getProductsForRoomPackage(packageId);
-    },
-    enabled: !!actor && !isFetching && !!packageId,
   });
 }
 
@@ -274,9 +260,9 @@ export function useGetRoomPackagesByStyleAndRoomType(
   const { actor, isFetching } = useActor();
 
   return useQuery<RoomPackage[]>({
-    queryKey: ['roomPackagesByStyleAndRoom', style, roomType],
+    queryKey: ['roomPackages', 'filter', style, roomType],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       if (!style || !roomType) return [];
       return actor.getRoomPackagesByStyleAndRoomType(style, roomType);
     },
@@ -284,32 +270,105 @@ export function useGetRoomPackagesByStyleAndRoomType(
   });
 }
 
-// Global Product Search Hook
-export function useGlobalProductSearch(searchTerm: string) {
+export function useGetProductsForRoomPackage(packageId: string) {
   const { actor, isFetching } = useActor();
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
   return useQuery<Product[]>({
-    queryKey: ['globalProductSearch', normalizedSearchTerm],
+    queryKey: ['roomPackage', packageId, 'products'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      if (!normalizedSearchTerm) return [];
-      return actor.globalProductSearch(normalizedSearchTerm);
+      if (!actor) return [];
+      return actor.getProductsForRoomPackage(packageId);
     },
-    enabled: !!actor && !isFetching && normalizedSearchTerm.length > 0,
+    enabled: !!actor && !isFetching && !!packageId,
   });
 }
 
-// Furniture Subcategory Hook
-export function useGetProductsByFurnitureSubCategory(subCategory: FurnitureSubCategory) {
+export function usePlaceOrder() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      order,
+      buyerInfo,
+      orderTotal,
+    }: {
+      order: Order;
+      buyerInfo: BuyerInfo;
+      orderTotal: bigint;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.placeOrder(order, buyerInfo, orderTotal);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+    },
+  });
+}
+
+export function useGetUserOrders(userId: string) {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Order[]>({
+    queryKey: ['orders', userId],
+    queryFn: async () => {
+      if (!actor || !identity) return [];
+      return actor.getUserOrders(identity.getPrincipal());
+    },
+    enabled: !!actor && !!identity && !isFetching,
+  });
+}
+
+// ===== Vendor Hooks =====
+
+export function useGetAllVendors() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Product[]>({
-    queryKey: ['productsByFurnitureSubCategory', subCategory],
+  return useQuery<Vendor[]>({
+    queryKey: ['vendors'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getProductsByFurnitureSubCategory(subCategory);
+      if (!actor) return [];
+      return actor.getAllVendors();
     },
     enabled: !!actor && !isFetching,
+  });
+}
+
+export function useRequestOtp() {
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (request: OtpRequest) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.requestOtp(request);
+    },
+  });
+}
+
+export function useVerifyOtp() {
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async (verification: OtpVerification) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.verifyOtp(verification);
+    },
+  });
+}
+
+export function useRegisterVendor() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: VendorInput) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.registerVendor(input);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendors'] });
+    },
   });
 }

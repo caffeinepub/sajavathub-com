@@ -2,34 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-frontend-global-product-search-experience-that-allows-users-to-search-across-all-products-from-the-shop-area-and-view-results-with-product-cards-consistent-with-existing-product-listing-cards-image-name-description-price-stock-add-to-cart",
-      "featureTitle": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
-      "files": [
-        "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-        "frontend/src/components/products/ProductListingCard.tsx",
-        "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-        "frontend/src/pages/products/ShopLandingPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-products-by-category-page-to-include-a-dedicated-furniture-menu-section-that-lists-all-available-furniture-options-sofa-center-table-dining-table-corner-table-king-size-bed-queen-size-bed-bed-side-tables-dressing-table-study-table-sofa-chairs-recliners-crockery-unit-and-lets-users-navigate-directly-to-each-furniture-subcategory-s-product-listing",
-      "featureTitle": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
+      "featureId": "feature-add-frontend-vendors-section-that-lets-users-view-a-list-of-registered-vendors-and-access-a-vendor-registration-flow",
+      "featureTitle": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-        "frontend/src/pages/products/ProductCategoriesPage.tsx"
+        "frontend/src/components/navigation/SiteFooter.tsx",
+        "frontend/src/components/navigation/SiteHeader.tsx",
+        "frontend/src/pages/vendors/VendorsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,17 +19,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-wire-frontend-data-hooks-for-global-product-search-using-react-query-keeping-query-keys-stable-and-ensuring-searches-are-cancellable-debounced-to-avoid-excessive-requests-while-typing",
-      "featureTitle": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
+      "featureId": "feature-create-a-frontend-vendor-registration-ui-with-a-two-step-otp-verification-flow-1-enter-vendor-details-including-mandatory-gst-number-and-mobile-request-otp-2-enter-otp-to-verify-and-only-then-allow-registration-submission",
+      "featureTitle": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
       "files": [
-        "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-        "frontend/src/hooks/useDebouncedValue.ts",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+        "frontend/src/pages/vendors/VendorsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -61,7 +39,28 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-react-query-hooks-and-backend-bindings-needed-to-support-vendor-listing-otp-request-verify-and-vendor-registration-following-existing-query-mutation-patterns-used-for-packages-designers-orders",
+      "featureTitle": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
+      "files": [
+        "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/vendors/VendorsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
       ],
       "confidence": "high"
     }

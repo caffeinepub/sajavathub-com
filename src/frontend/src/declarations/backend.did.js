@@ -67,6 +67,11 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const OrderItem = IDL.Record({
+  'productId' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'price' : IDL.Nat,
+});
 export const BudgetRange = IDL.Record({
   'max' : IDL.Nat,
   'min' : IDL.Nat,
@@ -82,6 +87,25 @@ export const ProjectBrief = IDL.Record({
   'budget' : BudgetRange,
   'roomType' : RoomType,
   'timeline' : IDL.Text,
+});
+export const Product = IDL.Record({
+  'id' : IDL.Text,
+  'stylePreference' : StylePreference,
+  'inventory' : IDL.Nat,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'imageUrl' : IDL.Text,
+  'brandId' : IDL.Text,
+  'priceINR' : IDL.Nat,
+  'roomType' : RoomType,
+});
+export const Vendor = IDL.Record({
+  'id' : IDL.Text,
+  'verified' : IDL.Bool,
+  'gstNumber' : IDL.Text,
+  'name' : IDL.Text,
+  'createdAt' : Time,
+  'mobileNumber' : IDL.Text,
 });
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
@@ -114,17 +138,6 @@ export const FurnitureSubCategory = IDL.Variant({
   'centerTable' : IDL.Null,
   'diningTable' : IDL.Null,
 });
-export const Product = IDL.Record({
-  'id' : IDL.Text,
-  'stylePreference' : StylePreference,
-  'inventory' : IDL.Nat,
-  'name' : IDL.Text,
-  'description' : IDL.Text,
-  'imageUrl' : IDL.Text,
-  'brandId' : IDL.Text,
-  'priceINR' : IDL.Nat,
-  'roomType' : RoomType,
-});
 export const FurnitureCategory = IDL.Record({
   'id' : IDL.Text,
   'subCategory' : FurnitureSubCategory,
@@ -146,11 +159,6 @@ export const PaymentMethod = IDL.Variant({
   'upi' : IDL.Null,
   'wallet' : IDL.Null,
   'netBanking' : IDL.Null,
-});
-export const OrderItem = IDL.Record({
-  'productId' : IDL.Text,
-  'quantity' : IDL.Nat,
-  'price' : IDL.Nat,
 });
 export const Order = IDL.Record({
   'id' : IDL.Text,
@@ -174,6 +182,23 @@ export const ProductCategory = IDL.Record({
   'description' : IDL.Text,
   'products' : IDL.Vec(Product),
 });
+export const BuyerInfo = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+  'address' : IDL.Text,
+  'phone' : IDL.Text,
+});
+export const VendorInput = IDL.Record({
+  'id' : IDL.Text,
+  'gstNumber' : IDL.Text,
+  'name' : IDL.Text,
+  'mobileNumber' : IDL.Text,
+});
+export const OtpRequest = IDL.Record({ 'mobileNumber' : IDL.Text });
+export const OtpVerification = IDL.Record({
+  'otp' : IDL.Text,
+  'mobileNumber' : IDL.Text,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -182,7 +207,11 @@ export const idlService = IDL.Service({
   'addPackage' : IDL.Func([Package], [], []),
   'addRoomPackage' : IDL.Func([RoomPackage], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'calculateOrderTotal' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
   'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
+  'deleteVendor' : IDL.Func([IDL.Text], [], []),
+  'findProductHelper' : IDL.Func([IDL.Text], [IDL.Opt(Product)], ['query']),
+  'getAllVendors' : IDL.Func([], [IDL.Vec(Vendor)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getConsultationsForProject' : IDL.Func(
@@ -203,6 +232,11 @@ export const idlService = IDL.Service({
     ),
   'getOrder' : IDL.Func([IDL.Text], [IDL.Opt(Order)], ['query']),
   'getPackages' : IDL.Func([], [IDL.Vec(Package)], ['query']),
+  'getPackagesByPriceRange' : IDL.Func(
+      [IDL.Nat, IDL.Nat],
+      [IDL.Vec(RoomPackage)],
+      ['query'],
+    ),
   'getProductBrands' : IDL.Func([], [IDL.Vec(ProductBrand)], ['query']),
   'getProductCategories' : IDL.Func([], [IDL.Vec(ProductCategory)], ['query']),
   'getProductsByBrand' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
@@ -260,16 +294,22 @@ export const idlService = IDL.Service({
       [IDL.Vec(ProjectBrief)],
       ['query'],
     ),
+  'getVendor' : IDL.Func([IDL.Text], [Vendor], ['query']),
+  'getVendorByMobileNumber' : IDL.Func([IDL.Text], [Vendor], ['query']),
+  'getVendorsByGstNumber' : IDL.Func([IDL.Text], [IDL.Vec(Vendor)], ['query']),
   'globalProductSearch' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'placeOrder' : IDL.Func([Order], [], []),
+  'placeOrder' : IDL.Func([Order, BuyerInfo, IDL.Nat], [], []),
+  'registerVendor' : IDL.Func([VendorInput], [], []),
   'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
+  'requestOtp' : IDL.Func([OtpRequest], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'searchFurnitureProducts' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(Product)],
       ['query'],
     ),
+  'verifyOtp' : IDL.Func([OtpVerification], [], []),
 });
 
 export const idlInitArgs = [];
@@ -334,6 +374,11 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const OrderItem = IDL.Record({
+    'productId' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'price' : IDL.Nat,
+  });
   const BudgetRange = IDL.Record({
     'max' : IDL.Nat,
     'min' : IDL.Nat,
@@ -349,6 +394,25 @@ export const idlFactory = ({ IDL }) => {
     'budget' : BudgetRange,
     'roomType' : RoomType,
     'timeline' : IDL.Text,
+  });
+  const Product = IDL.Record({
+    'id' : IDL.Text,
+    'stylePreference' : StylePreference,
+    'inventory' : IDL.Nat,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'imageUrl' : IDL.Text,
+    'brandId' : IDL.Text,
+    'priceINR' : IDL.Nat,
+    'roomType' : RoomType,
+  });
+  const Vendor = IDL.Record({
+    'id' : IDL.Text,
+    'verified' : IDL.Bool,
+    'gstNumber' : IDL.Text,
+    'name' : IDL.Text,
+    'createdAt' : Time,
+    'mobileNumber' : IDL.Text,
   });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
@@ -381,17 +445,6 @@ export const idlFactory = ({ IDL }) => {
     'centerTable' : IDL.Null,
     'diningTable' : IDL.Null,
   });
-  const Product = IDL.Record({
-    'id' : IDL.Text,
-    'stylePreference' : StylePreference,
-    'inventory' : IDL.Nat,
-    'name' : IDL.Text,
-    'description' : IDL.Text,
-    'imageUrl' : IDL.Text,
-    'brandId' : IDL.Text,
-    'priceINR' : IDL.Nat,
-    'roomType' : RoomType,
-  });
   const FurnitureCategory = IDL.Record({
     'id' : IDL.Text,
     'subCategory' : FurnitureSubCategory,
@@ -413,11 +466,6 @@ export const idlFactory = ({ IDL }) => {
     'upi' : IDL.Null,
     'wallet' : IDL.Null,
     'netBanking' : IDL.Null,
-  });
-  const OrderItem = IDL.Record({
-    'productId' : IDL.Text,
-    'quantity' : IDL.Nat,
-    'price' : IDL.Nat,
   });
   const Order = IDL.Record({
     'id' : IDL.Text,
@@ -441,6 +489,23 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'products' : IDL.Vec(Product),
   });
+  const BuyerInfo = IDL.Record({
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'address' : IDL.Text,
+    'phone' : IDL.Text,
+  });
+  const VendorInput = IDL.Record({
+    'id' : IDL.Text,
+    'gstNumber' : IDL.Text,
+    'name' : IDL.Text,
+    'mobileNumber' : IDL.Text,
+  });
+  const OtpRequest = IDL.Record({ 'mobileNumber' : IDL.Text });
+  const OtpVerification = IDL.Record({
+    'otp' : IDL.Text,
+    'mobileNumber' : IDL.Text,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -449,7 +514,11 @@ export const idlFactory = ({ IDL }) => {
     'addPackage' : IDL.Func([Package], [], []),
     'addRoomPackage' : IDL.Func([RoomPackage], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'calculateOrderTotal' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
     'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
+    'deleteVendor' : IDL.Func([IDL.Text], [], []),
+    'findProductHelper' : IDL.Func([IDL.Text], [IDL.Opt(Product)], ['query']),
+    'getAllVendors' : IDL.Func([], [IDL.Vec(Vendor)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getConsultationsForProject' : IDL.Func(
@@ -470,6 +539,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getOrder' : IDL.Func([IDL.Text], [IDL.Opt(Order)], ['query']),
     'getPackages' : IDL.Func([], [IDL.Vec(Package)], ['query']),
+    'getPackagesByPriceRange' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(RoomPackage)],
+        ['query'],
+      ),
     'getProductBrands' : IDL.Func([], [IDL.Vec(ProductBrand)], ['query']),
     'getProductCategories' : IDL.Func(
         [],
@@ -539,16 +613,26 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ProjectBrief)],
         ['query'],
       ),
+    'getVendor' : IDL.Func([IDL.Text], [Vendor], ['query']),
+    'getVendorByMobileNumber' : IDL.Func([IDL.Text], [Vendor], ['query']),
+    'getVendorsByGstNumber' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Vendor)],
+        ['query'],
+      ),
     'globalProductSearch' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'placeOrder' : IDL.Func([Order], [], []),
+    'placeOrder' : IDL.Func([Order, BuyerInfo, IDL.Nat], [], []),
+    'registerVendor' : IDL.Func([VendorInput], [], []),
     'requestConsultation' : IDL.Func([ConsultationRequest], [], []),
+    'requestOtp' : IDL.Func([OtpRequest], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'searchFurnitureProducts' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(Product)],
         ['query'],
       ),
+    'verifyOtp' : IDL.Func([OtpVerification], [], []),
   });
 };
 

@@ -49,6 +49,7 @@ export default function SiteHeader() {
     { to: '/packages', label: 'Packages' },
     { to: '/designers', label: 'Designers' },
     { to: '/visualizer', label: 'AI Room Visualizer' },
+    { to: '/vendors', label: 'Vendors' },
     { to: '/faq', label: 'FAQ' },
     { to: '/how-it-works', label: 'How It Works' },
   ];
@@ -71,28 +72,28 @@ export default function SiteHeader() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center space-x-6 md:flex">
-          {/* Category Dropdown Menu */}
+          {/* Shop by Category Dropdown Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="text-sm font-medium text-foreground/80 hover:text-foreground">
-                Category
+                Shop by Category
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link to="/products/room-category" className="cursor-pointer">
-                  Package Products by Room
+                <Link to="/products/furniture" className="cursor-pointer">
+                  Furniture
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/products" className="cursor-pointer">
-                  Products by Category
+                <Link to="/products/decor" className="cursor-pointer">
+                  Decor
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/products/brands" className="cursor-pointer">
-                  Products by Brand
+                <Link to="/products/furnishing" className="cursor-pointer">
+                  Furnishing
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -174,29 +175,29 @@ export default function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col space-y-4 pt-8">
-                {/* Category Section in Mobile */}
+                {/* Shop by Category Section in Mobile */}
                 <div className="border-b border-border pb-4">
-                  <p className="mb-2 text-sm font-semibold text-muted-foreground">Category</p>
+                  <p className="mb-2 text-sm font-semibold text-muted-foreground">Shop by Category</p>
                   <Link
-                    to="/products/room-category"
+                    to="/products/furniture"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Package Products by Room
+                    Furniture
                   </Link>
                   <Link
-                    to="/products"
+                    to="/products/decor"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Products by Category
+                    Decor
                   </Link>
                   <Link
-                    to="/products/brands"
+                    to="/products/furnishing"
                     className="block py-2 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Products by Brand
+                    Furnishing
                   </Link>
                 </div>
 

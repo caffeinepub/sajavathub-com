@@ -1,3 +1,4 @@
+import Int "mo:core/Int";
 import Map "mo:core/Map";
 import Array "mo:core/Array";
 import List "mo:core/List";
@@ -8,13 +9,14 @@ import Order "mo:core/Order";
 import Time "mo:core/Time";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
+import Option "mo:core/Option";
+import Migration "migration";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
 (with migration = Migration.run)
 actor {
-  // ===== Types =====
+  // ===== General Types =====
   public type RoomType = {
     #livingRoom;
     #bedroom;
@@ -195,7 +197,13 @@ actor {
     priceINR : Nat;
   };
 
-  // Array extensions
+  public type BuyerInfo = {
+    name : Text;
+    email : Text;
+    phone : Text;
+    address : Text;
+  };
+
   module ArrayExtras {
     public func mapMaybe<T, R>(array : [T], f : T -> ?R) : [R] {
       let results = List.empty<R>();
@@ -215,10 +223,27 @@ actor {
       };
       results.toArray();
     };
+  };
 
-    public func sort<T>(array : [T], compare : (T, T) -> Order.Order) : [T] {
-      array.sort();
-    };
+  // ===== Vendor Types =====
+  public type Vendor = {
+    id : Text;
+    name : Text;
+    gstNumber : Text;
+    mobileNumber : Text;
+    verified : Bool;
+    createdAt : Time.Time;
+  };
+
+  public type Otp = {
+    code : Text;
+    mobileNumber : Text;
+    expiryTime : Time.Time;
+  };
+
+  public type VerifiedOtp = {
+    mobileNumber : Text;
+    verifiedAt : Time.Time;
   };
 
   let packages = Map.empty<Text, Package>();
@@ -228,16 +253,20 @@ actor {
   let notes = Map.empty<Text, List.List<ProjectNote>>();
   let userProfiles = Map.empty<Principal, UserProfile>();
   let orders = Map.empty<Text, Order>();
-  let furnitureCategories = Map.empty<Text, FurnitureCategory>();
+  var furnitureCategories = Map.empty<Text, FurnitureCategory>();
   let productCategories = Map.empty<Text, ProductCategory>();
   let roomPackages = Map.empty<Text, RoomPackage>();
   let productBrands = Map.empty<Text, ProductBrand>();
+
+  // ===== New Vendor State =====
+  let vendors = Map.empty<Text, Vendor>();
+  let otps = Map.empty<Text, Otp>();
+  let verifiedOtps = Map.empty<Text, VerifiedOtp>();
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
   // === Room Package Functions ===
-  // Admin-only: Add new room packages
   public shared ({ caller }) func addRoomPackage(pkg : RoomPackage) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can add room packages");
@@ -245,38 +274,41 @@ actor {
     roomPackages.add(pkg.id, pkg);
   };
 
-  // Public browsing: List all room packages (accessible to all including guests)
   public query func getRoomPackages() : async [RoomPackage] {
     roomPackages.values().toArray();
   };
 
-  // Public browsing: Get specific room package (accessible to all including guests)
   public query func getRoomPackageById(packageId : Text) : async ?RoomPackage {
     roomPackages.get(packageId);
   };
 
-  // Public browsing: Filter packages by style (accessible to all including guests)
+  public query ({ caller }) func getPackagesByPriceRange(minPrice : Nat, maxPrice : Nat) : async [RoomPackage] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can use this function");
+    };
+    roomPackages.values().toArray().filter(
+      func(pkg) { pkg.priceINR >= minPrice and pkg.priceINR <= maxPrice }
+    );
+  };
+
   public query func getRoomPackagesByStyle(style : StylePreference) : async [RoomPackage] {
     roomPackages.values().toArray().filter(
       func(pkg) { pkg.style == style }
     );
   };
 
-  // Public browsing: Filter packages by room type (accessible to all including guests)
   public query func getRoomPackagesByRoomType(roomType : RoomType) : async [RoomPackage] {
     roomPackages.values().toArray().filter(
       func(pkg) { pkg.roomType == roomType }
     );
   };
 
-  // Public browsing: Filter packages by style and room type (accessible to all including guests)
   public query func getRoomPackagesByStyleAndRoomType(style : StylePreference, roomType : RoomType) : async [RoomPackage] {
     roomPackages.values().toArray().filter(
       func(pkg) { pkg.style == style and pkg.roomType == roomType }
     );
   };
 
-  // Public browsing: Get available styles for a room type (accessible to all including guests)
   public query func getStyleOptionsForRoomType(roomType : RoomType) : async [StylePreference] {
     let filtered = roomPackages.values().toArray().filter(
       func(pkg) { pkg.roomType == roomType }
@@ -293,7 +325,6 @@ actor {
     uniqueStyles.toArray();
   };
 
-  // Public browsing: Resolve package products (accessible to all including guests)
   public query func getProductsForRoomPackage(packageId : Text) : async [Product] {
     switch (roomPackages.get(packageId)) {
       case (null) {
@@ -315,7 +346,6 @@ actor {
     };
   };
 
-  // Admin-only: Add design packages
   public shared ({ caller }) func addPackage(pkg : Package) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can add packages");
@@ -323,12 +353,10 @@ actor {
     packages.add(pkg.id, pkg);
   };
 
-  // Public browsing: List design packages (accessible to all including guests)
   public query func getPackages() : async [Package] {
     packages.values().toArray();
   };
 
-  // Admin-only: Add designers
   public shared ({ caller }) func addDesigner(designer : Designer) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can add designers");
@@ -336,12 +364,10 @@ actor {
     designers.add(designer.id, designer);
   };
 
-  // Public browsing: List designers (accessible to all including guests)
   public query func getDesigners() : async [Designer] {
     designers.values().toArray();
   };
 
-  // User-only: Create project brief (ownership verified)
   public shared ({ caller }) func createProjectBrief(brief : ProjectBrief) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can create project briefs");
@@ -352,7 +378,6 @@ actor {
     briefs.add(brief.id, brief);
   };
 
-  // User-only: Get project brief (ownership or admin verified)
   public query ({ caller }) func getProjectBrief(id : Text) : async ?ProjectBrief {
     let brief = briefs.get(id);
     switch (brief) {
@@ -367,7 +392,6 @@ actor {
     };
   };
 
-  // User-only: Get user's project briefs (ownership or admin verified)
   public query ({ caller }) func getUserProjectBriefs(userId : Principal) : async [ProjectBrief] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view project briefs");
@@ -381,7 +405,6 @@ actor {
     filtered;
   };
 
-  // User-only: Request consultation (ownership verified)
   public shared ({ caller }) func requestConsultation(request : ConsultationRequest) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can request consultations");
@@ -407,7 +430,6 @@ actor {
     consultations.add(request.id, request);
   };
 
-  // User-only: Get consultations for project (ownership or admin verified)
   public query ({ caller }) func getConsultationsForProject(projectId : Text) : async [ConsultationRequest] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view consultations");
@@ -425,7 +447,6 @@ actor {
     consultations.values().toArray().filter(func(c) { switch (c.projectId) { case (?pid) { pid == projectId }; case (_) { false } } });
   };
 
-  // User-only: Add note to project (ownership verified)
   public shared ({ caller }) func addNote(note : ProjectNote) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can add notes");
@@ -449,7 +470,6 @@ actor {
     };
   };
 
-  // User-only: Get notes for project (ownership or admin verified)
   public query ({ caller }) func getNotesForProject(projectId : Text) : async [ProjectNote] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view notes");
@@ -470,7 +490,6 @@ actor {
     };
   };
 
-  // User-only: Get caller's profile
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can retrieve their profile");
@@ -478,7 +497,6 @@ actor {
     userProfiles.get(caller);
   };
 
-  // User-only: Get user profile (ownership or admin verified)
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin)) and user != caller) {
       Runtime.trap("Unauthorized: Can only view your own profile");
@@ -486,7 +504,6 @@ actor {
     userProfiles.get(user);
   };
 
-  // User-only: Save caller's profile
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
@@ -494,12 +511,10 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Public browsing: Get product categories (accessible to all including guests)
   public query func getProductCategories() : async [ProductCategory] {
     productCategories.values().toArray();
   };
 
-  // Public browsing: Get products by category (accessible to all including guests)
   public query func getProductsByCategory(categoryId : Text) : async [Product] {
     switch (productCategories.get(categoryId)) {
       case (null) {
@@ -509,12 +524,10 @@ actor {
     };
   };
 
-  // Public browsing: Get product brands (accessible to all including guests)
   public query func getProductBrands() : async [ProductBrand] {
     productBrands.values().toArray();
   };
 
-  // Public browsing: Get products by brand (accessible to all including guests)
   public query func getProductsByBrand(brandId : Text) : async [Product] {
     switch (productBrands.get(brandId)) {
       case (null) {
@@ -533,18 +546,86 @@ actor {
     };
   };
 
-  // User-only: Place order (ownership verified)
-  public shared ({ caller }) func placeOrder(order : Order) : async () {
+  public shared ({ caller }) func calculateOrderTotal(items : [OrderItem]) : async Nat {
+    var total = 0;
+    for (item in items.values()) {
+      switch (getProductHelper(item.productId)) {
+        case (null) {};
+        case (?product) {
+          total += product.priceINR * item.quantity;
+        };
+      };
+    };
+    total;
+  };
+
+  public shared ({ caller }) func placeOrder(
+    order : Order,
+    buyerInfo : BuyerInfo,
+    orderTotal : Nat,
+  ) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can place orders");
     };
+
+    // Ownership verification: ensure the order is for the caller
     if (order.buyerId != caller) {
       Runtime.trap("Unauthorized: Can only place orders for yourself");
     };
+
+    // Total and quantity validation
+    var calculatedTotal = 0;
+    for (item in order.items.values()) {
+      if (item.quantity > 1000) {
+        Runtime.trap("Invalid quantity requested");
+      };
+      switch (getProductHelper(item.productId)) {
+        case (null) { Runtime.trap("Product not found") };
+        case (?product) {
+          if (item.quantity > product.inventory) {
+            Runtime.trap("Not enough inventory for product " # item.productId);
+          };
+          calculatedTotal += product.priceINR * item.quantity;
+        };
+      };
+    };
+    if (calculatedTotal != orderTotal) {
+      Runtime.trap("Order total mismatch. Please try again.");
+    };
+
+    // Place order as draft after validation
     orders.add(order.id, order);
+
+    // Persist/update user profile
+    let profile : UserProfile = {
+      name = buyerInfo.name;
+      email = buyerInfo.email;
+      phone = buyerInfo.phone;
+      address = ?buyerInfo.address;
+      stylePreferences = [];
+      createdAt = Time.now();
+    };
+    userProfiles.add(caller, profile);
   };
 
-  // User-only: Get order (ownership or admin verified)
+  func getProductHelper(productId : Text) : ?Product {
+    for (category in productCategories.values()) {
+      let categoryProduct = category.products.find(func(p) { p.id == productId });
+      switch (categoryProduct) {
+        case (?product) { return ?product };
+        case (null) {};
+      };
+    };
+    for (category in furnitureCategories.values()) {
+      let categoryProduct = category.products.find(func(p) { p.id == productId });
+      switch (categoryProduct) {
+        case (?product) { return ?product };
+        case (null) {};
+      };
+    };
+    null;
+  };
+
   public query ({ caller }) func getOrder(orderId : Text) : async ?Order {
     let order = orders.get(orderId);
     switch (order) {
@@ -559,7 +640,6 @@ actor {
     };
   };
 
-  // User-only: Get user's orders (ownership or admin verified)
   public query ({ caller }) func getUserOrders(userId : Principal) : async [Order] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view orders");
@@ -573,12 +653,10 @@ actor {
     filtered;
   };
 
-  // Public browsing: Get furniture categories (accessible to all including guests)
   public query func getFurnitureCategories() : async [FurnitureCategory] {
     furnitureCategories.values().toArray();
   };
 
-  // Public browsing: Get products by furniture category (accessible to all including guests)
   public query func getProductsByFurnitureCategory(categoryId : Text) : async [Product] {
     switch (furnitureCategories.get(categoryId)) {
       case (null) {
@@ -588,7 +666,6 @@ actor {
     };
   };
 
-  // Public browsing: Get products by furniture subcategory (accessible to all including guests)
   public query func getProductsByFurnitureSubCategory(subCategory : FurnitureSubCategory) : async [Product] {
     var subCategoryProducts : [Product] = [];
     for (category in furnitureCategories.values()) {
@@ -599,7 +676,6 @@ actor {
     subCategoryProducts;
   };
 
-  // Public browsing: Search furniture products (accessible to all including guests)
   public query func searchFurnitureProducts(searchTerm : Text) : async [Product] {
     var matchingProducts : [Product] = [];
     for (category in furnitureCategories.values()) {
@@ -614,7 +690,6 @@ actor {
     matchingProducts;
   };
 
-  // Public browsing: Global product search across all categories (accessible to all including guests)
   public query func globalProductSearch(searchTerm : Text) : async [Product] {
     let lowerSearchTerm = searchTerm.toLower();
     var matchingProducts : [Product] = [];
@@ -642,5 +717,198 @@ actor {
     };
 
     matchingProducts;
+  };
+
+  public query ({ caller }) func findProductHelper(productId : Text) : async ?Product {
+    for (category in productCategories.values()) {
+      let categoryProduct = category.products.find(func(p) { p.id == productId });
+      switch (categoryProduct) {
+        case (?product) { return ?product };
+        case (null) {};
+      };
+    };
+    for (category in furnitureCategories.values()) {
+      let categoryProduct = category.products.find(func(p) { p.id == productId });
+      switch (categoryProduct) {
+        case (?product) { return ?product };
+        case (null) {};
+      };
+    };
+    null;
+  };
+
+  // ===== New Vendor Functions =====
+
+  public type VendorInput = {
+    id : Text;
+    name : Text;
+    gstNumber : Text;
+    mobileNumber : Text;
+  };
+
+  public type OtpVerification = {
+    mobileNumber : Text;
+    otp : Text;
+  };
+
+  public type OtpRequest = {
+    mobileNumber : Text;
+  };
+
+  func generateRandomOtp() : Text {
+    let random = Int.abs(Time.now() % 1000000000 + 123456789).toNat();
+    let otp = random % 1000000;
+    let paddedOtp = if (otp < 100000) { otp + 100000 } else { otp };
+    paddedOtp.toText();
+  };
+
+  // No authorization required - guests need to request OTP for registration
+  public func requestOtp(request : OtpRequest) : async () {
+    let otpCode = generateRandomOtp();
+    let expiryTime = Time.now() + 180_000_000_000;
+
+    let otp = {
+      code = otpCode;
+      mobileNumber = request.mobileNumber;
+      expiryTime;
+    };
+
+    otps.add(request.mobileNumber, otp);
+  };
+
+  // No authorization required - guests need to verify OTP for registration
+  public func verifyOtp(verification : OtpVerification) : async () {
+    switch (otps.get(verification.mobileNumber)) {
+      case (null) {
+        Runtime.trap("OTP expired or does not exist. Please request a new OTP.");
+      };
+      case (?otp) {
+        if (Time.now() > otp.expiryTime) {
+          otps.remove(verification.mobileNumber);
+          Runtime.trap("OTP expired. Please request a new OTP.");
+        };
+
+        if (otp.code != verification.otp) {
+          Runtime.trap("Invalid OTP. Please try again.");
+        };
+
+        // Mark OTP as verified
+        let verifiedOtp : VerifiedOtp = {
+          mobileNumber = verification.mobileNumber;
+          verifiedAt = Time.now();
+        };
+        verifiedOtps.add(verification.mobileNumber, verifiedOtp);
+
+        // Remove the OTP after successful verification
+        otps.remove(verification.mobileNumber);
+      };
+    };
+  };
+
+  // No authorization required - this is the registration endpoint for new vendors (guests)
+  public func registerVendor(input : VendorInput) : async () {
+    // Verify that the mobile number has been verified via OTP
+    switch (verifiedOtps.get(input.mobileNumber)) {
+      case (null) {
+        Runtime.trap("Mobile number not verified. Please complete OTP verification first.");
+      };
+      case (?verified) {
+        // Check if verification is still valid (within 10 minutes)
+        let verificationAge = Time.now() - verified.verifiedAt;
+        if (verificationAge > 600_000_000_000) {
+          verifiedOtps.remove(input.mobileNumber);
+          Runtime.trap("OTP verification expired. Please verify your mobile number again.");
+        };
+      };
+    };
+
+    // Validate GST number is not empty
+    if (input.gstNumber == "") {
+      Runtime.trap("GST number is mandatory for vendor registration");
+    };
+
+    // Check if vendor with same mobile number already exists
+    for (vendor in vendors.values()) {
+      if (vendor.mobileNumber == input.mobileNumber) {
+        Runtime.trap("A vendor with this mobile number already exists");
+      };
+    };
+
+    let vendor : Vendor = {
+      id = input.id;
+      name = input.name;
+      gstNumber = input.gstNumber;
+      mobileNumber = input.mobileNumber;
+      verified = true;
+      createdAt = Time.now();
+    };
+
+    vendors.add(input.id, vendor);
+
+    // Clean up verified OTP after successful registration
+    verifiedOtps.remove(input.mobileNumber);
+  };
+
+  // ===== Vendor Query Functions =====
+
+  // Admin-only: View specific vendor details
+  public query ({ caller }) func getVendor(id : Text) : async Vendor {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view vendor details");
+    };
+    switch (vendors.get(id)) {
+      case (?vendor) { vendor };
+      case (null) {
+        Runtime.trap("Vendor not found");
+      };
+    };
+  };
+
+  // Admin-only: View all vendors
+  public query ({ caller }) func getAllVendors() : async [Vendor] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all vendors");
+    };
+    vendors.values().toArray();
+  };
+
+  // Admin-only: Search vendors by GST number
+  public query ({ caller }) func getVendorsByGstNumber(gstNumber : Text) : async [Vendor] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can search vendors by GST number");
+    };
+    let filteredVendors = vendors.values().toArray().filter(
+      func(vendor) { vendor.gstNumber == gstNumber }
+    );
+    filteredVendors;
+  };
+
+  // Admin-only: Search vendor by mobile number
+  public query ({ caller }) func getVendorByMobileNumber(mobileNumber : Text) : async Vendor {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can search vendors by mobile number");
+    };
+    for (vendor in vendors.values()) {
+      if (vendor.mobileNumber == mobileNumber) {
+        return vendor;
+      };
+    };
+    Runtime.trap("Vendor not found");
+  };
+
+  // Admin-only: Delete vendor
+  public shared ({ caller }) func deleteVendor(id : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete vendors");
+    };
+
+    switch (vendors.get(id)) {
+      case (null) {
+        Runtime.trap("Vendor not found");
+      };
+      case (?_) {
+        vendors.remove(id);
+      };
+    };
   };
 };

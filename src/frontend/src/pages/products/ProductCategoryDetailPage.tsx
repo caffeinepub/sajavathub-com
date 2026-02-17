@@ -4,14 +4,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import ProductListingCard from '../../components/products/ProductListingCard';
+import BackButton from '../../components/navigation/BackButton';
 
 export default function ProductCategoryDetailPage() {
-  const { categoryId } = useParams({ from: '/products/$categoryId' });
+  const { categoryId } = useParams({ strict: false }) as { categoryId: string };
   const { data: products, isLoading, error } = useGetProductsByCategory(categoryId);
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
+        <BackButton fallbackPath="/products" className="mb-8" />
         <div className="mb-8">
           <Skeleton className="mb-2 h-10 w-64" />
           <Skeleton className="h-6 w-96" />
@@ -33,11 +35,12 @@ export default function ProductCategoryDetailPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-12">
+        <BackButton fallbackPath="/products" className="mb-8" />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            Failed to load products for this category. Please try again later.
+            Failed to load products. Please try again later.
           </AlertDescription>
         </Alert>
       </div>
@@ -47,9 +50,10 @@ export default function ProductCategoryDetailPage() {
   if (!products || products.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
+        <BackButton fallbackPath="/products" className="mb-8" />
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-            Category Products
+            {categoryId}
           </h1>
         </div>
         <Alert>
@@ -63,9 +67,11 @@ export default function ProductCategoryDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <BackButton fallbackPath="/products" className="mb-8" />
+      
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-          {categoryId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          {categoryId}
         </h1>
         <p className="text-muted-foreground">
           {products.length} {products.length === 1 ? 'product' : 'products'} available

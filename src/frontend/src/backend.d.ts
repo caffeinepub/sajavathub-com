@@ -7,6 +7,9 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface OtpRequest {
+    mobileNumber: string;
+}
 export interface ProjectBrief {
     id: string;
     status: string;
@@ -24,25 +27,17 @@ export interface OrderItem {
     quantity: bigint;
     price: bigint;
 }
-export interface Designer {
+export interface VendorInput {
     id: string;
-    bio: string;
-    portfolio: Array<PortfolioItem>;
-    styles: Array<StylePreference>;
+    gstNumber: string;
     name: string;
+    mobileNumber: string;
 }
 export interface ProductBrand {
     id: string;
     name: string;
     description: string;
     logoUrl: string;
-}
-export interface Package {
-    id: string;
-    features: Array<string>;
-    name: string;
-    description: string;
-    priceINR: bigint;
 }
 export type RoomType = {
     __kind__: "bedroom";
@@ -70,6 +65,17 @@ export interface ProjectNote {
     message: string;
     timestamp: Time;
 }
+export interface Package {
+    id: string;
+    features: Array<string>;
+    name: string;
+    description: string;
+    priceINR: bigint;
+}
+export interface OtpVerification {
+    otp: string;
+    mobileNumber: string;
+}
 export interface Order {
     id: string;
     status: string;
@@ -79,15 +85,6 @@ export interface Order {
     totalAmount: bigint;
     buyerId: Principal;
     items: Array<OrderItem>;
-}
-export interface ConsultationRequest {
-    id: string;
-    status: string;
-    userId: Principal;
-    projectId?: string;
-    notes: string;
-    submissionDate: Time;
-    requestedTime: Time;
 }
 export interface RoomPackage {
     id: string;
@@ -105,10 +102,21 @@ export interface FurnitureCategory {
     description: string;
     products: Array<Product>;
 }
-export interface BudgetRange {
-    max: bigint;
-    min: bigint;
-    currency: string;
+export interface Designer {
+    id: string;
+    bio: string;
+    portfolio: Array<PortfolioItem>;
+    styles: Array<StylePreference>;
+    name: string;
+}
+export interface ConsultationRequest {
+    id: string;
+    status: string;
+    userId: Principal;
+    projectId?: string;
+    notes: string;
+    submissionDate: Time;
+    requestedTime: Time;
 }
 export type StylePreference = {
     __kind__: "other";
@@ -132,11 +140,22 @@ export type StylePreference = {
     __kind__: "contemporary";
     contemporary: null;
 };
+export interface BudgetRange {
+    max: bigint;
+    min: bigint;
+    currency: string;
+}
 export interface PortfolioItem {
     id: string;
     description: string;
     style: StylePreference;
     imageUrl: string;
+}
+export interface BuyerInfo {
+    name: string;
+    email: string;
+    address: string;
+    phone: string;
 }
 export interface DeliveryAddress {
     country: string;
@@ -148,19 +167,19 @@ export interface DeliveryAddress {
     addressLine2?: string;
     phoneNumber: string;
 }
+export interface Vendor {
+    id: string;
+    verified: boolean;
+    gstNumber: string;
+    name: string;
+    createdAt: Time;
+    mobileNumber: string;
+}
 export interface ProductCategory {
     id: string;
     name: string;
     description: string;
     products: Array<Product>;
-}
-export interface UserProfile {
-    name: string;
-    createdAt: Time;
-    email: string;
-    address?: string;
-    stylePreferences: Array<StylePreference>;
-    phone: string;
 }
 export interface Product {
     id: string;
@@ -172,6 +191,14 @@ export interface Product {
     brandId: string;
     priceINR: bigint;
     roomType: RoomType;
+}
+export interface UserProfile {
+    name: string;
+    createdAt: Time;
+    email: string;
+    address?: string;
+    stylePreferences: Array<StylePreference>;
+    phone: string;
 }
 export enum FurnitureSubCategory {
     bedSideTables = "bedSideTables",
@@ -203,7 +230,11 @@ export interface backendInterface {
     addPackage(pkg: Package): Promise<void>;
     addRoomPackage(pkg: RoomPackage): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    calculateOrderTotal(items: Array<OrderItem>): Promise<bigint>;
     createProjectBrief(brief: ProjectBrief): Promise<void>;
+    deleteVendor(id: string): Promise<void>;
+    findProductHelper(productId: string): Promise<Product | null>;
+    getAllVendors(): Promise<Array<Vendor>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getConsultationsForProject(projectId: string): Promise<Array<ConsultationRequest>>;
@@ -212,6 +243,7 @@ export interface backendInterface {
     getNotesForProject(projectId: string): Promise<Array<ProjectNote>>;
     getOrder(orderId: string): Promise<Order | null>;
     getPackages(): Promise<Array<Package>>;
+    getPackagesByPriceRange(minPrice: bigint, maxPrice: bigint): Promise<Array<RoomPackage>>;
     getProductBrands(): Promise<Array<ProductBrand>>;
     getProductCategories(): Promise<Array<ProductCategory>>;
     getProductsByBrand(brandId: string): Promise<Array<Product>>;
@@ -229,10 +261,16 @@ export interface backendInterface {
     getUserOrders(userId: Principal): Promise<Array<Order>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserProjectBriefs(userId: Principal): Promise<Array<ProjectBrief>>;
+    getVendor(id: string): Promise<Vendor>;
+    getVendorByMobileNumber(mobileNumber: string): Promise<Vendor>;
+    getVendorsByGstNumber(gstNumber: string): Promise<Array<Vendor>>;
     globalProductSearch(searchTerm: string): Promise<Array<Product>>;
     isCallerAdmin(): Promise<boolean>;
-    placeOrder(order: Order): Promise<void>;
+    placeOrder(order: Order, buyerInfo: BuyerInfo, orderTotal: bigint): Promise<void>;
+    registerVendor(input: VendorInput): Promise<void>;
     requestConsultation(request: ConsultationRequest): Promise<void>;
+    requestOtp(request: OtpRequest): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     searchFurnitureProducts(searchTerm: string): Promise<Array<Product>>;
+    verifyOtp(verification: OtpVerification): Promise<void>;
 }

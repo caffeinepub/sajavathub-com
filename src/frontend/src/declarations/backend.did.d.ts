@@ -15,6 +15,12 @@ export interface BudgetRange {
   'min' : bigint,
   'currency' : string,
 }
+export interface BuyerInfo {
+  'name' : string,
+  'email' : string,
+  'address' : string,
+  'phone' : string,
+}
 export interface ConsultationRequest {
   'id' : string,
   'status' : string,
@@ -75,6 +81,8 @@ export interface OrderItem {
   'quantity' : bigint,
   'price' : bigint,
 }
+export interface OtpRequest { 'mobileNumber' : string }
+export interface OtpVerification { 'otp' : string, 'mobileNumber' : string }
 export interface Package {
   'id' : string,
   'features' : Array<string>,
@@ -166,6 +174,20 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface Vendor {
+  'id' : string,
+  'verified' : boolean,
+  'gstNumber' : string,
+  'name' : string,
+  'createdAt' : Time,
+  'mobileNumber' : string,
+}
+export interface VendorInput {
+  'id' : string,
+  'gstNumber' : string,
+  'name' : string,
+  'mobileNumber' : string,
+}
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addDesigner' : ActorMethod<[Designer], undefined>,
@@ -173,7 +195,11 @@ export interface _SERVICE {
   'addPackage' : ActorMethod<[Package], undefined>,
   'addRoomPackage' : ActorMethod<[RoomPackage], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'calculateOrderTotal' : ActorMethod<[Array<OrderItem>], bigint>,
   'createProjectBrief' : ActorMethod<[ProjectBrief], undefined>,
+  'deleteVendor' : ActorMethod<[string], undefined>,
+  'findProductHelper' : ActorMethod<[string], [] | [Product]>,
+  'getAllVendors' : ActorMethod<[], Array<Vendor>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getConsultationsForProject' : ActorMethod<
@@ -185,6 +211,7 @@ export interface _SERVICE {
   'getNotesForProject' : ActorMethod<[string], Array<ProjectNote>>,
   'getOrder' : ActorMethod<[string], [] | [Order]>,
   'getPackages' : ActorMethod<[], Array<Package>>,
+  'getPackagesByPriceRange' : ActorMethod<[bigint, bigint], Array<RoomPackage>>,
   'getProductBrands' : ActorMethod<[], Array<ProductBrand>>,
   'getProductCategories' : ActorMethod<[], Array<ProductCategory>>,
   'getProductsByBrand' : ActorMethod<[string], Array<Product>>,
@@ -211,12 +238,18 @@ export interface _SERVICE {
   'getUserOrders' : ActorMethod<[Principal], Array<Order>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserProjectBriefs' : ActorMethod<[Principal], Array<ProjectBrief>>,
+  'getVendor' : ActorMethod<[string], Vendor>,
+  'getVendorByMobileNumber' : ActorMethod<[string], Vendor>,
+  'getVendorsByGstNumber' : ActorMethod<[string], Array<Vendor>>,
   'globalProductSearch' : ActorMethod<[string], Array<Product>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'placeOrder' : ActorMethod<[Order], undefined>,
+  'placeOrder' : ActorMethod<[Order, BuyerInfo, bigint], undefined>,
+  'registerVendor' : ActorMethod<[VendorInput], undefined>,
   'requestConsultation' : ActorMethod<[ConsultationRequest], undefined>,
+  'requestOtp' : ActorMethod<[OtpRequest], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'searchFurnitureProducts' : ActorMethod<[string], Array<Product>>,
+  'verifyOtp' : ActorMethod<[OtpVerification], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

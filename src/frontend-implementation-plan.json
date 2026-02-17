@@ -1,89 +1,83 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Global product search UI and Furniture subcategory menu in Products by Category",
+  "title": "Vendors UI: Listing + OTP-based Vendor Registration (GST required)",
   "requirements": [
     {
-      "id": "REQ-6",
-      "summary": "Add a global product search UI in the Shop browsing flow and render results with existing-style product cards and add-to-cart behavior.",
+      "id": "REQ-3",
+      "summary": "Add a Vendors page/route with navigation access and a vendor list fetched from the backend.",
       "acceptanceCriteria": [
-        "A search input is available from the shopping flow (e.g., on /shop and/or /products) and is clearly labeled in English (e.g., \"Search products\").",
-        "Submitting a search shows matching products using the backend global search API.",
-        "Search results handle loading, empty, and error states with user-facing text in English.",
-        "Users can add products from search results to the cart using the existing add-to-cart behavior."
+        "A new Vendors page/route is available in the app and is reachable from the site navigation (desktop and mobile).",
+        "The Vendors page fetches and displays vendor entries from the backend with a sensible empty state when no vendors exist.",
+        "The UI uses English user-facing text for headings, buttons, and error/empty states."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/products/ProductListingCard.tsx",
+          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
           "operation": "create",
-          "description": "Create a reusable product listing card UI (image, name, description, price, stock, add-to-cart) consistent with existing category listing cards by composing existing components (e.g., SafeExternalImage, AddToCartButton, Card). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-          "operation": "create",
-          "description": "Create a global product search panel (labeled input + results region) that uses the global search React Query hook, renders loading/empty/error text in English, and displays results using ProductListingCard. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/products/ShopLandingPage.tsx",
-          "operation": "modify",
-          "description": "Add the GlobalProductSearchPanel to the /shop page so search is available from the shopping flow without introducing a new top-level route. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-          "operation": "modify",
-          "description": "Refactor product rendering to use ProductListingCard so search results and category listings remain visually consistent and share the same add-to-cart behavior. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Add a dedicated Furniture section on /products with links for each furniture option and a subcategory listing page for navigation.",
-      "acceptanceCriteria": [
-        "/products shows a Furniture section/menu with links/buttons for each listed furniture option.",
-        "Clicking a furniture option navigates to the corresponding category detail page and displays that option’s products.",
-        "The Furniture section does not break or hide existing non-furniture categories; they remain accessible from /products."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-          "operation": "create",
-          "description": "Create a furniture subcategory product listing page that loads products for the selected FurnitureSubCategory and renders them with ProductListingCard, including loading/empty/error states in English. Verify the component's usage instructions before implementing."
+          "description": "Create the Vendors page that renders a vendor list (loading/error/empty states) and provides access to the vendor registration flow. Use existing shadcn-ui components (e.g., Card, Button, Skeleton/Alert where available) to compose the UI—Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Register a new route under the existing /products area for furniture subcategory browsing (e.g., /products/furniture/$subCategory) so Furniture menu navigation is wired and not orphaned. Verify the component's usage instructions before implementing."
+          "description": "Register a new TanStack Router route for the Vendors page (e.g., /vendors) and include it in the route tree so the page is navigable."
         },
         {
-          "path": "frontend/src/pages/products/ProductCategoriesPage.tsx",
+          "path": "frontend/src/components/navigation/SiteHeader.tsx",
           "operation": "modify",
-          "description": "Add a dedicated Furniture menu/section above the existing categories grid, listing buttons/links for Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit, each linking to the new furniture subcategory route; keep existing non-furniture categories visible and accessible. Verify the component's usage instructions before implementing."
+          "description": "Add a 'Vendors' link to the desktop navLinks and to the mobile menu so the Vendors page is reachable from site navigation on all breakpoints. Use existing navigation/link patterns and existing shadcn-ui components already in use—Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/navigation/SiteFooter.tsx",
+          "operation": "modify",
+          "description": "Add a footer link to the Vendors page to improve discoverability and ensure navigation access beyond the header."
         }
       ]
     },
     {
-      "id": "REQ-8",
-      "summary": "Add stable React Query hooks for global product search with debounced/cancellable searching and stable query keys.",
+      "id": "REQ-4",
+      "summary": "Create a two-step vendor registration UI that requires GST and verifies mobile via OTP before final submission.",
       "acceptanceCriteria": [
-        "A new React Query hook exists for product search and calls the backend search method.",
-        "Typing into the search input does not trigger an unbounded number of requests (debounce or explicit submit).",
-        "Query keys include the search text so results cache correctly per query."
+        "The registration form enforces GST number as required on the client side (cannot proceed without it).",
+        "The user can request an OTP for the entered mobile number and then enter the OTP to verify it.",
+        "The UI prevents final submission until OTP verification succeeds (or the backend enforces and the UI reflects the error clearly).",
+        "On successful registration, the user sees a clear success message and the new vendor appears in the vendor list after refresh (or automatic query invalidation)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useDebouncedValue.ts",
+          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
           "operation": "create",
-          "description": "Add a small debouncing hook used by the search UI to avoid excessive requests while typing (e.g., debounce the search text before enabling the React Query search). Verify the component's usage instructions before implementing."
+          "description": "Implement the vendor registration UI as a reusable component with a two-step flow: vendor details (name, mobile, mandatory GST) + 'Request OTP', then OTP entry + 'Verify OTP', and only then enable 'Register'. Use existing shadcn-ui form inputs/buttons/cards and present clear English validation and error messages—Verify the component's usage instructions before implementing."
         },
+        {
+          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
+          "operation": "modify",
+          "description": "Wire VendorRegistrationCard into the Vendors page (inline section or dialog) and ensure successful registration triggers a visible success message and refreshes the displayed vendor list."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add React Query hooks for vendor listing, OTP request/verify, and vendor registration following existing query/mutation patterns.",
+      "acceptanceCriteria": [
+        "Frontend has dedicated query hook(s) for fetching vendors and mutation hook(s) for requesting OTP, verifying OTP, and registering a vendor.",
+        "After successful vendor registration, vendor list queries are invalidated/refetched so the UI updates without a manual reload."
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a new React Query hook for global product search that calls the backend globalProductSearch(searchTerm), uses a stable query key that includes the normalized search text, and avoids running for empty/whitespace terms; also add a hook to fetch products by furniture subcategory using getProductsByFurnitureSubCategory(subCategory) for the Furniture subcategory page. Verify the component's usage instructions before implementing."
+          "description": "Add vendor-focused React Query hooks consistent with existing patterns: a vendors list query (using backend getAllVendors) and mutations for requestOtp, verifyOtp, and registerVendor. Ensure register success invalidates/refetches the vendors query key so VendorsPage updates without manual reload."
         },
         {
-          "path": "frontend/src/components/products/GlobalProductSearchPanel.tsx",
+          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
           "operation": "modify",
-          "description": "Wire debouncing/cancellation behavior by using useDebouncedValue and the global search hook so typing does not create an unbounded number of requests and results cache by query text. Verify the component's usage instructions before implementing."
+          "description": "Adopt the new vendors query hook for data fetching and use the shared query key(s) expected by invalidation after registration."
+        },
+        {
+          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "operation": "modify",
+          "description": "Use the new OTP request/verify and vendor registration mutation hooks, and reflect mutation states (loading/disabled) and backend errors clearly in the UI using existing shadcn-ui feedback patterns—Verify the component's usage instructions before implementing."
         }
       ]
     }

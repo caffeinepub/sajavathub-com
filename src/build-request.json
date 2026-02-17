@@ -1,109 +1,109 @@
 {
   "kind": "build_request",
-  "title": "Add global product search and a Furniture menu with subcategories in Products by Category",
+  "title": "Add Vendor Registration with Mobile OTP + Mandatory GST, and Vendors UI",
+  "projectName": "SajavatHub Vendors",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-4",
-      "text": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items.",
+      "id": "REQ-1",
+      "text": "Implement backend vendor registration with a stored Vendor profile, where GST number is mandatory and the vendor’s mobile number must be OTP-verified before the registration can be completed.",
       "target": "backend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "add search option for all products."
+          "add vendors in front end and vender registration at back end. in the vendor registration otp required for mobile number and gst number is must for vendor registration"
         ]
       },
       "acceptanceCriteria": [
-        "Backend exposes a public query method that accepts a text query and returns matching products.",
-        "Search is case-insensitive.",
-        "If the query is empty/whitespace, the method returns an empty list (not a trap)."
+        "Backend defines a Vendor data model that includes, at minimum, vendor name (or business name), mobile number, GST number, createdAt timestamp, and a verification/registration status.",
+        "Backend rejects vendor registration attempts when GST number is missing/empty.",
+        "Backend rejects vendor registration completion when the provided mobile OTP has not been verified for that mobile number.",
+        "Vendor records are persisted in canister state and can be retrieved after page reload/canister call sequence."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add backend OTP flow for vendor mobile verification, including an API to request an OTP for a mobile number and an API to verify the OTP, with appropriate validation and expiration handling.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "otp required for mobile number"
+        ]
+      },
+      "acceptanceCriteria": [
+        "There is a backend call to request an OTP for a given mobile number that creates an OTP challenge tied to the mobile number and expires after a reasonable time window.",
+        "There is a backend call to verify an OTP for a given mobile number; verification succeeds only for the latest active (non-expired) OTP.",
+        "OTP verification status is tracked so the subsequent vendor registration completion can enforce it.",
+        "If OTP is incorrect or expired, backend returns a clear error (trap or error response) and does not mark the mobile as verified."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add frontend Vendors section that lets users view a list of registered vendors and access a vendor registration flow.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add vendors in front end"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new Vendors page/route is available in the app and is reachable from the site navigation (desktop and mobile).",
+        "The Vendors page fetches and displays vendor entries from the backend with a sensible empty state when no vendors exist.",
+        "The UI uses English user-facing text for headings, buttons, and error/empty states."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Create a frontend vendor registration UI with a two-step OTP verification flow: (1) enter vendor details including mandatory GST number and mobile, request OTP; (2) enter OTP to verify; and only then allow registration submission.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "vender registration at back end",
+          "otp required for mobile number and gst number is must for vendor registration"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The registration form enforces GST number as required on the client side (cannot proceed without it).",
+        "The user can request an OTP for the entered mobile number and then enter the OTP to verify it.",
+        "The UI prevents final submission until OTP verification succeeds (or the backend enforces and the UI reflects the error clearly).",
+        "On successful registration, the user sees a clear success message and the new vendor appears in the vendor list after refresh (or automatic query invalidation)."
       ]
     },
     {
       "id": "REQ-5",
-      "text": "Add a Furniture category structure to the backend product catalog that supports a Furniture parent category and separate furniture subcategory options for: Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, and Crockery Unit.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add furniture menu in products by category and give all available options of furniture for example, sofa, center table, dining table, corner table, king size bed, queen size bed, bed side tables, dressing table, study table, sofa chairs, recliners, crockery unit etc"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Product categories include a Furniture parent category and individual subcategories corresponding to each of the listed furniture types.",
-        "Each furniture subcategory has a stable category id and appears in the list returned by getProductCategories().",
-        "Each furniture subcategory has at least one Product seeded so the UI can display results."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Add a frontend global product search experience that allows users to search across all products from the Shop area and view results with product cards consistent with existing product listing cards (image, name, description, price, stock, add-to-cart).",
+      "text": "Add React Query hooks and backend bindings needed to support vendor listing, OTP request/verify, and vendor registration, following existing query/mutation patterns used for packages/designers/orders.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
-        ],
-        "quotes": [
-          "add search option for all products."
         ]
       },
       "acceptanceCriteria": [
-        "A search input is available from the shopping flow (e.g., on /shop and/or /products) and is clearly labeled in English (e.g., \"Search products\").",
-        "Submitting a search shows matching products using the backend global search API.",
-        "Search results handle loading, empty, and error states with user-facing text in English.",
-        "Users can add products from search results to the cart using the existing add-to-cart behavior."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Update the Products by Category page to include a dedicated Furniture menu/section that lists all available furniture options (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit) and lets users navigate directly to each furniture subcategory’s product listing.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add furniture menu in products by category and give all available options of furniture for example, sofa, center table, dining table, corner table, king size bed, queen size bed, bed side tables, dressing table, study table, sofa chairs, recliners, crockery unit etc"
-        ]
-      },
-      "acceptanceCriteria": [
-        "/products shows a Furniture section/menu with links/buttons for each listed furniture option.",
-        "Clicking a furniture option navigates to the corresponding category detail page and displays that option’s products.",
-        "The Furniture section does not break or hide existing non-furniture categories; they remain accessible from /products."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Wire frontend data hooks for global product search using React Query, keeping query keys stable and ensuring searches are cancellable/debounced to avoid excessive requests while typing.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add search option for all products."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new React Query hook exists for product search and calls the backend search method.",
-        "Typing into the search input does not trigger an unbounded number of requests (debounce or explicit submit).",
-        "Query keys include the search text so results cache correctly per query."
+        "Frontend has dedicated query hook(s) for fetching vendors and mutation hook(s) for requesting OTP, verifying OTP, and registering a vendor.",
+        "After successful vendor registration, vendor list queries are invalidated/refetched so the UI updates without a manual reload."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Only add a migration file (backend/migration.mo) if required by state/schema changes; follow the conditional migration policy.",
-    "Do not edit files under frontend immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui). Compose existing UI components instead."
+    "Backend must remain a single Motoko actor (all logic in backend/main.mo).",
+    "Do not edit files under frontend/src/components/ui or any other frontend immutable paths listed in SYSTEM_CONTEXT; compose existing UI components instead.",
+    "No third-party SMS/WhatsApp/email integrations may be used for OTP delivery; OTP must be handled within the app/canister constraints."
   ],
   "nonGoals": [
-    "Do not add third-party search services or external databases.",
-    "Do not implement third-party authentication providers; keep Internet Identity as-is.",
-    "Do not redesign unrelated pages (packages, designers, checkout) beyond what is needed to add search and the furniture menu."
+    "Implementing real SMS delivery for OTP codes.",
+    "Adding third-party authentication providers (only Internet Identity is supported).",
+    "Building a full vendor inventory/product management system beyond registration and listing (unless separately requested)."
   ],
   "imageRequirements": {
     "required": [],

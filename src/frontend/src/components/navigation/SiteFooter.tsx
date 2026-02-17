@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { SiInstagram, SiFacebook, SiX } from 'react-icons/si';
 import { getOrderedLocations } from '../../utils/locations';
 
@@ -48,42 +49,42 @@ export default function SiteFooter() {
 
           <div>
             <h3 className="mb-4 text-sm font-semibold">Services</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="/packages" className="transition-colors hover:text-foreground">
-                  Packages
-                </a>
+                <Link to="/packages" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Design Packages
+                </Link>
               </li>
               <li>
-                <a href="/designers" className="transition-colors hover:text-foreground">
+                <Link to="/designers" className="text-muted-foreground transition-colors hover:text-foreground">
                   Our Designers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/how-it-works" className="transition-colors hover:text-foreground">
-                  How It Works
-                </a>
+                <Link to="/visualizer" className="text-muted-foreground transition-colors hover:text-foreground">
+                  AI Room Visualizer
+                </Link>
+              </li>
+              <li>
+                <Link to="/vendors" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Vendors
+                </Link>
               </li>
             </ul>
           </div>
 
           <div>
             <h3 className="mb-4 text-sm font-semibold">Company</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="/faq" className="transition-colors hover:text-foreground">
+                <Link to="/how-it-works" className="text-muted-foreground transition-colors hover:text-foreground">
+                  How It Works
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-muted-foreground transition-colors hover:text-foreground">
                   FAQ
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-foreground">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-foreground">
-                  Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -100,7 +101,7 @@ export default function SiteFooter() {
 
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} SajavatHub. All rights reserved. Built with ❤️ using{' '}
+            © {currentYear} SajavatHub. All rights reserved. Built with love using{' '}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appIdentifier}`}
               target="_blank"

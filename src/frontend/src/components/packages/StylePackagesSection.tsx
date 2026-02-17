@@ -53,13 +53,6 @@ export default function StylePackagesSection() {
     setSelectedRoomPackageId(null);
   }, [selectedStyle, selectedRoomType]);
 
-  // Auto-select first package when packages load
-  useEffect(() => {
-    if (packages && packages.length > 0 && !selectedRoomPackageId) {
-      setSelectedRoomPackageId(packages[0].id);
-    }
-  }, [packages, selectedRoomPackageId]);
-
   const handleStyleChange = (value: string) => {
     const style = styleOptions.find((opt) => opt.label === value);
     if (style) {
@@ -78,7 +71,11 @@ export default function StylePackagesSection() {
     setSelectedRoomPackageId(pkg.id);
   };
 
-  const handleAddEntirePackageToCart = async () => {
+  const handleClearSelection = () => {
+    setSelectedRoomPackageId(null);
+  };
+
+  const handleAddEntirePackageToCart = async (packageQuantity: number) => {
     if (!products || products.length === 0) {
       toast.error('No products available in this package');
       return;
@@ -86,13 +83,17 @@ export default function StylePackagesSection() {
 
     setIsAddingToCart(true);
 
+    // Add each product with the specified quantity, clamped to its inventory
     const results = addItemBulk(
       products.map((product) => ({
-        productId: product.id,
-        name: product.name,
-        imageUrl: product.imageUrl,
-        priceINR: Number(product.priceINR),
-        availableInventory: Number(product.inventory),
+        item: {
+          productId: product.id,
+          name: product.name,
+          imageUrl: product.imageUrl,
+          priceINR: Number(product.priceINR),
+          availableInventory: Number(product.inventory),
+        },
+        quantity: Math.min(packageQuantity, Number(product.inventory)),
       }))
     );
 
@@ -220,8 +221,10 @@ export default function StylePackagesSection() {
                     getStyleLabel={getStyleLabel}
                     getRoomTypeLabel={getRoomTypeLabel}
                     onAddToCart={handleAddEntirePackageToCart}
+                    onBackToPackages={handleClearSelection}
                     isAddingToCart={isAddingToCart}
                     hasProducts={!!products && products.length > 0}
+                    products={products}
                   />
 
                   {productsLoading && <ProductsLoadingState />}

@@ -1,89 +1,55 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T12:52:11.257Z",
-  "summary": "Frontend adds a global product search panel on /shop with debounced querying and product cards, plus a new furniture subcategory route/page. Backend shows new Furniture-related types and introduces a migration module, but the diff summary does not provide explicit evidence of the required backend search API implementation or seeded furniture catalog/categories being returned by getProductCategories(). Several unrelated UI/auth/profile/footer changes were also introduced beyond the stated scope.",
+  "generatedAt": "2026-02-17T11:00:21.311Z",
+  "summary": "Frontend adds a new /vendors route with navigation links, a Vendors page that lists vendors, and a two-step vendor registration card that requests and verifies OTP before registering. Vendor-related React Query hooks are reported as added. Backend state migration introduces Vendor/OTP-related maps and types, but the diff summary does not provide enough evidence that backend vendor registration/OTP APIs (with required validations and expiry handling) are fully implemented in backend/main.mo.",
   "missing_requirements": [
     {
-      "id": "REQ-4",
-      "requirement": "Add a backend API to search across all products (global search), matching the query against at least product name and description, and return a list of matching Product items (case-insensitive; empty/whitespace query returns empty list).",
-      "reason": "The diff summary does not show any new public query method on the Motoko actor that performs product search, nor any evidence of case-insensitive matching or empty-query handling. Frontend calls a hook named useGlobalProductSearch, but the backend method it relies on is not evidenced in the shown backend changes.",
+      "id": "REQ-1",
+      "requirement": "Implement backend vendor registration with stored Vendor profile; GST mandatory; mobile must be OTP-verified before registration completion; persisted and retrievable.",
+      "reason": "The diff shows new Vendor-related types/state in backend/migration.mo, but the backend/main.mo diff is truncated and does not show vendor registration functions or the enforcement checks (GST non-empty, OTP verified) or retrieval API for persisted vendors.",
       "evidence": [
-        "backend/main.mo (truncated; shows type additions but no search method in provided excerpt)",
-        "frontend/src/components/products/GlobalProductSearchPanel.tsx (calls useGlobalProductSearch)",
-        "frontend/src/hooks/useQueries.ts (truncated; hook implementation not shown)"
+        "backend/main.mo (truncated; vendor APIs/validation not visible)",
+        "backend/migration.mo"
       ]
     },
     {
-      "id": "REQ-5",
-      "requirement": "Add a Furniture category structure to the backend product catalog with a Furniture parent category and subcategories (Sofa, Center Table, Dining Table, Corner Table, King Size Bed, Queen Size Bed, Bed Side Tables, Dressing Table, Study Table, Sofa Chairs, Recliners, Crockery Unit), each with stable category id, included in getProductCategories(), and at least one seeded Product each.",
-      "reason": "While new FurnitureSubCategory/FurnitureCategory types (and a migration file) are shown, the diff summary does not include evidence that getProductCategories() returns a Furniture parent category and each listed subcategory with stable IDs, nor that each furniture subcategory is seeded with at least one product.",
+      "id": "REQ-2",
+      "requirement": "Add backend OTP flow APIs to request and verify OTP with validation, expiration, latest-OTP-only verification, and tracked verification status.",
+      "reason": "While backend/migration.mo adds otp/verifiedOtp maps and an Otp type including expiryTime, the diff summary does not show the actual backend endpoints in backend/main.mo for requesting OTP, verifying OTP, enforcing expiry/latest OTP, or returning clear errors on incorrect/expired OTP.",
       "evidence": [
-        "backend/main.mo (truncated; shows new FurnitureSubCategory and FurnitureCategory types but not category seeding or getProductCategories() behavior)",
-        "backend/migration.mo (truncated; introduces furniture-related types but does not show seeding/output behavior)"
+        "backend/main.mo (truncated; OTP APIs/logic not visible)",
+        "backend/migration.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added protected-route authentication guard (RequireAuth) and applied it to checkout/dashboard routes.",
-      "reason": "BuildRequest did not ask to add or change route protection/auth gating; it explicitly stated to keep Internet Identity as-is and avoid unrelated redesigns.",
+      "description": "Changes to authentication guard and profile setup behavior (RequireAuth messaging, ProfileSetupDialog modal behavior, useCurrentUserProfile loading/flash prevention).",
+      "reason": "Not requested by the BuildRequest, which focuses on vendor registration/listing and OTP verification flows.",
       "evidence": [
-        "frontend/src/routes/RequireAuth.tsx",
-        "frontend/src/App.tsx (truncated; shows checkout/dashboard wrapped in RequireAuth)"
+        "frontend-file-summaries.txt (entries for frontend/src/routes/RequireAuth.tsx, frontend/src/components/auth/ProfileSetupDialog.tsx, frontend/src/hooks/useCurrentUserProfile.ts)"
       ]
     },
     {
-      "description": "Added a ProfileSetupDialog prompting new users to create a profile on first login.",
-      "reason": "Not requested; outside the search + furniture menu scope and potentially impacts user flows unrelated to products/search.",
+      "description": "Addition/changes to unrelated marketing and designer pages (HomePage, HowItWorksPage, PackagesPage, DesignersPage/DesignerDetailPage changes like SafeExternalImage).",
+      "reason": "Not requested by the BuildRequest; scope is Vendors UI and vendor registration + OTP.",
       "evidence": [
-        "frontend-file-summaries.txt (mentions frontend/src/components/auth/ProfileSetupDialog.tsx)",
-        "frontend/src/components/layout/SiteLayout.tsx (referenced in summaries as rendering the dialog)"
-      ]
-    },
-    {
-      "description": "Substantial copy/layout changes across marketing and other non-product pages (Home, How It Works, Packages, Designer detail, Dashboard, Project workspace) unrelated to adding search and the furniture menu.",
-      "reason": "Non-goals explicitly say not to redesign unrelated pages beyond what is needed to add search and the furniture menu; these changes appear unrelated to the requested features.",
-      "evidence": [
-        "frontend/src/pages/HomePage.tsx (modified)",
-        "frontend/src/pages/HowItWorksPage.tsx (modified)",
-        "frontend/src/pages/PackagesPage.tsx (modified)",
-        "frontend/src/pages/DesignerDetailPage.tsx (modified)",
-        "frontend/src/pages/dashboard/DashboardPage.tsx (modified)",
-        "frontend/src/pages/projects/ProjectWorkspacePage.tsx (modified)"
-      ]
-    },
-    {
-      "description": "Changed footer to include additional attribution/UTM tracking and location list behavior.",
-      "reason": "Not requested and unrelated to product search/furniture category navigation.",
-      "evidence": [
-        "frontend-file-summaries.txt (mentions frontend/src/components/navigation/SiteFooter.tsx changes)"
+        "frontend-file-summaries.txt (entries for frontend/src/pages/HomePage.tsx, HowItWorksPage.tsx, PackagesPage.tsx, DesignersPage.tsx, DesignerDetailPage.tsx)"
       ]
     }
   ],
-  "confidence": 0.55,
+  "confidence": 0.63,
   "changed_files": [
     "backend/main.mo",
     "backend/migration.mo",
     "frontend-file-summaries.txt",
     "frontend/src/App.tsx",
+    "frontend/src/components/navigation/SiteFooter.tsx",
     "frontend/src/components/navigation/SiteHeader.tsx",
-    "frontend/src/components/products/GlobalProductSearchPanel.tsx",
-    "frontend/src/components/products/ProductListingCard.tsx",
-    "frontend/src/hooks/useDebouncedValue.ts",
+    "frontend/src/components/vendors/VendorRegistrationCard.tsx",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/DesignerDetailPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/HowItWorksPage.tsx",
-    "frontend/src/pages/PackagesPage.tsx",
-    "frontend/src/pages/dashboard/DashboardPage.tsx",
-    "frontend/src/pages/onboarding/OnboardingQuizPage.tsx",
-    "frontend/src/pages/onboarding/ProjectBriefReviewPage.tsx",
-    "frontend/src/pages/products/FurnitureSubCategoryPage.tsx",
-    "frontend/src/pages/products/ProductCategoriesPage.tsx",
-    "frontend/src/pages/products/ProductCategoryDetailPage.tsx",
-    "frontend/src/pages/products/ShopLandingPage.tsx",
-    "frontend/src/pages/projects/ProjectWorkspacePage.tsx",
+    "frontend/src/pages/vendors/VendorsPage.tsx",
     "project_state.json"
   ]
 }
