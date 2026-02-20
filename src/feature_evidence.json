@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-existing-vendor-registration-flow-ui-backend-to-match-the-fields-steps-validations-and-success-error-states-defined-in-the-attached-vendor-registration-specification-document-including-any-additional-vendor-details-beyond-vendor-name-mobile-number-and-gst",
-      "featureTitle": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
+      "featureId": "feature-remove-the-tab-navigation-interface-from-the-designers-and-design-packages-dropdown-menu-in-the-site-header-replacing-it-with-a-simpler-dropdown-list-that-directly-links-to-the-designers-page-and-design-packages-page",
+      "featureTitle": "Remove the tab navigation interface from the Designers and Design Packages dropdown menu in the site header, replacing it with a simpler dropdown list that directly links to the Designers page and Design Packages page",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/vendors/VendorRegistrationCard.tsx",
-        "frontend/src/routes/RequireAuth.tsx"
+        "frontend/src/components/navigation/SiteHeader.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,27 +16,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-vendors-page-and-vendor-listing-ui-to-display-vendor-information-according-to-the-attached-document-fields-shown-formatting-and-any-status-labels-and-ensure-list-refreshes-appropriately-after-a-successful-registration",
-      "featureTitle": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
-      "files": [
-        "frontend/src/components/vendors/VendorListItem.tsx",
-        "frontend/src/pages/vendors/VendorsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
+        "REQ-6"
       ],
       "confidence": "high"
     }

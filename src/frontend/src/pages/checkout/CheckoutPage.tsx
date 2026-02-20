@@ -11,17 +11,18 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, CreditCard, Smartphone, Building2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, CreditCard, Smartphone, Building2, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { formatINR } from '../../utils/format';
 import SafeExternalImage from '../../components/products/SafeExternalImage';
 import { PaymentMethod } from '../../backend';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-  const { items, getSubtotal, clearCart } = useCartStore();
+  const { items, giftCard, getSubtotal, clearCart } = useCartStore();
   const placeOrderMutation = usePlaceOrder();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.upi);
@@ -83,31 +84,46 @@ export default function CheckoutPage() {
       errors.push('Phone number must be 10 digits');
     }
 
-    // Validate delivery address
-    if (!deliveryAddress.fullName.trim()) {
-      errors.push('Delivery full name is required');
+    // Only validate delivery address if there are product items (not just gift card)
+    if (items.length > 0) {
+      if (!deliveryAddress.fullName.trim()) {
+        errors.push('Delivery full name is required');
+      }
+      if (!deliveryAddress.addressLine1.trim()) {
+        errors.push('Delivery address is required');
+      }
+      if (!deliveryAddress.city.trim()) {
+        errors.push('City is required');
+      }
+      if (!deliveryAddress.state.trim()) {
+        errors.push('State is required');
+      }
+      if (!deliveryAddress.country.trim()) {
+        errors.push('Country is required');
+      }
+      if (!deliveryAddress.postalCode.trim()) {
+        errors.push('PIN code is required');
+      } else if (!/^\d{6}$/.test(deliveryAddress.postalCode.trim())) {
+        errors.push('PIN code must be 6 digits');
+      }
+      if (!deliveryAddress.phoneNumber.trim()) {
+        errors.push('Delivery phone number is required');
+      } else if (!/^\d{10}$/.test(deliveryAddress.phoneNumber.replace(/\s/g, ''))) {
+        errors.push('Delivery phone number must be 10 digits');
+      }
     }
-    if (!deliveryAddress.addressLine1.trim()) {
-      errors.push('Delivery address is required');
-    }
-    if (!deliveryAddress.city.trim()) {
-      errors.push('City is required');
-    }
-    if (!deliveryAddress.state.trim()) {
-      errors.push('State is required');
-    }
-    if (!deliveryAddress.country.trim()) {
-      errors.push('Country is required');
-    }
-    if (!deliveryAddress.postalCode.trim()) {
-      errors.push('PIN code is required');
-    } else if (!/^\d{6}$/.test(deliveryAddress.postalCode.trim())) {
-      errors.push('PIN code must be 6 digits');
-    }
-    if (!deliveryAddress.phoneNumber.trim()) {
-      errors.push('Delivery phone number is required');
-    } else if (!/^\d{10}$/.test(deliveryAddress.phoneNumber.replace(/\s/g, ''))) {
-      errors.push('Delivery phone number must be 10 digits');
+
+    // Validate gift card if present
+    if (giftCard) {
+      if (!giftCard.recipientEmail.trim()) {
+        errors.push('Gift card recipient email is required');
+      }
+      if (!giftCard.senderName.trim()) {
+        errors.push('Gift card sender name is required');
+      }
+      if (giftCard.amount < 1000) {
+        errors.push('Gift card amount must be at least ₹1,000');
+      }
     }
 
     setValidationErrors(errors);
@@ -141,7 +157,7 @@ export default function CheckoutPage() {
           paymentMethod,
           status: 'pending',
           createdAt: BigInt(Date.now() * 1000000),
-          deliveryAddress: {
+          deliveryAddress: items.length > 0 ? {
             fullName: deliveryAddress.fullName.trim(),
             addressLine1: deliveryAddress.addressLine1.trim(),
             addressLine2: deliveryAddress.addressLine2.trim() || undefined,
@@ -150,7 +166,22 @@ export default function CheckoutPage() {
             country: deliveryAddress.country.trim(),
             postalCode: deliveryAddress.postalCode.trim(),
             phoneNumber: deliveryAddress.phoneNumber.trim(),
+          } : {
+            fullName: buyerInfo.name.trim(),
+            addressLine1: 'Gift Card Purchase',
+            city: 'N/A',
+            state: 'N/A',
+            country: 'India',
+            postalCode: '000000',
+            phoneNumber: buyerInfo.phone.trim(),
           },
+          giftCardPurchase: giftCard ? {
+            amount: BigInt(giftCard.amount),
+            recipientEmail: giftCard.recipientEmail,
+            senderName: giftCard.senderName,
+            message: giftCard.message,
+            deliveryTime: giftCard.deliveryTime ? BigInt(giftCard.deliveryTime * 1000000) : undefined,
+          } : undefined,
         },
         buyerInfo: {
           name: buyerInfo.name.trim(),
@@ -171,7 +202,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0 && !orderPlaced) {
+  if (items.length === 0 && !giftCard && !orderPlaced) {
     navigate({ to: '/cart' });
     return null;
   }
@@ -187,6 +218,12 @@ export default function CheckoutPage() {
           <p className="mb-2 text-muted-foreground">
             Thank you for your order. Your order has been received and is being processed.
           </p>
+          {giftCard && (
+            <p className="mb-2 text-sm text-muted-foreground">
+              Your gift card will be sent to {giftCard.recipientEmail}
+              {giftCard.deliveryTime ? ` on ${format(new Date(giftCard.deliveryTime), 'MMM d, yyyy')}` : ' immediately'}.
+            </p>
+          )}
           <p className="mb-8 text-sm text-muted-foreground">Order ID: {orderId}</p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Button asChild size="lg">
@@ -269,124 +306,128 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              <Separator className="my-6" />
+              {items.length > 0 && (
+                <>
+                  <Separator className="my-6" />
 
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Delivery Address</h3>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Delivery Address</h3>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="deliveryFullName">
-                      Full Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="deliveryFullName"
-                      value={deliveryAddress.fullName}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, fullName: e.target.value }))
-                      }
-                      placeholder="Enter full name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="deliveryPhone">
-                      Phone Number <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="deliveryPhone"
-                      value={deliveryAddress.phoneNumber}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, phoneNumber: e.target.value }))
-                      }
-                      placeholder="10-digit mobile number"
-                    />
-                  </div>
-                </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="deliveryFullName">
+                          Full Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="deliveryFullName"
+                          value={deliveryAddress.fullName}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, fullName: e.target.value }))
+                          }
+                          placeholder="Enter full name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="deliveryPhone">
+                          Phone Number <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="deliveryPhone"
+                          value={deliveryAddress.phoneNumber}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, phoneNumber: e.target.value }))
+                          }
+                          placeholder="10-digit mobile number"
+                        />
+                      </div>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="addressLine1">
-                    Address Line 1 <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="addressLine1"
-                    value={deliveryAddress.addressLine1}
-                    onChange={(e) =>
-                      setDeliveryAddress((prev) => ({ ...prev, addressLine1: e.target.value }))
-                    }
-                    placeholder="House/Flat No., Building Name, Street"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="addressLine1">
+                        Address Line 1 <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="addressLine1"
+                        value={deliveryAddress.addressLine1}
+                        onChange={(e) =>
+                          setDeliveryAddress((prev) => ({ ...prev, addressLine1: e.target.value }))
+                        }
+                        placeholder="House/Flat No., Building Name, Street"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
-                  <Input
-                    id="addressLine2"
-                    value={deliveryAddress.addressLine2}
-                    onChange={(e) =>
-                      setDeliveryAddress((prev) => ({ ...prev, addressLine2: e.target.value }))
-                    }
-                    placeholder="Landmark, Area"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
+                      <Input
+                        id="addressLine2"
+                        value={deliveryAddress.addressLine2}
+                        onChange={(e) =>
+                          setDeliveryAddress((prev) => ({ ...prev, addressLine2: e.target.value }))
+                        }
+                        placeholder="Landmark, Area"
+                      />
+                    </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">
-                      City <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="city"
-                      value={deliveryAddress.city}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, city: e.target.value }))
-                      }
-                      placeholder="Enter city"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="state">
-                      State <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="state"
-                      value={deliveryAddress.state}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, state: e.target.value }))
-                      }
-                      placeholder="Enter state"
-                    />
-                  </div>
-                </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="city">
+                          City <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="city"
+                          value={deliveryAddress.city}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, city: e.target.value }))
+                          }
+                          placeholder="Enter city"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="state">
+                          State <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="state"
+                          value={deliveryAddress.state}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, state: e.target.value }))
+                          }
+                          placeholder="Enter state"
+                        />
+                      </div>
+                    </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="postalCode">
-                      PIN Code <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="postalCode"
-                      value={deliveryAddress.postalCode}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, postalCode: e.target.value }))
-                      }
-                      placeholder="6-digit PIN code"
-                    />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="postalCode">
+                          PIN Code <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="postalCode"
+                          value={deliveryAddress.postalCode}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, postalCode: e.target.value }))
+                          }
+                          placeholder="6-digit PIN code"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="country">
+                          Country <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="country"
+                          value={deliveryAddress.country}
+                          onChange={(e) =>
+                            setDeliveryAddress((prev) => ({ ...prev, country: e.target.value }))
+                          }
+                          placeholder="Enter country"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="country">
-                      Country <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="country"
-                      value={deliveryAddress.country}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({ ...prev, country: e.target.value }))
-                      }
-                      placeholder="Enter country"
-                    />
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -441,6 +482,30 @@ export default function CheckoutPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
+                {/* Gift Card Section */}
+                {giftCard && (
+                  <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-3">
+                    <div className="flex gap-3">
+                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-primary/20 to-accent/20">
+                        <Gift className="h-8 w-8 text-primary" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-semibold">Gift Card</p>
+                        <p className="text-xs text-muted-foreground">To: {giftCard.recipientEmail}</p>
+                        <p className="text-xs text-muted-foreground">From: {giftCard.senderName}</p>
+                        {giftCard.deliveryTime && (
+                          <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {format(new Date(giftCard.deliveryTime), 'MMM d, yyyy')}
+                          </p>
+                        )}
+                        <p className="text-sm font-bold">{formatINR(giftCard.amount)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Product Items */}
                 {items.map((item) => (
                   <div key={item.productId} className="flex gap-3">
                     <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
@@ -466,26 +531,19 @@ export default function CheckoutPage() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>{formatINR(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-green-600">FREE</span>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span className="text-primary">{formatINR(subtotal)}</span>
                 </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-                <span className="text-primary">{formatINR(subtotal)}</span>
               </div>
 
               <Button
                 onClick={handlePlaceOrder}
-                disabled={placeOrderMutation.isPending}
-                className="w-full"
                 size="lg"
+                className="w-full"
+                disabled={placeOrderMutation.isPending}
               >
-                {placeOrderMutation.isPending ? 'Placing Order...' : 'Place Order'}
+                {placeOrderMutation.isPending ? 'Processing...' : 'Place Order'}
               </Button>
             </CardContent>
           </Card>

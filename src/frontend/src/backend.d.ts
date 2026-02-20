@@ -7,8 +7,85 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export type Time = bigint;
+export interface Designer {
+    id: string;
+    bio: string;
+    portfolio: Array<PortfolioItem>;
+    styles: Array<StylePreference>;
+    name: string;
+}
+export interface OrderItem {
+    productId: string;
+    quantity: bigint;
+    price: bigint;
+}
+export interface ConsultationRequest {
+    id: string;
+    status: string;
+    userId: Principal;
+    projectId?: string;
+    notes: string;
+    submissionDate: Time;
+    requestedTime: Time;
+}
+export interface ProductBrand {
+    id: string;
+    name: string;
+    description: string;
+    logoUrl: string;
+}
+export interface ProjectNote {
+    id: string;
+    userId: Principal;
+    projectId: string;
+    message: string;
+    timestamp: Time;
+}
+export interface FurnitureCategory {
+    id: string;
+    subCategory: FurnitureSubCategory;
+    name: string;
+    description: string;
+    products: Array<Product>;
+}
+export interface BudgetRange {
+    max: bigint;
+    min: bigint;
+    currency: string;
+}
+export interface BuyerInfo {
+    name: string;
+    email: string;
+    address: string;
+    phone: string;
+}
+export interface DeliveryAddress {
+    country: string;
+    city: string;
+    postalCode: string;
+    fullName: string;
+    state: string;
+    addressLine1: string;
+    addressLine2?: string;
+    phoneNumber: string;
+}
 export interface OtpRequest {
     mobileNumber: string;
+}
+export interface Vendor {
+    id: string;
+    verified: boolean;
+    gstNumber: string;
+    name: string;
+    createdAt: Time;
+    mobileNumber: string;
+}
+export interface ProductCategory {
+    id: string;
+    name: string;
+    description: string;
+    products: Array<Product>;
 }
 export interface ProjectBrief {
     id: string;
@@ -21,23 +98,11 @@ export interface ProjectBrief {
     roomType: RoomType;
     timeline: string;
 }
-export type Time = bigint;
-export interface OrderItem {
-    productId: string;
-    quantity: bigint;
-    price: bigint;
-}
 export interface VendorInput {
     id: string;
     gstNumber: string;
     name: string;
     mobileNumber: string;
-}
-export interface ProductBrand {
-    id: string;
-    name: string;
-    description: string;
-    logoUrl: string;
 }
 export type RoomType = {
     __kind__: "bedroom";
@@ -58,13 +123,6 @@ export type RoomType = {
     __kind__: "diningRoom";
     diningRoom: null;
 };
-export interface ProjectNote {
-    id: string;
-    userId: Principal;
-    projectId: string;
-    message: string;
-    timestamp: Time;
-}
 export interface Package {
     id: string;
     features: Array<string>;
@@ -72,19 +130,20 @@ export interface Package {
     description: string;
     priceINR: bigint;
 }
-export interface OtpVerification {
-    otp: string;
-    mobileNumber: string;
-}
 export interface Order {
     id: string;
     status: string;
     deliveryAddress: DeliveryAddress;
     paymentMethod: PaymentMethod;
+    giftCardPurchase?: GiftCardPurchase;
     createdAt: Time;
     totalAmount: bigint;
     buyerId: Principal;
     items: Array<OrderItem>;
+}
+export interface OtpVerification {
+    otp: string;
+    mobileNumber: string;
 }
 export interface RoomPackage {
     id: string;
@@ -95,28 +154,12 @@ export interface RoomPackage {
     priceINR: bigint;
     roomType: RoomType;
 }
-export interface FurnitureCategory {
-    id: string;
-    subCategory: FurnitureSubCategory;
-    name: string;
-    description: string;
-    products: Array<Product>;
-}
-export interface Designer {
-    id: string;
-    bio: string;
-    portfolio: Array<PortfolioItem>;
-    styles: Array<StylePreference>;
-    name: string;
-}
-export interface ConsultationRequest {
-    id: string;
-    status: string;
-    userId: Principal;
-    projectId?: string;
-    notes: string;
-    submissionDate: Time;
-    requestedTime: Time;
+export interface GiftCardPurchase {
+    deliveryTime?: Time;
+    message: string;
+    senderName: string;
+    amount: bigint;
+    recipientEmail: string;
 }
 export type StylePreference = {
     __kind__: "other";
@@ -140,46 +183,11 @@ export type StylePreference = {
     __kind__: "contemporary";
     contemporary: null;
 };
-export interface BudgetRange {
-    max: bigint;
-    min: bigint;
-    currency: string;
-}
 export interface PortfolioItem {
     id: string;
     description: string;
     style: StylePreference;
     imageUrl: string;
-}
-export interface BuyerInfo {
-    name: string;
-    email: string;
-    address: string;
-    phone: string;
-}
-export interface DeliveryAddress {
-    country: string;
-    city: string;
-    postalCode: string;
-    fullName: string;
-    state: string;
-    addressLine1: string;
-    addressLine2?: string;
-    phoneNumber: string;
-}
-export interface Vendor {
-    id: string;
-    verified: boolean;
-    gstNumber: string;
-    name: string;
-    createdAt: Time;
-    mobileNumber: string;
-}
-export interface ProductCategory {
-    id: string;
-    name: string;
-    description: string;
-    products: Array<Product>;
 }
 export interface Product {
     id: string;

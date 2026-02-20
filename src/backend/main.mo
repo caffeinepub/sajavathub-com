@@ -1,21 +1,23 @@
-import Int "mo:core/Int";
-import Map "mo:core/Map";
-import Array "mo:core/Array";
 import List "mo:core/List";
+import Map "mo:core/Map";
 import Text "mo:core/Text";
-import Iter "mo:core/Iter";
-import Nat "mo:core/Nat";
-import Order "mo:core/Order";
 import Time "mo:core/Time";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
-import Option "mo:core/Option";
-
-import MixinAuthorization "authorization/MixinAuthorization";
+import Int "mo:core/Int";
+import Array "mo:core/Array";
 import AccessControl "authorization/access-control";
-
+import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
+  stable let designerSelections = Map.empty<Principal, DesignerSelection>();
+
+  type DesignerSelection = {
+    userId : Principal.Principal;
+    designerId : Text;
+    timestamp : Int;
+  };
+
   // ===== General Types =====
   public type RoomType = {
     #livingRoom;
@@ -176,6 +178,14 @@ actor {
     phoneNumber : Text;
   };
 
+  public type GiftCardPurchase = {
+    amount : Nat;
+    recipientEmail : Text;
+    senderName : Text;
+    message : Text;
+    deliveryTime : ?Time.Time;
+  };
+
   public type Order = {
     id : Text;
     buyerId : Principal;
@@ -185,6 +195,7 @@ actor {
     status : Text;
     createdAt : Time.Time;
     deliveryAddress : DeliveryAddress;
+    giftCardPurchase : ?GiftCardPurchase;
   };
 
   public type RoomPackage = {
@@ -282,10 +293,7 @@ actor {
     roomPackages.get(packageId);
   };
 
-  public query ({ caller }) func getPackagesByPriceRange(minPrice : Nat, maxPrice : Nat) : async [RoomPackage] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can use this function");
-    };
+  public query func getPackagesByPriceRange(minPrice : Nat, maxPrice : Nat) : async [RoomPackage] {
     roomPackages.values().toArray().filter(
       func(pkg) { pkg.priceINR >= minPrice and pkg.priceINR <= maxPrice }
     );
@@ -354,7 +362,43 @@ actor {
   };
 
   public query func getPackages() : async [Package] {
-    packages.values().toArray();
+    // Return static packages as default data
+    let defaultPackages : [Package] = [
+      {
+        id = "starter";
+        name = "Starter Makeover";
+        priceINR = 5000;
+        description = "A budget-friendly mini-makeover for a single room. Includes design consultation, layout suggestions, and décor recommendations.";
+        features = ["1 design consultation (virtual)", "Recommended shopping list", "Personalized style guide"];
+      },
+      {
+        id = "premium";
+        name = "Premium Package";
+        priceINR = 25000;
+        description = "A full-room transformation with custom designs, furniture layout, and styling. Includes 3D renders, shopping recommendations, and virtual support.";
+        features = [
+          "2 design consultations (virtual or in-person)",
+          "3D room renderings",
+          "Sourcing assistance for furniture and décor"
+        ];
+      },
+      {
+        id = "luxury";
+        name = "Luxury Package";
+        priceINR = 55000;
+        description = "The ultimate design experience for any room or home. Includes everything from the Premium package plus project management and vendor coordination.";
+        features = [
+          "Up to 3 rooms included",
+          "Custom sourced furniture",
+          "On-site project management (for major projects)",
+        ];
+      }
+    ];
+    defaultPackages;
+
+    // To enable persistence again, change the return value to the following
+    // and remove the return statement above this one.
+    // packages.values().toArray();
   };
 
   public shared ({ caller }) func addDesigner(designer : Designer) : async () {
@@ -546,7 +590,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func calculateOrderTotal(items : [OrderItem]) : async Nat {
+  public query func calculateOrderTotal(items : [OrderItem]) : async Nat {
     var total = 0;
     for (item in items.values()) {
       switch (getProductHelper(item.productId)) {
@@ -719,7 +763,7 @@ actor {
     matchingProducts;
   };
 
-  public query ({ caller }) func findProductHelper(productId : Text) : async ?Product {
+  public query func findProductHelper(productId : Text) : async ?Product {
     for (category in productCategories.values()) {
       let categoryProduct = category.products.find(func(p) { p.id == productId });
       switch (categoryProduct) {

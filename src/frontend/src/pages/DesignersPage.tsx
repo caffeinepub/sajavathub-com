@@ -56,21 +56,31 @@ export default function DesignersPage() {
 
   return (
     <div className="flex flex-col">
-      <section className="bg-gradient-to-b from-background to-muted/30 py-20">
-        <div className="container mx-auto px-4">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/30 py-20 md:py-28">
+        <div className="absolute inset-0 opacity-5">
+          <img
+            src="/assets/generated/havenly-india-banner-dining.dim_1800x600.png"
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div className="container relative mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-4xl font-bold md:text-5xl">Our Designers</h1>
-            <p className="text-lg text-muted-foreground md:text-xl">
-              Meet India's most talented interior designers. Each brings unique expertise and a
-              passion for creating beautiful spaces.
+            <h1 className="font-serif mb-6 text-4xl font-bold md:text-5xl lg:text-6xl">
+              Meet Our Designers
+            </h1>
+            <p className="text-xl text-muted-foreground md:text-2xl">
+              India's most talented interior designers, ready to bring your vision to life with expertise and creativity
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-12">
+      {/* Filters & Grid */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="search">Search Designers</Label>
               <Input
@@ -102,33 +112,35 @@ export default function DesignersPage() {
           </div>
 
           {filteredDesigners.length === 0 ? (
-            <div className="py-12 text-center">
-              <p className="text-muted-foreground">No designers found matching your criteria.</p>
+            <div className="py-16 text-center">
+              <p className="text-lg text-muted-foreground">No designers found matching your criteria.</p>
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {filteredDesigners.map((designer) => (
                 <Link key={designer.id} to="/designers/$designerId" params={{ designerId: designer.id }}>
-                  <Card className="group overflow-hidden transition-all hover:shadow-lg">
+                  <Card className="group overflow-hidden transition-all hover:shadow-xl border-2 h-full">
                     <div className="aspect-[4/3] overflow-hidden">
                       {designer.portfolio.length > 0 ? (
                         <SafeExternalImage
                           src={designer.portfolio[0].imageUrl}
                           alt={`${designer.name}'s portfolio`}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                           fallbackSrc="/assets/generated/portfolio-1.dim_1200x800.png"
                         />
                       ) : (
                         <img
                           src="/assets/generated/portfolio-1.dim_1200x800.png"
                           alt={`${designer.name}'s portfolio`}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       )}
                     </div>
                     <CardContent className="p-6">
-                      <h3 className="mb-2 text-xl font-semibold">{designer.name}</h3>
-                      <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{designer.bio}</p>
+                      <h3 className="mb-3 text-xl font-semibold">{designer.name}</h3>
+                      <p className="mb-4 line-clamp-3 text-sm text-muted-foreground leading-relaxed">
+                        {designer.bio}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {designer.styles.map((style, index) => (
                           <Badge key={index} variant="secondary">

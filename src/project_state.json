@@ -1,24 +1,16 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project to implement a vendor registration flow/UI per the attached specification document.",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-existing-vendor-registration-flow-ui-backend-to-match-the-fields-steps-validations-and-success-error-states-defined-in-the-attached-vendor-registration-specification-document-including-any-additional-vendor-details-beyond-vendor-name-mobile-number-and-gst",
-      "title": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
+      "id": "feature-remove-the-tab-navigation-interface-from-the-designers-and-design-packages-dropdown-menu-in-the-site-header-replacing-it-with-a-simpler-dropdown-list-that-directly-links-to-the-designers-page-and-design-packages-page",
+      "title": "Remove the tab navigation interface from the Designers and Design Packages dropdown menu in the site header, replacing it with a simpler dropdown list that directly links to the Designers page and Design Packages page",
       "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-vendors-page-and-vendor-listing-ui-to-display-vendor-information-according-to-the-attached-document-fields-shown-formatting-and-any-status-labels-and-ensure-list-refreshes-appropriately-after-a-successful-registration",
-      "title": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
-      "reqIds": [
-        "REQ-3"
+        "REQ-6"
       ],
       "version": 1
     }
@@ -26,29 +18,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement vendor registration flow/UI as specified in the attached document",
+      "summary": "Remove tab options from Designers and Design Packages menu",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Ensure the backend vendor data model and APIs support the attached document’s vendor registration requirements, including persisting all required vendor attributes and enforcing any constraints/uniqueness rules specified in the document.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "If the attached document requires changes to persisted vendor state (new fields or altered types), add a conditional Motoko state migration to preserve existing vendor/OTP data across upgrades.",
-      "reqIds": [
-        "REQ-4"
-      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "SajavatHub Vendors",
+  "projectName": "Remove tab options from Designers and Design Packages menu",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

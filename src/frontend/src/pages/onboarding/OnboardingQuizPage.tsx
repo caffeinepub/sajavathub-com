@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import type { RoomType, StylePreference } from '../../backend';
 
 export default function OnboardingQuizPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { designerId?: string };
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
@@ -24,7 +25,15 @@ export default function OnboardingQuizPage() {
     setBudget,
     timeline,
     setTimeline,
+    setPreselectedDesignerId,
   } = useOnboardingStore();
+
+  // Capture designer context from URL if present
+  useEffect(() => {
+    if (search.designerId) {
+      setPreselectedDesignerId(search.designerId);
+    }
+  }, [search.designerId, setPreselectedDesignerId]);
 
   const roomTypes: { value: RoomType; label: string }[] = [
     { value: { __kind__: 'livingRoom', livingRoom: null }, label: 'Living Room' },
@@ -88,7 +97,7 @@ export default function OnboardingQuizPage() {
   return (
     <div className="container mx-auto max-w-2xl px-4 py-12">
       <div className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="font-serif mb-4 text-3xl font-bold tracking-tight text-foreground">
           Design Style Quiz
         </h1>
         <Progress value={progress} className="h-2" />

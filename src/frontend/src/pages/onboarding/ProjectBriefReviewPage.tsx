@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, CheckCircle, Edit } from 'lucide-react';
@@ -16,10 +16,9 @@ export default function ProjectBriefReviewPage() {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { roomType, stylePreferences, budget, timeline, selectedPackage, reset } = useOnboardingStore();
+  const { roomType, stylePreferences, budget, timeline, selectedPackage, setLastSubmittedBriefId } = useOnboardingStore();
   const createBrief = useCreateProjectBrief();
 
   const isAuthenticated = !!identity;
@@ -65,8 +64,9 @@ export default function ProjectBriefReviewPage() {
     setSubmitError(null);
 
     try {
+      const briefId = `brief-${Date.now()}`;
       const brief: ProjectBrief = {
-        id: `brief-${Date.now()}`,
+        id: briefId,
         userId: identity.getPrincipal(),
         roomType,
         stylePreferences,
@@ -82,11 +82,10 @@ export default function ProjectBriefReviewPage() {
       };
 
       await createBrief.mutateAsync(brief);
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        reset();
-        navigate({ to: '/dashboard' });
-      }, 2000);
+      setLastSubmittedBriefId(briefId);
+      
+      // Navigate to designer matching page
+      navigate({ to: '/matching' });
     } catch (error: any) {
       console.error('Submit error:', error);
       setSubmitError(error.message || 'Failed to submit project brief');
@@ -111,22 +110,6 @@ export default function ProjectBriefReviewPage() {
     return String(style);
   };
 
-  if (submitSuccess) {
-    return (
-      <div className="container mx-auto max-w-2xl px-4 py-12">
-        <Card className="border-2 border-primary">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <CheckCircle className="mb-4 h-16 w-16 text-primary" />
-            <h2 className="mb-2 text-2xl font-semibold">Project Brief Submitted!</h2>
-            <p className="text-muted-foreground">
-              Redirecting you to your dashboard...
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto max-w-2xl px-4 py-12">
       <div className="mb-8">
@@ -134,7 +117,7 @@ export default function ProjectBriefReviewPage() {
           <Edit className="mr-2 h-4 w-4" />
           Edit Answers
         </Button>
-        <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="font-serif mb-2 text-3xl font-bold tracking-tight text-foreground">
           Review Your Project Brief
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -223,7 +206,7 @@ export default function ProjectBriefReviewPage() {
             disabled={isSubmitting}
             className="flex-1"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Project Brief'}
+            {isSubmitting ? 'Submitting...' : 'Submit & Find Designers'}
           </Button>
         </div>
       </div>

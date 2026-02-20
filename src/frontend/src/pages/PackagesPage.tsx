@@ -51,16 +51,33 @@ export default function PackagesPage() {
     );
   }
 
+  // Strict validation: ensure exactly 3 packages are available
+  const hasExactlyThreePackages = packages && packages.length === 3;
+
+  if (!hasExactlyThreePackages) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Packages Temporarily Unavailable</AlertTitle>
+          <AlertDescription>
+            Our design packages are currently being updated. Please check back shortly or contact us for assistance.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-background to-muted/30 py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
-            Design Packages for Every Need
+            Three Design Packages for Every Need
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground">
-            Choose the perfect package for your interior design project. All packages include
+            Choose from our three carefully crafted packages for your interior design project. All packages include
             personalized design services tailored to Indian homes.
           </p>
           <Button asChild size="lg">
@@ -78,7 +95,7 @@ export default function PackagesPage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mb-12 grid gap-8 md:grid-cols-3">
-            {packages?.map((pkg) => (
+            {packages.map((pkg) => (
               <Card
                 key={pkg.id}
                 className="flex flex-col transition-all hover:shadow-lg"

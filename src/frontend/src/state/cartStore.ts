@@ -10,12 +10,24 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface GiftCardPurchase {
+  amount: number;
+  recipientEmail: string;
+  recipientName: string;
+  senderName: string;
+  message: string;
+  deliveryTime: number | null;
+}
+
 interface CartStore {
   items: CartItem[];
+  giftCard: GiftCardPurchase | null;
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => { success: boolean; message: string };
   addItemBulk: (items: Array<{ item: Omit<CartItem, 'quantity'>; quantity?: number }>) => Array<{ success: boolean; message: string }>;
   removeItem: (productId: string) => void;
   setQuantity: (productId: string, quantity: number) => { success: boolean; message: string };
+  setGiftCard: (giftCard: GiftCardPurchase) => void;
+  removeGiftCard: () => void;
   clearCart: () => void;
   getSubtotal: () => number;
   getItemCount: () => number;
@@ -25,6 +37,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      giftCard: null,
 
       addItem: (item, quantity = 1) => {
         const state = get();
@@ -106,16 +119,30 @@ export const useCartStore = create<CartStore>()(
         return { success: true, message: 'Quantity updated' };
       },
 
+      setGiftCard: (giftCard) => {
+        set({ giftCard });
+      },
+
+      removeGiftCard: () => {
+        set({ giftCard: null });
+      },
+
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], giftCard: null });
       },
 
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.priceINR * item.quantity, 0);
+        const state = get();
+        const itemsTotal = state.items.reduce((sum, item) => sum + item.priceINR * item.quantity, 0);
+        const giftCardTotal = state.giftCard ? state.giftCard.amount : 0;
+        return itemsTotal + giftCardTotal;
       },
 
       getItemCount: () => {
-        return get().items.reduce((sum, item) => sum + item.quantity, 0);
+        const state = get();
+        const itemsCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+        const giftCardCount = state.giftCard ? 1 : 0;
+        return itemsCount + giftCardCount;
       },
     }),
     {

@@ -61,6 +61,11 @@ export default function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link to="/gift" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Gift Cards
+                </Link>
+              </li>
+              <li>
                 <Link to="/visualizer" className="text-muted-foreground transition-colors hover:text-foreground">
                   AI Room Visualizer
                 </Link>

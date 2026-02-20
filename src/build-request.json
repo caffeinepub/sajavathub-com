@@ -1,105 +1,43 @@
 {
   "kind": "build_request",
-  "title": "Align Vendor Registration With Attached Specification Document",
-  "projectName": "SajavatHub Vendors",
+  "title": "Remove tab options from Designers and Design Packages menu",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Update the existing vendor registration flow (UI + backend) to match the fields, steps, validations, and success/error states defined in the attached vendor registration specification document (including any additional vendor details beyond vendor name, mobile number, and GST).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "vendor registration to be done as per attached document"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All vendor registration form fields, labels, and required/optional rules match the attached document.",
-        "The registration flow steps (e.g., detail entry, verification, confirmation) match the attached document and are implemented end-to-end.",
-        "All user-facing text in the vendor registration flow is in English.",
-        "Validation messages clearly explain what is missing/invalid and prevent submission when requirements are not met."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Ensure the backend vendor data model and APIs support the attached document’s vendor registration requirements, including persisting all required vendor attributes and enforcing any constraints/uniqueness rules specified in the document.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "vendor registration to be done as per attached document"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend stores all vendor attributes required by the attached document.",
-        "Backend rejects registration attempts that do not meet the document’s required constraints with clear error messages.",
-        "Vendor listing API returns enough vendor fields for the Vendors page to render the document-required summary/details."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the Vendors page and vendor listing UI to display vendor information according to the attached document (fields shown, formatting, and any status/labels), and ensure list refreshes appropriately after a successful registration.",
+      "id": "REQ-6",
+      "text": "Remove the tab navigation interface from the Designers and Design Packages dropdown menu in the site header, replacing it with a simpler dropdown list that directly links to the Designers page and Design Packages page",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "vendor registration to be done as per attached document"
+          "remove tab options from Desingers and Design packages menu"
         ]
       },
       "acceptanceCriteria": [
-        "Vendor list cards/rows display the fields and statuses required by the attached document.",
-        "After successful vendor registration, the Vendors list updates to show the newly registered vendor without a manual refresh.",
-        "Loading, empty, and error states remain present and readable."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "If the attached document requires changes to persisted vendor state (new fields or altered types), add a conditional Motoko state migration to preserve existing vendor/OTP data across upgrades.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "vendor registration to be done as per attached document"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Upgrade does not wipe existing vendor records or OTP-related state.",
-        "Migration runs only when needed (conditional) and leaves state unchanged when no schema change is required."
+        "The dropdown menu in SiteHeader no longer displays tabs",
+        "Both 'Designers' and 'Design Packages' appear as simple list items in the dropdown",
+        "Clicking 'Designers' navigates directly to the designers directory page",
+        "Clicking 'Design Packages' navigates directly to the packages page",
+        "The dropdown maintains the same visual styling as other site navigation elements"
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo.",
-    "Create/update backend/migration.mo only if state schema changes require migration (conditional migration policy).",
-    "Do not edit files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT.",
-    "Do not add integrations that require external services for OTP delivery (no SMS/email provider integrations)."
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts",
+    "Do not modify frontend/src/hooks/useInternetIdentity.tsx",
+    "Do not modify frontend/src/hooks/useActor.ts",
+    "Do not modify frontend/src/main.tsx",
+    "Do not modify files in frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Adding third-party authentication providers (only Internet Identity is supported).",
-    "Adding real-time features (WebSockets/push notifications).",
-    "Using external databases or non-Motoko backend services."
+    "Changing the destinations of the menu links",
+    "Modifying the overall header layout or styling",
+    "Removing the dropdown menu entirely"
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

@@ -1,73 +1,23 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "SajavatHub Vendors — Vendor registration + vendor listing UI aligned to specification",
+  "title": "Remove tab options from Designers and Design Packages menu",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Align the vendor registration UI flow (steps, fields, validations, and success/error states) to the attached vendor registration specification; ensure the Vendors area is access-controlled and all text is in English.",
+      "id": "REQ-6",
+      "summary": "Replace tab navigation in Designers and Design Packages dropdown menu with simple list items that directly link to their respective pages",
       "acceptanceCriteria": [
-        "All vendor registration form fields, labels, and required/optional rules match the attached document.",
-        "The registration flow steps (e.g., detail entry, verification, confirmation) match the attached document and are implemented end-to-end.",
-        "All user-facing text in the vendor registration flow is in English.",
-        "Validation messages clearly explain what is missing/invalid and prevent submission when requirements are not met."
+        "The dropdown menu in SiteHeader no longer displays tabs",
+        "Both 'Designers' and 'Design Packages' appear as simple list items in the dropdown",
+        "Clicking 'Designers' navigates directly to the designers directory page",
+        "Clicking 'Design Packages' navigates directly to the packages page",
+        "The dropdown maintains the same visual styling as other site navigation elements"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/vendors/VendorRegistrationCard.tsx",
+          "path": "frontend/src/components/navigation/SiteHeader.tsx",
           "operation": "modify",
-          "description": "Update the multi-step vendor registration flow to match the attached specification (fields beyond vendor name/mobile/GST if required), including step sequencing, per-field validation, and explicit success/error UI states. Ensure validation blocks submission and messages are clear and English-only."
-        },
-        {
-          "path": "frontend/src/components/vendors/vendorRegistrationSchema.ts",
-          "operation": "create",
-          "description": "Create a dedicated vendor registration form schema/validator + helpers (e.g., required/optional rules, formatting rules, step-level validation) derived from the attached specification, to keep VendorRegistrationCard logic maintainable."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Update vendor-related React Query hooks to support the specification-aligned registration flow (e.g., any new request/verify/register payload shapes), and ensure vendor list queries are invalidated/refetched on successful registration."
-        },
-        {
-          "path": "frontend/src/backend.d.ts",
-          "operation": "modify",
-          "description": "Sync frontend backend type declarations used by the vendor registration flow (e.g., VendorInput/Vendor) with any specification-driven backend shape changes so the UI can submit and render all required attributes."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Protect the Vendors route behind authentication/authorization as required by the selected authorization component (Internet Identity + role-based access patterns). Use the existing RequireAuth wrapper so users must be logged in before accessing vendor data. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/routes/RequireAuth.tsx",
-          "operation": "modify",
-          "description": "Adjust the sign-in required messaging (English-only) to cover accessing vendor registration/vendor data as well, keeping the same authentication flow. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Update the Vendors page listing UI to display vendor information (fields, formatting, and statuses/labels) per the attached specification, and refresh the list after successful registration with solid loading/empty/error states.",
-      "acceptanceCriteria": [
-        "Vendor list cards/rows display the fields and statuses required by the attached document.",
-        "After successful vendor registration, the Vendors list updates to show the newly registered vendor without a manual refresh.",
-        "Loading, empty, and error states remain present and readable."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/vendors/VendorsPage.tsx",
-          "operation": "modify",
-          "description": "Revise the Vendors list UI to render the specification-required vendor summary/details (including any status/labels/formatting), keep loading/empty/error states readable, and ensure the list refreshes immediately after successful registration (e.g., by relying on query invalidation and/or an explicit refetch on success)."
-        },
-        {
-          "path": "frontend/src/components/vendors/VendorListItem.tsx",
-          "operation": "create",
-          "description": "Add a dedicated vendor list row/card component to encapsulate specification-driven field layout, status badges/labels, and formatting rules for display consistency across the Vendors page."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Ensure the vendors query key + invalidation strategy supports immediate post-registration refresh (and remains compatible with the specification-required vendor fields rendered by the Vendors page)."
+          "description": "Remove the tab navigation interface from the Designers and Design Packages dropdown menu. Replace the tab-based navigation with a simple dropdown list containing two direct link items: 'Designers' (linking to /designers) and 'Design Packages' (linking to /packages). Ensure the dropdown styling remains consistent with other navigation elements in the site header. Remove any state management or tab selection logic that is no longer needed after removing the tabs."
         }
       ]
     }

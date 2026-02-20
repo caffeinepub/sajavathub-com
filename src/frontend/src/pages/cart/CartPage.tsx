@@ -4,14 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Trash2, ShoppingBag, ArrowLeft, Minus, Plus } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowLeft, Minus, Plus, Gift, Calendar } from 'lucide-react';
 import { formatINR } from '../../utils/format';
 import SafeExternalImage from '../../components/products/SafeExternalImage';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const { items, removeItem, setQuantity, getSubtotal, clearCart } = useCartStore();
+  const { items, giftCard, removeItem, setQuantity, removeGiftCard, getSubtotal, clearCart } = useCartStore();
   const subtotal = getSubtotal();
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
@@ -25,7 +26,7 @@ export default function CartPage() {
     navigate({ to: '/checkout' });
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !giftCard) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-2xl text-center">
@@ -62,9 +63,57 @@ export default function CartPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Cart Items ({items.length})</CardTitle>
+              <CardTitle>Cart Items ({items.length + (giftCard ? 1 : 0)})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Gift Card Section */}
+              {giftCard && (
+                <>
+                  <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4">
+                    <div className="flex gap-4">
+                      <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
+                        <Gift className="h-12 w-12 text-primary" />
+                      </div>
+                      <div className="flex flex-1 flex-col justify-between">
+                        <div>
+                          <h3 className="font-semibold">Gift Card</h3>
+                          <p className="text-sm text-muted-foreground">
+                            To: {giftCard.recipientEmail}
+                          </p>
+                          {giftCard.recipientName && (
+                            <p className="text-sm text-muted-foreground">
+                              For: {giftCard.recipientName}
+                            </p>
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            From: {giftCard.senderName}
+                          </p>
+                          {giftCard.deliveryTime && (
+                            <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              Scheduled: {format(new Date(giftCard.deliveryTime), 'MMM d, yyyy')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end justify-between">
+                        <p className="font-bold">{formatINR(giftCard.amount)}</p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() => removeGiftCard()}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  {items.length > 0 && <Separator className="my-4" />}
+                </>
+              )}
+
+              {/* Product Items */}
               {items.map((item, index) => (
                 <div key={item.productId}>
                   {index > 0 && <Separator className="my-4" />}
@@ -157,18 +206,14 @@ export default function CartPage() {
                   <span className="text-primary">{formatINR(subtotal)}</span>
                 </div>
               </div>
-              <Button className="w-full" size="lg" onClick={handleCheckout}>
+              <Button onClick={handleCheckout} size="lg" className="w-full">
                 Proceed to Checkout
               </Button>
               <Button
+                onClick={() => clearCart()}
                 variant="outline"
+                size="sm"
                 className="w-full"
-                onClick={() => {
-                  if (confirm('Are you sure you want to clear your cart?')) {
-                    clearCart();
-                    toast.success('Cart cleared');
-                  }
-                }}
               >
                 Clear Cart
               </Button>

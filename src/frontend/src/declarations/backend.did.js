@@ -160,11 +160,19 @@ export const PaymentMethod = IDL.Variant({
   'wallet' : IDL.Null,
   'netBanking' : IDL.Null,
 });
+export const GiftCardPurchase = IDL.Record({
+  'deliveryTime' : IDL.Opt(Time),
+  'message' : IDL.Text,
+  'senderName' : IDL.Text,
+  'amount' : IDL.Nat,
+  'recipientEmail' : IDL.Text,
+});
 export const Order = IDL.Record({
   'id' : IDL.Text,
   'status' : IDL.Text,
   'deliveryAddress' : DeliveryAddress,
   'paymentMethod' : PaymentMethod,
+  'giftCardPurchase' : IDL.Opt(GiftCardPurchase),
   'createdAt' : Time,
   'totalAmount' : IDL.Nat,
   'buyerId' : IDL.Principal,
@@ -207,7 +215,7 @@ export const idlService = IDL.Service({
   'addPackage' : IDL.Func([Package], [], []),
   'addRoomPackage' : IDL.Func([RoomPackage], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'calculateOrderTotal' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
+  'calculateOrderTotal' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], ['query']),
   'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
   'deleteVendor' : IDL.Func([IDL.Text], [], []),
   'findProductHelper' : IDL.Func([IDL.Text], [IDL.Opt(Product)], ['query']),
@@ -467,11 +475,19 @@ export const idlFactory = ({ IDL }) => {
     'wallet' : IDL.Null,
     'netBanking' : IDL.Null,
   });
+  const GiftCardPurchase = IDL.Record({
+    'deliveryTime' : IDL.Opt(Time),
+    'message' : IDL.Text,
+    'senderName' : IDL.Text,
+    'amount' : IDL.Nat,
+    'recipientEmail' : IDL.Text,
+  });
   const Order = IDL.Record({
     'id' : IDL.Text,
     'status' : IDL.Text,
     'deliveryAddress' : DeliveryAddress,
     'paymentMethod' : PaymentMethod,
+    'giftCardPurchase' : IDL.Opt(GiftCardPurchase),
     'createdAt' : Time,
     'totalAmount' : IDL.Nat,
     'buyerId' : IDL.Principal,
@@ -514,7 +530,11 @@ export const idlFactory = ({ IDL }) => {
     'addPackage' : IDL.Func([Package], [], []),
     'addRoomPackage' : IDL.Func([RoomPackage], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'calculateOrderTotal' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
+    'calculateOrderTotal' : IDL.Func(
+        [IDL.Vec(OrderItem)],
+        [IDL.Nat],
+        ['query'],
+      ),
     'createProjectBrief' : IDL.Func([ProjectBrief], [], []),
     'deleteVendor' : IDL.Func([IDL.Text], [], []),
     'findProductHelper' : IDL.Func([IDL.Text], [IDL.Opt(Product)], ['query']),

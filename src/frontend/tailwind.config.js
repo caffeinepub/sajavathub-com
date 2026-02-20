@@ -9,7 +9,13 @@ export default {
     theme: {
         container: {
             center: true,
-            padding: '2rem',
+            padding: {
+                DEFAULT: '1rem',
+                sm: '2rem',
+                lg: '4rem',
+                xl: '5rem',
+                '2xl': '6rem',
+            },
             screens: {
                 '2xl': '1400px'
             }
@@ -25,7 +31,7 @@ export default {
                     'Roboto',
                     'sans-serif'
                 ],
-                serif: ['Lora', 'Georgia', 'serif']
+                serif: ['Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif']
             },
             colors: {
                 border: 'oklch(var(--border))',
@@ -76,7 +82,12 @@ export default {
             },
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                soft: '0 2px 8px -2px rgba(0,0,0,0.1)'
+                soft: '0 2px 8px -2px rgba(0,0,0,0.1)',
+                editorial: '0 4px 24px -4px rgba(0,0,0,0.12)'
+            },
+            spacing: {
+                '18': '4.5rem',
+                '22': '5.5rem',
             },
             keyframes: {
                 'accordion-down': {
@@ -96,4 +107,3 @@ export default {
     },
     plugins: [typography, containerQueries, animate]
 };
-

@@ -13,6 +13,7 @@ import DesignerDetailPage from './pages/DesignerDetailPage';
 import FaqPage from './pages/FaqPage';
 import OnboardingQuizPage from './pages/onboarding/OnboardingQuizPage';
 import ProjectBriefReviewPage from './pages/onboarding/ProjectBriefReviewPage';
+import DesignerMatchingPage from './pages/onboarding/DesignerMatchingPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProjectWorkspacePage from './pages/projects/ProjectWorkspacePage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -30,6 +31,8 @@ import RoomCategoryPage from './pages/products/RoomCategoryPage';
 import CartPage from './pages/cart/CartPage';
 import CheckoutPage from './pages/checkout/CheckoutPage';
 import VendorsPage from './pages/vendors/VendorsPage';
+import GiftCardPage from './pages/gift/GiftCardPage';
+import DesignersAndPackagesLandingPage from './pages/DesignersAndPackagesLandingPage';
 import RequireAuth from './routes/RequireAuth';
 
 const queryClient = new QueryClient({
@@ -82,6 +85,12 @@ const designersRoute = createRoute({
   component: DesignersPage,
 });
 
+const designersAndPackagesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/designers-and-packages',
+  component: DesignersAndPackagesLandingPage,
+});
+
 const designerDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/designers/$designerId',
@@ -106,6 +115,12 @@ const reviewRoute = createRoute({
   component: ProjectBriefReviewPage,
 });
 
+const matchingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/matching',
+  component: DesignerMatchingPage,
+});
+
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
@@ -116,7 +131,7 @@ const dashboardRoute = createRoute({
   ),
 });
 
-const projectRoute = createRoute({
+const projectWorkspaceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/projects/$projectId',
   component: ProjectWorkspacePage,
@@ -128,31 +143,31 @@ const shopRoute = createRoute({
   component: ShopLandingPage,
 });
 
-const categoriesRoute = createRoute({
+const productCategoriesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/categories',
   component: ProductCategoriesPage,
 });
 
-const categoryDetailRoute = createRoute({
+const productCategoryDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/categories/$categoryId',
   component: ProductCategoryDetailPage,
 });
 
-const brandsRoute = createRoute({
+const productBrandsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/brands',
   component: ProductBrandsPage,
 });
 
-const brandDetailRoute = createRoute({
+const productBrandDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/brands/$brandId',
   component: ProductBrandDetailPage,
 });
 
-const visualizerRoute = createRoute({
+const roomVisualizerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/visualizer',
   component: RoomVisualizerPage,
@@ -170,19 +185,19 @@ const furnitureSubCategoryRoute = createRoute({
   component: FurnitureSubCategoryPage,
 });
 
-const decorRoute = createRoute({
+const decorLandingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/decor',
   component: DecorLandingPage,
 });
 
-const furnishingRoute = createRoute({
+const furnishingLandingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/furnishing',
   component: FurnishingLandingPage,
 });
 
-const roomPackagesRoute = createRoute({
+const roomCategoryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shop/room-packages',
   component: RoomCategoryPage,
@@ -214,6 +229,12 @@ const vendorsRoute = createRoute({
   ),
 });
 
+const giftCardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/gift',
+  component: GiftCardPage,
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '*',
@@ -225,26 +246,29 @@ const routeTree = rootRoute.addChildren([
   howItWorksRoute,
   packagesRoute,
   designersRoute,
+  designersAndPackagesRoute,
   designerDetailRoute,
   faqRoute,
   quizRoute,
   reviewRoute,
+  matchingRoute,
   dashboardRoute,
-  projectRoute,
+  projectWorkspaceRoute,
   shopRoute,
-  categoriesRoute,
-  categoryDetailRoute,
-  brandsRoute,
-  brandDetailRoute,
-  visualizerRoute,
+  productCategoriesRoute,
+  productCategoryDetailRoute,
+  productBrandsRoute,
+  productBrandDetailRoute,
+  roomVisualizerRoute,
   furnitureMenuRoute,
   furnitureSubCategoryRoute,
-  decorRoute,
-  furnishingRoute,
-  roomPackagesRoute,
+  decorLandingRoute,
+  furnishingLandingRoute,
+  roomCategoryRoute,
   cartRoute,
   checkoutRoute,
   vendorsRoute,
+  giftCardRoute,
   notFoundRoute,
 ]);
 

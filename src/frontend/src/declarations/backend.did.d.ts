@@ -66,11 +66,19 @@ export type FurnitureSubCategory = { 'bedSideTables' : null } |
   { 'dressingTable' : null } |
   { 'centerTable' : null } |
   { 'diningTable' : null };
+export interface GiftCardPurchase {
+  'deliveryTime' : [] | [Time],
+  'message' : string,
+  'senderName' : string,
+  'amount' : bigint,
+  'recipientEmail' : string,
+}
 export interface Order {
   'id' : string,
   'status' : string,
   'deliveryAddress' : DeliveryAddress,
   'paymentMethod' : PaymentMethod,
+  'giftCardPurchase' : [] | [GiftCardPurchase],
   'createdAt' : Time,
   'totalAmount' : bigint,
   'buyerId' : Principal,
